@@ -9,7 +9,7 @@ public class GameServer extends ServerMethods {
             ServerMethods obj = new ServerMethods();
             ServerInterface stub = (ServerInterface)UnicastRemoteObject.exportObject(obj, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.bind("ServerInterface", stub);
+            registry.bind("Server.ServerInterface", stub);
             System.err.println("Server ready");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
