@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DistributedScrabbleGame.iml" filepath="$PROJECT_DIR$/DistributedScrabbleGame.iml" />
-      <module fileurl="file://$PROJECT_DIR$/GameClient/GameClient.iml" filepath="$PROJECT_DIR$/GameClient/GameClient.iml" />
-      <module fileurl="file://$PROJECT_DIR$/GameServer/GameServer.iml" filepath="$PROJECT_DIR$/GameServer/GameServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Client/GameClient.iml" filepath="$PROJECT_DIR$/Client/GameClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Server/GameServer.iml" filepath="$PROJECT_DIR$/Server/GameServer.iml" />
     </modules>
   </component>
 </project>
