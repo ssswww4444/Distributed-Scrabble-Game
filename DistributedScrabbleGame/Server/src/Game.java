@@ -12,6 +12,8 @@ public class Game {
     private static final int boardWidth = 20;
     private ArrayList<Player> players;
     private HashMap<Player, Integer> scores;
+    private int voteAgreeNum = 0;
+    private int voteTotalNum = 0;
 
     /**
      * Constructor
@@ -91,21 +93,70 @@ public class Game {
     }
 
     /**
-     *
-     * @param i
-     * @param j
-     * @param letter
-     * @return success or failed
+     * Insert letter to the board at (i,j)
+     * @return success or fail
      */
     public boolean insertLetter(int i, int j, Character letter) {
         Cell targetCell = board.get(i).get(j);
 
         if (targetCell.getLetter() != null) {  // non-empty cell
-            return false;  // failed
+            return false;  // fail
         }
 
         targetCell.setLetter(letter);
         return true;
+    }
+
+    /**
+     * Initialise a vote and notify all clients
+     */
+    public void startVote() {
+        // notify
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyStartVote();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Get voting response from a player, and notify all, if all voted, give result: success,fail
+     */
+    public void vote(String username, boolean agree) {
+        if (agree) {
+            voteAgreeNum++;
+        }
+        voteTotalNum++;
+        if (voteTotalNum == players.size()) {  // all voted
+            if (voteAgreeNum == voteTotalNum) {  // all agree
+                voteSuccess();
+            } else {
+                voteFail();
+            }
+        }
+        // notify
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyVote(username, agree);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private void voteSuccess() {
+        // notify
+
+    }
+
+    private void voteFail() {
+        // notify
+
     }
 
 

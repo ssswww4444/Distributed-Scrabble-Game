@@ -16,7 +16,7 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
      * Start voting
      */
     public void startVote() {
-
+        game.startVote();
     }
 
     /**
@@ -36,8 +36,8 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
     /**
      * Vote for the word highlighted
      */
-    public void vote(boolean agree) {
-
+    public void vote(String username, boolean agree) {
+        game.vote(username, agree);
     }
 
 
