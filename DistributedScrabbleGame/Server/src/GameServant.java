@@ -3,11 +3,13 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class GameServant extends UnicastRemoteObject implements GameInterface {
 
+    private Game game;
+
     /**
      * Constructor
      */
-    public GameServant() throws RemoteException {
-
+    public GameServant(Game game) throws RemoteException {
+        this.game = game;
     }
 
     /**
@@ -21,14 +23,14 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
      * Pass the turn
      */
     public void pass() {
-
+        game.nextTurn();
     }
 
     /**
-     * Insert a letter to the board
+     * Insert a letter to the board at coordinate (i,j): row i, col j
      */
-    public void insertLetter() {
-
+    public boolean insertLetter(int i, int j, char letter) {
+        return game.insertLetter(i, j, letter);
     }
 
     /**

@@ -1,6 +1,6 @@
 public class Cell {
 
-    private char letter;
+    private Character letter;
 
     /**
      * Constructor
@@ -13,7 +13,7 @@ public class Cell {
     /**
      * Mutator
      */
-    private void setLetter(char letter) {
+    public void setLetter(Character letter) {
         this.letter = letter;
     }
 
@@ -21,7 +21,7 @@ public class Cell {
      * Accessor
      * @return current letter in the cell
      */
-    private char getLetter() {
+    public Character getLetter() {
         return letter;
     }
 }

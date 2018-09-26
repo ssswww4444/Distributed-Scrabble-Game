@@ -20,6 +20,7 @@ public class Game {
         this.players = players;
         initGame();
         registerGame(roomID);   // create & bind game servant
+        notifyGameStart();
     }
 
     /**
@@ -28,7 +29,7 @@ public class Game {
     private void registerGame(int roomID) {
         try {
             Registry registry = LocateRegistry.getRegistry();  // get registry of the server
-            registry.rebind(Integer.toString(roomID), new GameServant());   // one servant for each game
+            registry.rebind(Integer.toString(roomID), new GameServant(this));   // one servant for each game
         } catch(RemoteException e) {
             e.printStackTrace();
         }
@@ -55,13 +56,57 @@ public class Game {
     }
 
     /**
-     * Switching turn
+     * Notify all players that game has started
      */
-    private void nextTurn() {
+    private void notifyGameStart() {
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyGameStart();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Switch turn and notify all players
+     */
+    public void nextTurn() {
+        // switch turn
         turn += 1;
         if (turn > players.size()) {
             turn = 1;
         }
+
+        // notify
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyTurn(turn);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
+
+    /**
+     *
+     * @param i
+     * @param j
+     * @param letter
+     * @return success or failed
+     */
+    public boolean insertLetter(int i, int j, Character letter) {
+        Cell targetCell = board.get(i).get(j);
+
+        if (targetCell.getLetter() != null) {  // non-empty cell
+            return false;  // failed
+        }
+
+        targetCell.setLetter(letter);
+        return true;
+    }
+
 
 }
