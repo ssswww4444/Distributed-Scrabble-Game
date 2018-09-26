@@ -1,6 +1,6 @@
 public class Player {
 
     String username;
-    // and RMI objects ....
+    // and remote object (servant) of the client ....
 
 }

@@ -1,3 +1,6 @@
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,9 +16,22 @@ public class Game {
     /**
      * Constructor
      */
-    public Game(ArrayList<Player> players) {
+    public Game(ArrayList<Player> players, int roomID) {
         this.players = players;
         initGame();
+        registerGame(roomID);   // create & bind game servant
+    }
+
+    /**
+     * Bind the game to registry for clients lookup
+     */
+    private void registerGame(int roomID) {
+        try {
+            Registry registry = LocateRegistry.getRegistry();  // get registry of the server
+            registry.rebind(Integer.toString(roomID), new GameServant());   // one servant for each game
+        } catch(RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
