@@ -2,8 +2,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-public class GameServer extends ServerMethods {
-    public GameServer(){}
+public class Server extends ServerMethods {
+    public Server(){}
     public static void main(String[] args){
         try {
             ServerMethods obj = new ServerMethods();
