@@ -1,4 +1,6 @@
-public class ClientServant implements ClientInterface {
+// Obsolete if using MQTT, delete this after realizing publisher-subscriber.
+
+/*public class GameClientServant implements ClientInterface {
     @Override
     public void notifyGameStart() {
 
@@ -48,4 +50,4 @@ public class ClientServant implements ClientInterface {
     public void notifyTurnPassed(String username) {
         System.out.println("turn passed message received. ");
     }
-}
+}*/

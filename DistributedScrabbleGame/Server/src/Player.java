@@ -1,21 +1,17 @@
 public class Player {
 
     private String username;
-    private ClientInterface clientServant;
+
 
     /**
      * Constructor
      */
-    public Player(String username, ClientInterface clientServant) {
+    public Player(String username) {
         this.username = username;
-        this.clientServant = clientServant;
     }
 
     /**
      * Accessors
      */
     public String getUsername() { return username; }
-    public ClientInterface getClientServant() {
-        return clientServant;
-    }
 }

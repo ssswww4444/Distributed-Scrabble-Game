@@ -4,18 +4,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 public class GameServer{
-    private ArrayList<ClientInterface> clientList;
-
     public static void main(String[] args){
-
-        //getClientRegistry();
-
         ArrayList<Player> players = mockPlayers();
         int roomId = 1;
         Game game = new Game(players, roomId);
         bindServerRegistry(game);
-
-
     }
 
 
@@ -36,25 +29,11 @@ public class GameServer{
     }
 
 
-    /**
-     * Get the remote client servant.
-     * */
-//    private static void getClientRegistry() {
-//        try {
-//            Registry registry = LocateRegistry.getRegistry("localhost");
-//            clientServantStub = (ClientInterface) registry.lookup("ClientInterface");
-//        } catch (Exception e) {
-//            System.err.println("Client exception: " + e.toString());
-//            e.printStackTrace();
-//        }
-//    }
-
-
     private static ArrayList<Player> mockPlayers(){
         ArrayList<Player> players = new ArrayList<>();
-        Player p1 = new Player("p1", new GameClientServant());
-        Player p2 = new Player("p2", new GameClientServant());
-        Player p3 = new Player("p3", new GameClientServant());
+        Player p1 = new Player("p1");
+        Player p2 = new Player("p2");
+        Player p3 = new Player("p3");
         players.add(p1);
         players.add(p2);
         players.add(p3);

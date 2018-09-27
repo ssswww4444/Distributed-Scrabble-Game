@@ -27,9 +27,9 @@ public class Game {
      */
     public Game(ArrayList<Player> players, int roomID) {
         this.players = players;
-        initGame();
-        registerGame(roomID);   // create & bind game servant
-        notifyGameStart();
+        //initGame();
+        //registerGame(roomID);   // create & bind game servant
+        //notifyGameStart();
     }
 
     /**
@@ -38,7 +38,7 @@ public class Game {
     private void registerGame(int roomID) {
         try {
             Registry registry = LocateRegistry.getRegistry();  // get registry of the server
-            GameServant gameServant = new GameServant(this);   // create servant instance
+            GameServerServant gameServant = new GameServerServant(this);   // create servant instance
             registry.rebind(Integer.toString(roomID), gameServant);   // bind to register
         } catch(RemoteException e) {
             e.printStackTrace();
@@ -78,14 +78,16 @@ public class Game {
      */
     private void notifyGameStart() {
         for (Player player: players) {
-            ClientInterface clientServant = player.getClientServant();
+            //ClientInterface clientServant = player.getClientServant();
             Player currPlayer = players.get(turn - 1);  // will be p1
-            try {
+
+            // Obsolete if using MQTT
+            /*try {
                 clientServant.notifyGameStart();
                 clientServant.notifyTurn(currPlayer.getUsername());  // starts with turn = 1 (p1)
             } catch (RemoteException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         currStatus = GameStatus.INSERTING; // p1 inserting letter
     }
@@ -95,7 +97,9 @@ public class Game {
      */
     public void passTurn() {
         // notify
-        for (Player player: players) {
+
+        //Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             Player currPlayer = players.get(turn - 1);
             try {
@@ -103,7 +107,7 @@ public class Game {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         // switch turn
         nextTurn();
@@ -133,8 +137,8 @@ public class Game {
         currStatus = GameStatus.INSERTING;
         hasInserted = false;  // reset boolean
 
-        // notify
-        for (Player player: players) {
+        // Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             Player currPlayer = players.get(turn - 1);
             try {
@@ -142,7 +146,7 @@ public class Game {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     /**
@@ -157,15 +161,15 @@ public class Game {
 
         targetCell.setLetter(letter);
 
-        // notify
-        for (Player player: players) {
+        // Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
                 clientServant.notifyInsertLetter(i, j, letter);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     /**
@@ -178,8 +182,8 @@ public class Game {
         voteAgreeNum = 0;
         voteTotalNum = 0;
 
-        // notify
-        for (Player player: players) {
+        // Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             currWordLength = length;
             try {
@@ -187,7 +191,7 @@ public class Game {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     /**
@@ -210,15 +214,15 @@ public class Game {
             }
         }
 
-        // notify
-        for (Player player: players) {
+        // Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
                 clientServant.notifyVote(username, agree);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
     }
 
@@ -226,14 +230,15 @@ public class Game {
      * Notify all clients the voting results
      */
     private void notifyVoteResult(boolean success) {
-        for (Player player: players) {
+        //Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
                 clientServant.notifyVoteResult(success);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     /**
@@ -248,15 +253,15 @@ public class Game {
         Integer newScore = scores.get(currPlayer) + currWordLength;
         scores.put(currPlayer, newScore);
 
-        // notify score change
-        for (Player player: players) {
+        // notify score change, Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
                 clientServant.notifyScoreChange(currPlayer.getUsername(), newScore);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         nextTurn();
 
@@ -276,15 +281,16 @@ public class Game {
      * Notify all clients who has left the game, and end game
      */
     public void leaveGame(String username) {
-        // notify who has left
-        for (Player player: players) {
+
+        // notify who has left, Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
                 clientServant.notifyLeaveGame(username);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
         // end game
         endGame();
@@ -294,15 +300,16 @@ public class Game {
      * End the game
      */
     private void endGame() {
-        // notify game has ended
-        for (Player player: players) {
+
+        // notify game has ended, Obsolete if using MQTT
+        /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
                 clientServant.notifyEndGame();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
 }
