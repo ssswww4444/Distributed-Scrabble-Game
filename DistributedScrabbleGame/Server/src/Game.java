@@ -14,6 +14,7 @@ public class Game {
     private HashMap<Player, Integer> scores;
     private int voteAgreeNum = 0;
     private int voteTotalNum = 0;
+    private int currWordLength;  // current voting word
     private enum GameStatus {
         INSERTING, VOTING
     }
@@ -134,10 +135,14 @@ public class Game {
      */
     public void startVote(int startI, int startJ, int length, boolean horizontal) {
         currStatus = GameStatus.VOTING;
+        voteAgreeNum = 0;
+        voteTotalNum = 0;
+
         // notify
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
+                currWordLength = length;
                 clientServant.notifyStartVote(startI, startJ, length, horizontal);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -146,20 +151,24 @@ public class Game {
     }
 
     /**
-     * Get voting response from a player, and notify all, if all voted, give result: success,fail
+     * Get voting response from a player, and notify all, if all voted, notify result: success,fail
      */
     public void vote(String username, boolean agree) {
+
         if (agree) {
             voteAgreeNum++;
         }
         voteTotalNum++;
-        if (voteTotalNum == players.size()) {  // all voted
+
+        // check if all voted
+        if (voteTotalNum == players.size()) {
             if (voteAgreeNum == voteTotalNum) {  // all agree
                 voteSuccess();
             } else {
                 voteFail();
             }
         }
+
         // notify
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
@@ -169,8 +178,13 @@ public class Game {
                 e.printStackTrace();
             }
         }
+
     }
 
+    /**
+     * Notify all clients the voting results
+     * @param success
+     */
     private void notifyVoteResult(boolean success) {
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
@@ -182,9 +196,27 @@ public class Game {
         }
     }
 
+    /**
+     * If success, gives score to current player
+     */
     private void voteSuccess() {
-        // notify
+        // notify voting result
         notifyVoteResult(true);
+
+        // increment score
+        Player currPlayer = players.get(turn - 1);
+        Integer newScore = scores.get(currPlayer) + currWordLength;
+        scores.put(currPlayer, newScore);
+
+        // notify score change
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyScoreChange(currPlayer, newScore);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
 
         nextTurn();
 
@@ -194,9 +226,14 @@ public class Game {
         // notify
         notifyVoteResult(false);
 
-        // check if game ends
+        // check if game ends *****
 
         nextTurn();
+    }
+
+    public void leaveRoom(String username) {
+        // end game ******
+
     }
 
 }

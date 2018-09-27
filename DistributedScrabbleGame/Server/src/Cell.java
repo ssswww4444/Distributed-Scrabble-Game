@@ -21,7 +21,5 @@ public class Cell {
      * Accessor
      * @return current letter in the cell
      */
-    public Character getLetter() {
-        return letter;
-    }
+    public Character getLetter() { return letter; }
 }

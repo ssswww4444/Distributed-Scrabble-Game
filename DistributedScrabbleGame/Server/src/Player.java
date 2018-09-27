@@ -17,10 +17,7 @@ public class Player {
     /**
      * Accessors
      */
-    public String getUsername() {
-        return username;
-    }
-
+    public String getUsername() { return username; }
     public ClientInterface getClientServant() {
         return clientServant;
     }

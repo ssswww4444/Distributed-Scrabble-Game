@@ -40,5 +40,12 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
         game.vote(username, agree);
     }
 
+    /**
+     * A player with this username has left the room
+     */
+    public void leaveRoom(String username) {
+        game.leaveRoom(username);
+    }
+
 
 }
