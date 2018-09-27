@@ -212,7 +212,7 @@ public class Game {
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
-                clientServant.notifyScoreChange(currPlayer, newScore);
+                clientServant.notifyScoreChange(currPlayer.getUsername(), newScore);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -222,18 +222,47 @@ public class Game {
 
     }
 
+    /**
+     * If failed, notify and switch turn
+     */
     private void voteFail() {
         // notify
         notifyVoteResult(false);
 
-        // check if game ends *****
+        // check if game end ******
 
         nextTurn();
     }
 
-    public void leaveRoom(String username) {
-        // end game ******
+    public void leaveGame(String username) {
+        // notify who left
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyLeaveGame(username);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
 
+        // end game
+        endGame();
+
+    }
+
+    /**
+     * End the game
+     */
+    private void endGame() {
+        // notify game has ended
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyEndGame();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

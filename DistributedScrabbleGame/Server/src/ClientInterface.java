@@ -10,5 +10,7 @@ public interface ClientInterface extends Remote {
     public void notifyVote(String username, boolean agree) throws RemoteException;  // some player has started vote
     public void notifyVoteResult(boolean success) throws RemoteException;  // notify if the voting is succeed
     public void notifyInsertLetter(int i, int j, Character letter) throws RemoteException;  // notify current user has inserted the letter
-    public void notifyScoreChange(Player currPlayer, Integer newScore) throws RemoteException; // notify score change of current player
+    public void notifyScoreChange(String currUsername, Integer newScore) throws RemoteException; // notify score change of current player
+    public void notifyLeaveGame(String username) throws RemoteException; // notify all clients who left the game
+    public void notifyEndGame() throws RemoteException;  // notify game has ended
 }
