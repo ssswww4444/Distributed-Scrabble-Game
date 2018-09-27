@@ -115,6 +115,17 @@ public class Game {
         }
 
         targetCell.setLetter(letter);
+
+        // notify
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyInsertLetter(i, j, letter);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
         return true;
     }
 
