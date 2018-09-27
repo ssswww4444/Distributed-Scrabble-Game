@@ -1,7 +1,6 @@
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
-public class GameServant extends UnicastRemoteObject implements GameInterface {
+public class GameServant implements GameInterface {
 
     private Game game;
 
@@ -38,6 +37,8 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
      */
     public void vote(String username, boolean agree) {
         game.vote(username, agree);
+
+        System.out.println(username + agree);
     }
 
     /**
