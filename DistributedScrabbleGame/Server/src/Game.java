@@ -78,9 +78,10 @@ public class Game {
     private void notifyGameStart() {
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
+            Player currPlayer = players.get(turn - 1);  // will be p1
             try {
                 clientServant.notifyGameStart();
-                clientServant.notifyTurn(turn);  // starts with turn = 1 (p1)
+                clientServant.notifyTurn(currPlayer.getUsername());  // starts with turn = 1 (p1)
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -95,8 +96,8 @@ public class Game {
         // notify
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
+            Player currPlayer = players.get(turn - 1);
             try {
-                Player currPlayer = players.get(turn - 1);
                 clientServant.notifyTurnPassed(currPlayer.getUsername());
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -134,8 +135,9 @@ public class Game {
         // notify
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
+            Player currPlayer = players.get(turn - 1);
             try {
-                clientServant.notifyTurn(turn);
+                clientServant.notifyTurn(currPlayer.getUsername());
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -185,8 +187,8 @@ public class Game {
         // notify
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
+            currWordLength = length;
             try {
-                currWordLength = length;
                 clientServant.notifyStartVote(startI, startJ, length, horizontal);
             } catch (RemoteException e) {
                 e.printStackTrace();
