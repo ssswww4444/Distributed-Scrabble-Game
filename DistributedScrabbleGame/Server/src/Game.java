@@ -123,14 +123,14 @@ public class Game {
             endGame();
         }
 
-        currStatus = GameStatus.INSERTING;
-        hasInserted = false;  // reset boolean
-
         // switch turn
         turn += 1;
         if (turn > players.size()) {
             turn = 1;
         }
+
+        currStatus = GameStatus.INSERTING;
+        hasInserted = false;  // reset boolean
 
         // notify
         for (Player player: players) {
@@ -148,16 +148,11 @@ public class Game {
      * Insert letter to the board at (i,j)
      * @return success or fail
      */
-    public boolean insertLetter(int i, int j, Character letter) {
-
+    public void insertLetter(int i, int j, Character letter) {
         hasInserted = true;
 
         // get cell
         Cell targetCell = board.get(i).get(j);
-
-        if (targetCell.getLetter() != null) {  // non-empty cell
-            return false;  // fail
-        }
 
         targetCell.setLetter(letter);
 
@@ -170,8 +165,6 @@ public class Game {
                 e.printStackTrace();
             }
         }
-
-        return true;
     }
 
     /**

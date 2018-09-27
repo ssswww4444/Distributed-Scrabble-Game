@@ -29,8 +29,8 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
     /**
      * Insert a letter to the board at coordinate (i,j): row i, col j
      */
-    public boolean insertLetter(int i, int j, char letter) {
-        return game.insertLetter(i, j, letter);
+    public void insertLetter(int i, int j, char letter) {
+        game.insertLetter(i, j, letter);
     }
 
     /**
