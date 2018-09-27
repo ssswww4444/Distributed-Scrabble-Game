@@ -14,6 +14,10 @@ public class Game {
     private HashMap<Player, Integer> scores;
     private int voteAgreeNum = 0;
     private int voteTotalNum = 0;
+    private enum GameStatus {
+        INSERTING, VOTING
+    }
+    private GameStatus currStatus;
 
     /**
      * Constructor
@@ -55,6 +59,9 @@ public class Game {
         for (Player player: players) {
             scores.put(player, 0);
         }
+
+        // init turn
+        turn = 1;
     }
 
     /**
@@ -65,16 +72,20 @@ public class Game {
             ClientInterface clientServant = player.getClientServant();
             try {
                 clientServant.notifyGameStart();
+                clientServant.notifyTurn(turn);  // starts with turn = 1 (p1)
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
         }
+        currStatus = GameStatus.INSERTING; // p1 inserting letter
     }
 
     /**
      * Switch turn and notify all players
      */
     public void nextTurn() {
+        currStatus = GameStatus.INSERTING;
+
         // switch turn
         turn += 1;
         if (turn > players.size()) {
@@ -110,12 +121,13 @@ public class Game {
     /**
      * Initialise a vote and notify all clients
      */
-    public void startVote() {
+    public void startVote(int startI, int startJ, int length, boolean horizontal) {
+        currStatus = GameStatus.VOTING;
         // notify
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
-                clientServant.notifyStartVote();
+                clientServant.notifyStartVote(startI, startJ, length, horizontal);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -146,18 +158,34 @@ public class Game {
                 e.printStackTrace();
             }
         }
+    }
 
+    private void notifyVoteResult(boolean success) {
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                clientServant.notifyVoteResult(success);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void voteSuccess() {
         // notify
+        notifyVoteResult(true);
+
+        nextTurn();
 
     }
 
     private void voteFail() {
         // notify
+        notifyVoteResult(false);
 
+        // check if game ends
+
+        nextTurn();
     }
-
 
 }

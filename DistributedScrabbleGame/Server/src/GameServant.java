@@ -15,12 +15,12 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
     /**
      * Start voting
      */
-    public void startVote() {
-        game.startVote();
+    public void startVote(int startI, int startJ, int length, boolean horizontal) {  // horizontal = false --> vertical
+        game.startVote(startI, startJ, length, horizontal);
     }
 
     /**
-     * Pass the turn
+     * Pass the turn either before inserting letter or before voting
      */
     public void pass() {
         game.nextTurn();
