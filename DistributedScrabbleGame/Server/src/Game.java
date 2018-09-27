@@ -224,7 +224,6 @@ public class Game {
 
     /**
      * Notify all clients the voting results
-     * @param success
      */
     private void notifyVoteResult(boolean success) {
         for (Player player: players) {
@@ -273,8 +272,11 @@ public class Game {
         nextTurn();
     }
 
+    /**
+     * Notify all clients who has left the game, and end game
+     */
     public void leaveGame(String username) {
-        // notify who left
+        // notify who has left
         for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
             try {
