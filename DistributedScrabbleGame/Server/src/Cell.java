@@ -3,14 +3,6 @@ public class Cell {
     private Character letter;
 
     /**
-     * Constructor
-     */
-    public Cell() {
-
-    }
-
-
-    /**
      * Mutator
      */
     public void setLetter(Character letter) {

@@ -3,8 +3,6 @@ public class Player {
     private String username;
     private ClientInterface clientServant;
 
-    // and remote object (servant) of the client ....
-
     /**
      * Constructor
      */
