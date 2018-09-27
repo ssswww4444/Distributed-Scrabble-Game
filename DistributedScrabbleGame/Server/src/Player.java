@@ -7,7 +7,6 @@ public class Player {
 
     /**
      * Constructor
-     * @param username
      */
     public Player(String username, ClientInterface clientServant) {
         this.username = username;

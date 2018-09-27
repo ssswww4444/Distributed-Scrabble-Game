@@ -41,10 +41,10 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
     }
 
     /**
-     * A player with this username has left the room
+     * A player with this username has left the game
      */
-    public void leaveRoom(String username) {
-        game.leaveRoom(username);
+    public void leaveGame(String username) {
+        game.leaveGame(username);
     }
 
 
