@@ -22,8 +22,8 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
     /**
      * Pass the turn either before inserting letter or before voting
      */
-    public void pass() {
-        game.nextTurn();
+    public void passTurn() {
+        game.passTurn();
     }
 
     /**

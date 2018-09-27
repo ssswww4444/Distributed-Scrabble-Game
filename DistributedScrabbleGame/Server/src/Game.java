@@ -12,13 +12,15 @@ public class Game {
     private static final int boardWidth = 20;
     private ArrayList<Player> players;
     private HashMap<Player, Integer> scores;
-    private int voteAgreeNum = 0;
-    private int voteTotalNum = 0;
+    private int voteAgreeNum;
+    private int voteTotalNum;
     private int currWordLength;  // current voting word
     private enum GameStatus {
         INSERTING, VOTING
     }
     private GameStatus currStatus;
+    private boolean hasInserted;  // insertion made in this turn
+    private int passCount;
 
     /**
      * Constructor
@@ -61,8 +63,13 @@ public class Game {
             scores.put(player, 0);
         }
 
-        // init turn
+        // init pass count
+        passCount = 0;
+
+        // init turn 1
         turn = 1;
+        hasInserted = false;
+
     }
 
     /**
@@ -82,10 +89,41 @@ public class Game {
     }
 
     /**
+     * Current player passed this turn
+     */
+    public void passTurn() {
+        // notify
+        for (Player player: players) {
+            ClientInterface clientServant = player.getClientServant();
+            try {
+                Player currPlayer = players.get(turn - 1);
+                clientServant.notifyTurnPassed(currPlayer.getUsername());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // switch turn
+        nextTurn();
+    }
+
+    /**
      * Switch turn and notify all players
      */
     public void nextTurn() {
+
+        if (!hasInserted) {   // currPlayer passed
+            passCount += 1;
+        } else {
+            passCount = 0;  // currPlayer not passed
+        }
+
+        if (passCount == players.size()) {  // all players passed
+            endGame();
+        }
+
         currStatus = GameStatus.INSERTING;
+        hasInserted = false;  // reset boolean
 
         // switch turn
         turn += 1;
@@ -109,6 +147,10 @@ public class Game {
      * @return success or fail
      */
     public boolean insertLetter(int i, int j, Character letter) {
+
+        hasInserted = true;
+
+        // get cell
         Cell targetCell = board.get(i).get(j);
 
         if (targetCell.getLetter() != null) {  // non-empty cell
@@ -134,6 +176,8 @@ public class Game {
      * Initialise a vote and notify all clients
      */
     public void startVote(int startI, int startJ, int length, boolean horizontal) {
+
+        // init vote
         currStatus = GameStatus.VOTING;
         voteAgreeNum = 0;
         voteTotalNum = 0;
@@ -155,6 +199,7 @@ public class Game {
      */
     public void vote(String username, boolean agree) {
 
+        // update vote response
         if (agree) {
             voteAgreeNum++;
         }
@@ -229,8 +274,6 @@ public class Game {
         // notify
         notifyVoteResult(false);
 
-        // check if game end ******
-
         nextTurn();
     }
 
@@ -247,7 +290,6 @@ public class Game {
 
         // end game
         endGame();
-
     }
 
     /**
