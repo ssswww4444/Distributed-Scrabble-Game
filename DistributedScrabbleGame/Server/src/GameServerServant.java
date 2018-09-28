@@ -1,4 +1,7 @@
-public class GameServerServant implements GameInterface {
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class GameServerServant extends UnicastRemoteObject implements GameInterface {
 
     private Game game;
 
@@ -6,7 +9,7 @@ public class GameServerServant implements GameInterface {
     /**
      * Constructor
      */
-    public GameServerServant(Game game) {
+    public GameServerServant(Game game) throws RemoteException {
         this.game = game;
     }
 
