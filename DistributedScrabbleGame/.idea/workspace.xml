@@ -2,29 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="139ba43e-147f-46f7-b864-8427b53bdb2d" name="Default Changelist" comment="client get server methods done">
-      <change afterPath="$PROJECT_DIR$/Client/src/SimpleMqttCallback.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/Client.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Client/Client.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/GameClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/GameClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DistributedScrabbleGame.iml" beforeDir="false" afterPath="$PROJECT_DIR$/DistributedScrabbleGame.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/Server.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Server/Server.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/GameServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/GameServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server/src/GameServerServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/GameServerServant.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/ChatClient3.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/ChatClient3IF.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/ChatClient3_Stub.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/ChatServerIF.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/ClientRMIGUI$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/ClientRMIGUI.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/GameClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/GameClient.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/ChatClient3IF.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/ChatServer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/ChatServerIF.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/ChatServer_Stub.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/Chatter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/GameServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Server/GameServer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/GameServerServant.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Server/GameServerServant.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Server/GameServerServant_Stub.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Server/GameServerServant_Stub.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -187,7 +165,7 @@
         <entry file="file://$PROJECT_DIR$/Server/src/GameServer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-109">
-              <caret line="78" column="9" lean-forward="true" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
+              <caret line="78" column="9" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -210,11 +188,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Client/src/GameClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="50" column="55" selection-start-line="50" selection-start-column="55" selection-end-line="50" selection-end-column="55" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state>
+              <caret column="37" selection-start-column="7" selection-end-column="37" />
             </state>
           </provider>
         </entry>
@@ -476,7 +451,7 @@
       <workItem from="1537957319904" duration="332000" />
       <workItem from="1537957947897" duration="2591000" />
       <workItem from="1538056064816" duration="18260000" />
-      <workItem from="1538129369866" duration="1266000" />
+      <workItem from="1538129369866" duration="1926000" />
     </task>
     <task id="LOCAL-00001" summary="client get server methods done">
       <created>1538048262271</created>
@@ -489,7 +464,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="22675000" />
+    <option name="totallyTimeSpent" value="23335000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -514,12 +489,12 @@
       <window_info anchor="bottom" id="Database Changes" order="0" show_stripe_button="false" />
       <window_info anchor="bottom" id="Message" order="1" />
       <window_info anchor="bottom" id="Find" order="2" weight="0.44" />
-      <window_info active="true" anchor="bottom" id="Run" order="3" visible="true" weight="0.25347593" />
+      <window_info anchor="bottom" id="Run" order="3" weight="0.25347593" />
       <window_info anchor="bottom" id="Debug" order="4" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="5" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="7" weight="0.32941177" />
-      <window_info anchor="bottom" id="Terminal" order="8" weight="0.27058825" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.27058825" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.32941177" />
       <window_info anchor="bottom" id="Messages" order="11" weight="0.32972974" />
@@ -692,7 +667,7 @@
     <entry file="file://$PROJECT_DIR$/Server/src/GameServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-109">
-          <caret line="78" column="9" lean-forward="true" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
+          <caret line="78" column="9" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -711,11 +686,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/GameClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="50" column="55" selection-start-line="50" selection-start-column="55" selection-end-line="50" selection-end-column="55" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state>
+          <caret column="37" selection-start-column="7" selection-end-column="37" />
         </state>
       </provider>
     </entry>
