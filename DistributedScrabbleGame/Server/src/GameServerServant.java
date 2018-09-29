@@ -1,16 +1,15 @@
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-
-public class GameServant extends UnicastRemoteObject implements GameInterface {
+public class GameServerServant implements GameInterface {
 
     private Game game;
+
 
     /**
      * Constructor
      */
-    public GameServant(Game game) throws RemoteException {
+    public GameServerServant(Game game) {
         this.game = game;
     }
+
 
     /**
      * Start voting
@@ -19,12 +18,14 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
         game.startVote(startI, startJ, length, horizontal);
     }
 
+
     /**
      * Pass the turn either before inserting letter or before voting
      */
     public void passTurn() {
         game.passTurn();
     }
+
 
     /**
      * Insert a letter to the board at coordinate (i,j): row i, col j
@@ -33,12 +34,16 @@ public class GameServant extends UnicastRemoteObject implements GameInterface {
         game.insertLetter(i, j, letter);
     }
 
+
     /**
      * Vote for the word highlighted
      */
     public void vote(String username, boolean agree) {
         game.vote(username, agree);
+
+        System.out.println(username + " " + agree);
     }
+
 
     /**
      * A player with this username has left the game
