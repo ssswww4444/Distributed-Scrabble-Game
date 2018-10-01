@@ -1,5 +1,6 @@
 import org.eclipse.paho.client.mqttv3.MqttClient;
 
+import java.lang.reflect.Array;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -10,11 +11,12 @@ public class GameClient {
 
     private String username;
     private int roomNumber;
+    private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
 
 
-    private static GameInterface gameServantStub;
+    public static GameInterface gameServantStub;
 
     public static final String serverTopic = "mqtt/server";
     public static final String testTopic = "mqtt/room1";
@@ -25,10 +27,27 @@ public class GameClient {
 
     public GameClient(String username) throws Exception{
 
+        getServerRegistry();
+
         if(username.equals("ERROR")){
             throw new Exception("Error");
         }else{
-            this.username = username;
+
+            clientID   = MqttClient.generateClientId().toString();
+            this.username = clientID;
+
+            MqttBroker mqttBroker = new MqttBroker(testTopic, clientID);
+
+            gameServantStub.addPlayer(clientID);
+
+            mqttBroker.notify(serverTopic, serverTopic + ";" + "Login" + ";" + clientID);
+
+
+
+
+
+//            mqttBroker.notify(testTopic, "Hello room mates, I am client: " + clientID);
+
         }
         /*try {
             Registry registry = LocateRegistry.getRegistry(null);
@@ -44,26 +63,26 @@ public class GameClient {
     /**
      * Constructor
      * */
-    public GameClient() {
-        clientID   = MqttClient.generateClientId().toString();;
-    }
+//    public GameClient() {
+//        clientID   = MqttClient.generateClientId().toString();;
+//    }
 
 
-    public static void main(String[] args) {
-        GameClient gameClient = new GameClient();
-
-        MqttBroker mqttBroker = new MqttBroker(testTopic, clientID);
-
-        mqttBroker.notify(serverTopic, serverTopic + ";" + "Login" + ";" + clientID);
-        mqttBroker.notify(testTopic, "Hello room mates, I am client: " + clientID);
-
+//    public static void main(String[] args) {
+//        GameClient gameClient = new GameClient();
+//
+//        MqttBroker mqttBroker = new MqttBroker(testTopic, clientID);
+//
+//        mqttBroker.notify(serverTopic, serverTopic + ";" + "Login" + ";" + clientID);
+//        mqttBroker.notify(testTopic, "Hello room mates, I am client: " + clientID);
+//
 //        getServerRegistry();
 //        try {
 //            gameServantStub.vote("p1", true);
 //        } catch (RemoteException e) {
 //            e.printStackTrace();
 //        }
-    }
+//    }
 
     /**
      * Get the game server remote servant.
@@ -85,18 +104,34 @@ public class GameClient {
     public ArrayList<PlayerModel> getPlayerList(){
         ArrayList<PlayerModel> players = new ArrayList<>();
 
-        Random r = new Random();
-        int n = r.nextInt(9);
-        if(n>=0);
-        if(n>=1) players.add(new PlayerModel("dumb_user1", "Room102"));
-        if(n>=2) players.add(new PlayerModel("dumb_user2", "Available"));
-        if(n>=3) players.add(new PlayerModel("Kuang Laoshi", "Available"));
-        if(n>=4) players.add(new PlayerModel("Man Laoshi", "Room102"));
-        if(n>=5) players.add(new PlayerModel("dumb_user3", "Room219"));
-        if(n>=6) players.add(new PlayerModel("dumb_user4", "Available"));
-        if(n>=7) players.add(new PlayerModel("Will Laoshi", "Room219"));
-        if(n>=8) players.add(new PlayerModel("dumb_user5", "Room102"));
+
+
+//        Random r = new Random();
+//        int n = r.nextInt(9);
+//        if(n>=0);
+//        if(n>=1) players.add(new PlayerModel("dumb_user1", "Room102"));
+//        if(n>=2) players.add(new PlayerModel("dumb_user2", "Available"));
+//        if(n>=3) players.add(new PlayerModel("Kuang Laoshi", "Available"));
+//        if(n>=4) players.add(new PlayerModel("Man Laoshi", "Room102"));
+//        if(n>=5) players.add(new PlayerModel("dumb_user3", "Room219"));
+//        if(n>=6) players.add(new PlayerModel("dumb_user4", "Available"));
+//        if(n>=7) players.add(new PlayerModel("Will Laoshi", "Room219"));
+//        if(n>=8) players.add(new PlayerModel("dumb_user5", "Room102"));
         return players;
+    }
+
+    public void changePlayerList(ArrayList<String> players){
+        if(this.menuController!=null){
+            ArrayList<PlayerModel> playerModels = new ArrayList<>();
+
+            for(String player : players){
+                if(!player.equals(this.username)){
+                    playerModels.add(new PlayerModel(player, "Available"));
+                }
+            }
+
+            menuController.updatePlayerList(playerModels);
+        }
     }
 
     public void createRoom(){
@@ -131,6 +166,10 @@ public class GameClient {
         }else{
             roomController.replyInvitation(username, true);
         }
+    }
+
+    public void setMenuController(MenuController controller){
+        this.menuController = controller;
     }
 
     public void setRoomController(RoomController controller){

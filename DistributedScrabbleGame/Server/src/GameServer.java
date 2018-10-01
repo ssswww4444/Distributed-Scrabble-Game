@@ -30,6 +30,7 @@ public class GameServer{
         int roomId = 1;
         Game game = new Game(playerPool, roomId);
 
+
         GameServer gameServer = new GameServer();
         MqttBroker mqttBroker = new MqttBroker(serverTopic, clientID, game);
 
@@ -38,7 +39,7 @@ public class GameServer{
 
         showPlayerPool();
 
-//        bindServerRegistry(game);
+        bindServerRegistry(game);
 
     }
 
@@ -51,16 +52,18 @@ public class GameServer{
      * */
     private static void bindServerRegistry(Game game) {
         try {
-            GameServerServant gs = new GameServerServant(game);
-            GameInterface stub = (GameInterface) UnicastRemoteObject.exportObject(gs, 0);
+            GameServant gs = new GameServant(game);
+//            GameInterface stub = (GameInterface) UnicastRemoteObject.exportObject(gs, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.bind("GameInterface", stub);
+            registry.rebind("GameInterface", gs);
             System.err.println("Game Server ready");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
             e.printStackTrace();
         }
     }
+
+
 
     /**
      * A player can login with its username

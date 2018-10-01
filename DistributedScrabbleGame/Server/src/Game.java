@@ -38,7 +38,7 @@ public class Game {
     private void registerGame(int roomID) {
         try {
             Registry registry = LocateRegistry.getRegistry();  // get registry of the server
-            GameServerServant gameServant = new GameServerServant(this);   // create servant instance
+            GameServant gameServant = new GameServant(this);   // create servant instance
             registry.rebind(Integer.toString(roomID), gameServant);   // bind to register
         } catch(RemoteException e) {
             e.printStackTrace();
@@ -310,6 +310,21 @@ public class Game {
                 e.printStackTrace();
             }
         }*/
+    }
+
+
+
+    public ArrayList<String> getPlayers() {
+        ArrayList<String> pList = new ArrayList<String>();
+        for(int i=0; i<players.size(); i++){
+             pList.add(players.get(i).getUsername());
+
+        }
+        return pList;
+    }
+
+    public void setPlayers(ArrayList<Player> players) {
+        this.players = players;
     }
 
 }

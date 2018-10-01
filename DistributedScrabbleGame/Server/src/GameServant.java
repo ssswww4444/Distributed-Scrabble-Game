@@ -1,7 +1,8 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 
-public class GameServerServant extends UnicastRemoteObject implements GameInterface {
+public class GameServant extends UnicastRemoteObject implements GameInterface {
 
     private Game game;
 
@@ -9,7 +10,7 @@ public class GameServerServant extends UnicastRemoteObject implements GameInterf
     /**
      * Constructor
      */
-    public GameServerServant(Game game) throws RemoteException {
+    public GameServant(Game game) throws RemoteException {
         this.game = game;
     }
 
@@ -56,4 +57,9 @@ public class GameServerServant extends UnicastRemoteObject implements GameInterf
     }
 
 
+    @Override
+    public ArrayList<String> addPlayer(String username) {
+        game.getPlayers().add(username);
+        return game.getPlayers();
+    }
 }
