@@ -1,7 +1,6 @@
 /*
-    COMP90015 Project 1 ServerApp.java
-    Student Name: Haowen Tang
-    Student Number: 706892
+    COMP90015 Project 2 ClientApp.java
+    Group Name: Distributed Otaku
     Tutor: Alisha Aneja
  */
 
@@ -14,7 +13,7 @@ import javafx.stage.Stage;
 
 
 /* An application class to initiate a JavaFX program for Server*/
-public class ServerApp extends Application{
+public class ClientApp extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception{
