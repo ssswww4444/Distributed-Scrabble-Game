@@ -1,15 +1,49 @@
+import org.eclipse.paho.client.mqttv3.MqttClient;
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 public class GameServer{
-    public static void main(String[] args){
-        ArrayList<Player> players = mockPlayers();
-        int roomId = 1;
-        Game game = new Game(players, roomId);
-        bindServerRegistry(game);
+    private static final String serverTopic = "mqtt/server";
+    private static final String testTopic = "mqtt/room1";
+    private static String clientID  = null;
+    public  static ArrayList<Player> playerPool;
+
+    private static MqttClient client;
+    private String message;
+
+
+    /**
+     * Constructor
+     * */
+    public GameServer() {
+        playerPool = mockPlayers();
+        clientID   = "gameServer";
     }
+
+
+
+    public static void main(String[] args){
+        GameServer server = new GameServer();
+        int roomId = 1;
+        Game game = new Game(playerPool, roomId);
+
+        GameServer gameServer = new GameServer();
+        MqttBroker mqttBroker = new MqttBroker(serverTopic, clientID, game);
+
+
+        mqttBroker.notify(serverTopic, "Server Ready");
+
+        showPlayerPool();
+
+//        bindServerRegistry(game);
+
+    }
+
+
+
 
 
     /**
@@ -28,6 +62,25 @@ public class GameServer{
         }
     }
 
+    /**
+     * A player can login with its username
+     */
+    public static Boolean login(String username) {
+        boolean result = true; // change later based on the allowance from GUI
+        if(result){
+            Player p = new Player(username);
+            playerPool.add(p);
+        }
+        return result;
+    }
+
+
+    public static void showPlayerPool(){
+        for(int i=0; i<playerPool.size(); i++){
+            System.out.println(playerPool.get(i).getUsername());
+        }
+
+    }
 
     private static ArrayList<Player> mockPlayers(){
         ArrayList<Player> players = new ArrayList<>();
@@ -39,4 +92,6 @@ public class GameServer{
         players.add(p3);
         return players;
     }
+
+
 }
