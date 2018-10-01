@@ -72,6 +72,10 @@ public class GameClient {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost");
             gameServantStub = (GameInterface) registry.lookup("GameInterface");
+        } catch (Exception e) {
+
+        }
+    }
 
 
     public String getUsername(){
