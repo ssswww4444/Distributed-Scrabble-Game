@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RoomController">
+   <children>
+      <ImageView fitHeight="25.0" fitWidth="26.0" layoutX="454.0" layoutY="373.0">
+         <image>
+            <Image url="@media/scrabble_letter.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="485.0" layoutY="370.0" prefHeight="31.0" prefWidth="219.0" text="DS Scrabble">
+         <font>
+            <Font name="System Bold" size="19.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnHost" disable="true" layoutX="57.0" layoutY="104.0" mnemonicParsing="false" prefHeight="80.0" prefWidth="186.0" text="Username">
+         <font>
+            <Font name="System Bold Italic" size="19.0" />
+         </font>
+      </Button>
+      <Label layoutX="20.0" layoutY="21.0" text="Room No.">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="roomNumber" layoutX="108.0" layoutY="21.0" prefHeight="27.0" prefWidth="44.0" text="110">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnPlayer4" layoutX="260.0" layoutY="200.0" mnemonicParsing="false" onAction="#inviteBtnClick" prefHeight="80.0" prefWidth="186.0" text="&lt;Click to invite&gt;">
+         <font>
+            <Font name="System Bold Italic" size="19.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnPlayer2" layoutX="260.0" layoutY="104.0" mnemonicParsing="false" onAction="#inviteBtnClick" prefHeight="80.0" prefWidth="186.0" text="&lt;Click to invite&gt;" wrapText="true">
+         <font>
+            <Font name="System Bold Italic" size="19.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnPlayer3" layoutX="57.0" layoutY="200.0" mnemonicParsing="false" onAction="#inviteBtnClick" prefHeight="80.0" prefWidth="186.0" text="&lt;Click to invite&gt;">
+         <font>
+            <Font name="System Bold Italic" size="19.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnStart" layoutX="492.0" layoutY="104.0" mnemonicParsing="false" onAction="#startBtnClick" prefHeight="177.0" prefWidth="86.0" text="START">
+         <font>
+            <Font name="System Bold" size="19.0" />
+         </font>
+      </Button>
+      <Label layoutX="20.0" layoutY="49.0" text="Host:">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <Label fx:id="hostUsername" layoutX="64.0" layoutY="48.0" prefHeight="27.0" prefWidth="204.0" text="Username">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnLeave" layoutX="492.0" layoutY="321.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="86.0" text="Leave">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <StackPane fx:id="dialogPane" layoutX="187.0" layoutY="25.0" prefHeight="350.0" prefWidth="227.0" visible="false" />
+   </children>
+</AnchorPane>
