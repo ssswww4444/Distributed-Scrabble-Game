@@ -28,13 +28,13 @@ public class GameServer{
     public static void main(String[] args){
         GameServer server = new GameServer();
         int roomId = 1;
-
-        GameServer gameServer = new GameServer();
-        MqttBroker mqttBroker = new MqttBroker(serverTopic, clientID);
-
         Game game = new Game(playerPool, roomId);
 
-        mqttBroker.notify(testTopic, "Hello client");
+        GameServer gameServer = new GameServer();
+        MqttBroker mqttBroker = new MqttBroker(serverTopic, clientID, game);
+
+
+        mqttBroker.notify(serverTopic, "Server Ready");
 
         showPlayerPool();
 
