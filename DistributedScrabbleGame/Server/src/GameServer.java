@@ -1,7 +1,4 @@
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -9,76 +6,44 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
 public class GameServer{
-    public static final String broker = "tcp://localhost:1883";
-    public static final String topic1 = "mqtt/test";
-    private static final String clientID = "game server";
+    private static final String serverTopic = "mqtt/server";
+    private static final String testTopic = "mqtt/room1";
+    private static final String clientID = "gameServer";
+    public  static ArrayList<Player> playerPool;
 
     private static MqttClient client;
     private String message;
+
+
     /**
      * Constructor
      * */
-    public GameServer() throws MqttException {
-
-        client = new MqttClient("tcp://localhost:1883", clientID);
+    public GameServer() {
+        playerPool = mockPlayers();
     }
 
 
 
     public static void main(String[] args){
-        ArrayList<Player> players = mockPlayers();
+        GameServer server = new GameServer();
         int roomId = 1;
 
-        GameServer server = null;
+        GameServer gameServer = new GameServer();
+        MqttBroker mqttBroker = new MqttBroker(serverTopic, clientID);
 
-        try {
-            server = new GameServer();
-            server.connect();
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+        Game game = new Game(playerPool, roomId);
 
-        server.message = "Hello Client";
-        server.sendMessage(topic1, server.message);
+        mqttBroker.sendMessage(testTopic, "Hello client");
 
+        gameServer.showPlayerPool();
 
-        Game game = new Game(players, roomId);
 //        bindServerRegistry(game);
-    }
-
-
-
-
-    /**
-     * Connect server to the Mqtt broker
-     * */
-    private void connect() {
-        try {
-            client.setCallback( new SimpleMqttCallback() );
-            client.connect();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
     }
 
 
-    /**
-     *  Send message to subscriber based on topic
-     * */
-    private void sendMessage(String topic, String s) {
 
-        MqttMessage message = new MqttMessage();
-        message.setPayload(s.getBytes());
-        try {
-            client.publish(topic, message);
-        } catch (MqttPersistenceException e) {
-            e.printStackTrace();
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
 
-    }
 
     /**
      * Initiate a game servant and bind the GameInterface to registry.
@@ -96,6 +61,27 @@ public class GameServer{
         }
     }
 
+    /**
+     * A player can login with its username
+     */
+    public static void login(String username) {
+        boolean result = true; // change later based on the allowance from GUI
+        if(result){
+            System.out.println(11111);
+            Player p = new Player(username);
+            System.out.println(22222);
+            playerPool.add(p);
+            System.out.println(33333);
+        }
+    }
+
+
+    private void showPlayerPool(){
+        for(int i=0; i<playerPool.size(); i++){
+            System.out.println(playerPool.get(i).getUsername());
+        }
+
+    }
 
     private static ArrayList<Player> mockPlayers(){
         ArrayList<Player> players = new ArrayList<>();
@@ -107,4 +93,6 @@ public class GameServer{
         players.add(p3);
         return players;
     }
+
+
 }

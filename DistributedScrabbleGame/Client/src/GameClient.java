@@ -1,7 +1,4 @@
 import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -9,17 +6,23 @@ import java.rmi.registry.Registry;
 public class GameClient {
     private static GameInterface gameServantStub;
 
-    public static final String broker = "tcp://localhost:1883";
-    public static final String topic1 = "mqtt/test";
-    private String content = "Let's vote!";
+    public static final String serverTopic = "mqtt/server";
+    public static final String testTopic = "mqtt/room1";
+
+    private String content = "First test content!";
 
 
-    private static MqttClient client;
 
+    /**
+     * Constructor
+     * */
     public static void main(String[] args) {
-        GameClient gc = new GameClient();
-        gc.start();
+        GameClient gameClient = new GameClient();
 
+        MqttBroker mqttBroker = new MqttBroker(testTopic, MqttClient.generateClientId().toString());
+
+        mqttBroker.sendMessage(serverTopic, "Hello server, I am client: " + MqttClient.generateClientId().toString());
+        mqttBroker.sendMessage(testTopic, "Hello room mates, I am client: " + MqttClient.generateClientId().toString());
 
 //        getServerRegistry();
 //        try {
@@ -32,51 +35,6 @@ public class GameClient {
 
 
 
-    private void start() {
-        try{
-
-            // create Mqtt client
-            client = new MqttClient("tcp://localhost:1883", MqttClient.generateClientId());
-
-
-            // set up callback
-            client.setCallback( new SimpleMqttCallback() );
-
-            // connect to Mqtt broker
-            client.connect();
-
-            // subscribe from a topic
-            client.subscribe(topic1);
-
-            System.out.println("Client connected?: " + client.isConnected());
-
-
-            // publish to a topic
-            sendMessage(topic1, content);
-
-
-        }catch (Exception e){
-            System.err.println("Mqtt Client exception: " + e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     *  Send message to subscriber based on topic
-     * */
-    private static void sendMessage(String topic, String s) {
-
-        MqttMessage message = new MqttMessage();
-        message.setPayload(s.getBytes());
-        try {
-            client.publish(topic, message);
-        } catch (MqttPersistenceException e) {
-            e.printStackTrace();
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
-
-    }
 
     /**
      * Get the game server remote servant.
