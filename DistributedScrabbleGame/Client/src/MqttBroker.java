@@ -31,9 +31,9 @@ public class MqttBroker implements MqttCallback {
     }
 
     /**
-     *  Send message to subscriber based on topic
+     *  Send message to sunotifybscriber based on topic
      * */
-    public void sendMessage(String topic, String s) {
+    public void notify(String topic, String s) {
         MqttMessage message = new MqttMessage();
         message.setPayload(s.getBytes());
         try {
@@ -54,10 +54,12 @@ public class MqttBroker implements MqttCallback {
         System.out.println("The content is : " + new String(message.getPayload()) + "\n");
 
         if(topic.equals("mqtt/server")){
-            String[] cmd= message.toString().split(" ");
-            if(cmd[0].equals("Login")){
-                System.out.println("Yeyeye: " + cmd[1]);
-//                GameServer.login("yep");
+            String[] cmd= message.toString().split(";");
+//            System.out.println(cmd[0]);
+            if(cmd[1].equals("Login")){
+                System.out.println("Yeyeye: " + cmd[2]);
+                GameServer.login(cmd[2]);
+                GameServer.showPlayerPool();
 
             }
         }
@@ -66,8 +68,10 @@ public class MqttBroker implements MqttCallback {
 
 
     @Override
-    public void connectionLost(Throwable cause) {
+    public void connectionLost(Throwable e) {
         System.err.println("MQTT connection broken");
+        e.getCause();
+        e.printStackTrace();
     }
 
 

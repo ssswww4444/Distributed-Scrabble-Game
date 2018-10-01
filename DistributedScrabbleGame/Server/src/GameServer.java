@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class GameServer{
     private static final String serverTopic = "mqtt/server";
     private static final String testTopic = "mqtt/room1";
-    private static final String clientID = "gameServer";
+    private static String clientID  = null;
     public  static ArrayList<Player> playerPool;
 
     private static MqttClient client;
@@ -20,6 +20,7 @@ public class GameServer{
      * */
     public GameServer() {
         playerPool = mockPlayers();
+        clientID   = "gameServer";
     }
 
 
@@ -33,9 +34,9 @@ public class GameServer{
 
         Game game = new Game(playerPool, roomId);
 
-        mqttBroker.sendMessage(testTopic, "Hello client");
+        mqttBroker.notify(testTopic, "Hello client");
 
-        gameServer.showPlayerPool();
+        showPlayerPool();
 
 //        bindServerRegistry(game);
 
@@ -64,19 +65,17 @@ public class GameServer{
     /**
      * A player can login with its username
      */
-    public static void login(String username) {
+    public static Boolean login(String username) {
         boolean result = true; // change later based on the allowance from GUI
         if(result){
-            System.out.println(11111);
             Player p = new Player(username);
-            System.out.println(22222);
             playerPool.add(p);
-            System.out.println(33333);
         }
+        return result;
     }
 
 
-    private void showPlayerPool(){
+    public static void showPlayerPool(){
         for(int i=0; i<playerPool.size(); i++){
             System.out.println(playerPool.get(i).getUsername());
         }

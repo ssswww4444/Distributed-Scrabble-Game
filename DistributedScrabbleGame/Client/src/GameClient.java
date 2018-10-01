@@ -9,20 +9,26 @@ public class GameClient {
     public static final String serverTopic = "mqtt/server";
     public static final String testTopic = "mqtt/room1";
 
-    private String content = "First test content!";
-
+    private static String content = "First test content!";
+    private static String clientID;
 
 
     /**
      * Constructor
      * */
+    public GameClient() {
+        clientID   = MqttClient.generateClientId().toString();;
+    }
+
+
+
     public static void main(String[] args) {
         GameClient gameClient = new GameClient();
 
-        MqttBroker mqttBroker = new MqttBroker(testTopic, MqttClient.generateClientId().toString());
+        MqttBroker mqttBroker = new MqttBroker(testTopic, clientID);
 
-        mqttBroker.sendMessage(serverTopic, "Hello server, I am client: " + MqttClient.generateClientId().toString());
-        mqttBroker.sendMessage(testTopic, "Hello room mates, I am client: " + MqttClient.generateClientId().toString());
+        mqttBroker.notify(serverTopic, serverTopic + ";" + "Login" + ";" + clientID);
+        mqttBroker.notify(testTopic, "Hello room mates, I am client: " + clientID);
 
 //        getServerRegistry();
 //        try {
