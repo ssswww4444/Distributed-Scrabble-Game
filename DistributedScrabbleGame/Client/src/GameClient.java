@@ -1,3 +1,5 @@
+import org.eclipse.paho.client.mqttv3.MqttClient;
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
@@ -5,10 +7,21 @@ import java.util.Random;
 
 public class GameClient {
 
+
     private String username;
     private int roomNumber;
     private RoomController roomController;
     private GameController gameController;
+
+
+    private static GameInterface gameServantStub;
+
+    public static final String serverTopic = "mqtt/server";
+    public static final String testTopic = "mqtt/room1";
+
+    private static String content = "First test content!";
+    private static String clientID;
+
 
     public GameClient(String username) throws Exception{
 
@@ -21,11 +34,45 @@ public class GameClient {
             Registry registry = LocateRegistry.getRegistry(null);
             ServerInterface stub = (ServerInterface) registry.lookup("ServerInterface");
             stub.printMsg();
-        } catch (Exception e) {
+            } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
             e.printStackTrace();
         }*/
     }
+
+
+    /**
+     * Constructor
+     * */
+    public GameClient() {
+        clientID   = MqttClient.generateClientId().toString();;
+    }
+
+
+    public static void main(String[] args) {
+        GameClient gameClient = new GameClient();
+
+        MqttBroker mqttBroker = new MqttBroker(testTopic, clientID);
+
+        mqttBroker.notify(serverTopic, serverTopic + ";" + "Login" + ";" + clientID);
+        mqttBroker.notify(testTopic, "Hello room mates, I am client: " + clientID);
+
+//        getServerRegistry();
+//        try {
+//            gameServantStub.vote("p1", true);
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    /**
+     * Get the game server remote servant.
+     * */
+    private static void getServerRegistry() {
+        try {
+            Registry registry = LocateRegistry.getRegistry("localhost");
+            gameServantStub = (GameInterface) registry.lookup("GameInterface");
+
 
     public String getUsername(){
         return this.username;
