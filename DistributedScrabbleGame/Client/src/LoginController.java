@@ -101,6 +101,7 @@ public class LoginController implements Initializable {
             Scene menuScene = new Scene(menuView);
             MenuController controller = loader.getController();
             controller.setClientObj(this.clientObj);
+            this.clientObj.setMenuController(controller);
             controller.refresh();
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
             currentStage.setScene(menuScene);

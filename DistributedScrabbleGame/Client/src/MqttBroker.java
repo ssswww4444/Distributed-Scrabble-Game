@@ -1,5 +1,7 @@
 import org.eclipse.paho.client.mqttv3.*;
 
+import java.util.ArrayList;
+
 
 /**
  * Connection callback will be triggered by mqttClient.connect()
@@ -11,6 +13,8 @@ public class MqttBroker implements MqttCallback {
     private MqttClient mqttClient;
 
     private Game game;
+
+    private GameClient gc;
 
     /**
      * Constructor used in GameClient
@@ -83,12 +87,17 @@ public class MqttBroker implements MqttCallback {
                 if(cmd[1].equals("Login")){
                     System.out.println("Newly added client: " + cmd[2]);
                     GameServer.login(cmd[2]);
+                    ArrayList<String> pList = gc.gameServantStub.addPlayer(cmd[2]);
+                    gc.changePlayerList(pList);
                     GameServer.showPlayerPool();
 
                 }
                 if(cmd[1].equals("Vote")){
 //                game.startVote();
                 }
+
+
+
             }
         }
     }

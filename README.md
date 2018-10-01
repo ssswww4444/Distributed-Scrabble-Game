@@ -8,18 +8,15 @@
 
 ##### start MQTT broker
 + install mosquitto first
-+ run 'mosquitto_sub -h 127.0.0.1 -t mqtt/test' for Subscriber
-+ run 'mosquitto_pub -h 127.0.0.1 -t mqtt/test -m "Hello world"' for Publisher
 
 
 
-To run the server, 
-enter
+##### To run the server, 
 
-out/production/Server
++ cd out/production/Server
 
-run "rmiregistry&" 
++ rmiregistry& 
 
 then in IDEA, 
-run GameServer & GameClient
+run GameServer & ClientApp
 
