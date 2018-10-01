@@ -7,7 +7,16 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="DistributedScrabbleGame" exported="" />
+    <orderEntry type="module" module-name="DistributedScrabbleGame" />
     <orderEntry type="module" module-name="Server" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../lib/org.eclipse.paho.client.mqttv3-1.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
