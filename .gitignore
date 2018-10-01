@@ -1,1 +1,5 @@
 /bin/
+.DS_Store
+/out/
+.idea
+/paho*
