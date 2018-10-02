@@ -21,6 +21,18 @@ public class GameClient {
         return this.roomNumber;
     }
 
+    public void setMenuController(MenuController controller) {
+        this.menuController = controller;
+    }
+
+    public void setRoomController(RoomController controller) {
+        this.roomController = controller;
+    }
+
+    public void setGameController(GameController controller) {
+        this.gameController = controller;
+    }
+
     /**
      * Create game client.
      * 1. look up the registry
@@ -100,7 +112,7 @@ public class GameClient {
 
                 for (String player : players) {
                     if (!player.equals(this.username)) {
-                        playerModels.add(new PlayerModel(player, "Available"));
+                        playerModels.add(new PlayerModel(player, Constants.STATUS_AVAILABLE));
                     }
                 }
                 menuController.updatePlayerList(playerModels);
@@ -111,6 +123,9 @@ public class GameClient {
     }
 
 
+    /**
+     * Create a new room, room ID is assigned by server.
+     */
     public void createRoom() {
         try {
             this.roomNumber = serverServantStub.addRoom();
@@ -120,17 +135,27 @@ public class GameClient {
     }
 
 
-    public void newGame() {
+    /**
+     * Create a new room, room ID is assigned by server.
+     */
+    public void startGame() {
+        try {
+            serverServantStub.startNewGame(serverServantStub.getUserInRoom(roomNumber), roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
+
     public void invite(String username) {
-        Random r = new Random();
+
+        /*Random r = new Random();
         int n = r.nextInt(10);
         if (n > 7) {
             roomController.replyInvitation(username, false);
         } else {
             roomController.replyInvitation(username, true);
-        }
+        }*/
     }
 
     public void receiveInvitation(String username, String roomNumber){
@@ -158,17 +183,22 @@ public class GameClient {
         }
     }
 
-    public void setMenuController(MenuController controller) {
-        this.menuController = controller;
+    /**
+     * Be invited, render the GUI to ROOM(input)
+     */
+    public void renderRoomPage(int roomNumber) {
+        this.roomNumber = roomNumber;
+        // TODO
     }
 
-    public void setRoomController(RoomController controller) {
-        this.roomController = controller;
+
+    /**
+     * Final ranking board.
+     */
+    public void renderResultPage() {
+        //TODO
     }
 
-    public void setGameController(GameController controller) {
-        this.gameController = controller;
-    }
 
     public void removeMenuController(){
         this.menuController = null;
@@ -176,11 +206,11 @@ public class GameClient {
 
     public void sendVoteRequest(String word) {
 
-        if (word.equals("HAPPY")) {
+        /*if (word.equals("HAPPY")) {
             this.gameController.voteResponse(false);
         } else {
             this.gameController.voteResponse(true);
-        }
+        }*/
     }
 
     public void pass() {
@@ -190,5 +220,6 @@ public class GameClient {
     public void noWord() {
 
     }
+
 
 }
