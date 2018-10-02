@@ -91,13 +91,10 @@ public class MenuController implements Initializable {
 
     public void refreshPlayerList(){
         ArrayList<PlayerModel> refreshedPlayers = clientObj.getPlayerList();
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run(){
-                MenuController.this.playerList.getItems().clear();
-                for(PlayerModel player : refreshedPlayers){
-                    MenuController.this.playerList.getItems().add(player);
-                }
+        Platform.runLater(() -> {
+            MenuController.this.playerList.getItems().clear();
+            for(PlayerModel player : refreshedPlayers){
+                MenuController.this.playerList.getItems().add(player);
             }
         });
     }

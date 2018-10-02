@@ -59,12 +59,9 @@ public class LoginController implements Initializable {
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnClose = new Button("Okay");
-        btnClose.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dialog.close();
-                dialogPane.setVisible(false);
-            }
+        btnClose.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
         });
         dialogContent.setActions(btnClose);
         dialogPane.setVisible(true);

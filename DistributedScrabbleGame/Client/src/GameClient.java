@@ -17,13 +17,14 @@ public class GameClient {
 
     private ServerInterface serverServantStub;
 
-    private static String clientID;
+    //private static String clientID;
 
 
     /**
      * Create game client.
-     * 1. Add the current player to server playerPool via RMI
-     * 2. Subscribe Server topic and wait for messages
+     * 1. look up the registry
+     * 1. Subscribe Server topic and wait for messages
+     * 2. Add the current player to server playerPool via RMI
      */
     public GameClient(String username) throws Exception {
 
@@ -33,12 +34,10 @@ public class GameClient {
         if (username.equals("ERROR")) {
             throw new Exception("Error");
         } else {
-            clientID = MqttClient.generateClientId();
-            this.username = clientID;
-            MqttBroker mqttBroker = new MqttBroker(Constants.SERVER_TOPIC, clientID, this);
-            serverServantStub.addTOPlayerPool(clientID);
-            /*ArrayList<String> players = serverServantStub.getPlayerPool();
-            System.out.println(players);*/
+            //clientID = MqttClient.generateClientId();
+            this.username = username;
+            MqttBroker mqttBroker = new MqttBroker(Constants.SERVER_TOPIC, username, this);
+            serverServantStub.addTOPlayerPool(username);
         }
     }
 
@@ -55,26 +54,32 @@ public class GameClient {
         }
     }
 
-
     public String getUsername() {
         return this.username;
     }
 
     public ArrayList<PlayerModel> getPlayerList() {
         ArrayList<PlayerModel> players = new ArrayList<>();
+        try {
+            ArrayList<String> playerObjects = serverServantStub.getPlayerPool();
+            for (String s : playerObjects) {
+                players.add(new PlayerModel(s, "Available"));
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
 
-
-//        Random r = new Random();
-//        int n = r.nextInt(9);
-//        if(n>=0);
-//        if(n>=1) players.add(new GUI.PlayerModel("dumb_user1", "Room102"));
-//        if(n>=2) players.add(new GUI.PlayerModel("dumb_user2", "Available"));
-//        if(n>=3) players.add(new GUI.PlayerModel("Kuang Laoshi", "Available"));
-//        if(n>=4) players.add(new GUI.PlayerModel("Man Laoshi", "Room102"));
-//        if(n>=5) players.add(new GUI.PlayerModel("dumb_user3", "Room219"));
-//        if(n>=6) players.add(new GUI.PlayerModel("dumb_user4", "Available"));
-//        if(n>=7) players.add(new GUI.PlayerModel("Will Laoshi", "Room219"));
-//        if(n>=8) players.add(new GUI.PlayerModel("dumb_user5", "Room102"));
+        /*Random r = new Random();
+        int n = r.nextInt(9);
+        if(n>=0);
+        if(n>=1) players.add(new PlayerModel("dumb_user1", "Room102"));
+        if(n>=2) players.add(new PlayerModel("dumb_user2", "Available"));
+        if(n>=3) players.add(new PlayerModel("Kuang Laoshi", "Available"));
+        if(n>=4) players.add(new PlayerModel("Man Laoshi", "Room102"));
+        if(n>=5) players.add(new PlayerModel("dumb_user3", "Room219"));
+        if(n>=6) players.add(new PlayerModel("dumb_user4", "Available"));
+        if(n>=7) players.add(new PlayerModel("Will Laoshi", "Room219"));
+        if(n>=8) players.add(new PlayerModel("dumb_user5", "Room102"));*/
         return players;
     }
 
@@ -83,7 +88,6 @@ public class GameClient {
         ArrayList<String> players;
         try {
             players = serverServantStub.getPlayerPool();
-            System.out.println(players);
             if (this.menuController != null) {
                 ArrayList<PlayerModel> playerModels = new ArrayList<>();
 

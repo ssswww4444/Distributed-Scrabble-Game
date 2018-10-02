@@ -1,7 +1,5 @@
 import org.eclipse.paho.client.mqttv3.*;
 
-import java.util.ArrayList;
-
 
 /**
  * Connection callback will be triggered by mqttClient.connect()
