@@ -53,13 +53,13 @@ public class GameClient {
             throw new Exception("Existing user");
         } else if (username.equals("gameServer")) {  // username cannot be "gameServer" (for mqtt id purpose)
             throw new Exception("Username cannot be 'gameServer'");
+        } else if (username.equals("")) {  // empty string
+            throw new Exception("Username cannot be empty");
         } else {
             //clientID = MqttClient.generateClientId();  // not necessary
             this.username = username;
             mqttBroker = new MqttBroker(username, this);
-            System.out.println("1");
             serverServantStub.addTOPlayerPool(username);
-            System.out.println("2");
         }
     }
 
@@ -206,12 +206,13 @@ public class GameClient {
      * Join room successful
      */
     public void renderRoomPage(boolean isHost, int roomNumber){
+        System.out.println("rendering room");
         if(this.menuController!=null){
-            this.roomNumber = roomNumber;
-            this.roomPlayerNames.add(this.username);  // add himself
-            this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
             try {
-                mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
+                this.roomNumber = roomNumber;
+                this.roomPlayerNames.add(this.username);  // add himself
+                this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
+                mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
             } catch (MqttException e) {
                 e.printStackTrace();
             }

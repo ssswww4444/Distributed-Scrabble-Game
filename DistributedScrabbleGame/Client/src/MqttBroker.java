@@ -88,8 +88,6 @@ public class MqttBroker implements MqttCallback {
 
         String[] topics = topic.split("/") ; // always starts with mqtt
 
-        System.out.println("topics[1]: " + topics[1]);
-
         switch(topics[1]) {
             case Constants.SERVER_TOPIC:
                 serverMessageHandler(message);
