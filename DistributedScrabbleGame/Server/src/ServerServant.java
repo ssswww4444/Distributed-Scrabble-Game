@@ -67,7 +67,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void inviteAll(String inviter, int roomNum) {
-            mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + Constants.INVITATION + ";" + inviter + ";" + roomNum);
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.INVITATION + ";" + inviter + ";" + roomNum);
     }
 
 
@@ -76,7 +76,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void invite(String inviter, String targetUser, int roomNum) throws RemoteException {
-        mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + Constants.INVITATION + ";" + targetUser + ";" + roomNum);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.CLIENT_TOPIC + targetUser, Constants.INVITATION + ";" + inviter + ";" + roomNum);
     }
 
     /**

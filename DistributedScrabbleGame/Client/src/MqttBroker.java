@@ -75,6 +75,10 @@ public class MqttBroker implements MqttCallback {
     /**
      * Note: This method is ONLY used by GameClient.
      * Client -> Server is using RMI.
+     * topic types:
+     * 1. MQTT/server
+     * 2. MQTT/room/roomID
+     * 3. MQTT/client/username
      */
     @Override
     public void messageArrived(String topic, MqttMessage message) {
@@ -103,18 +107,16 @@ public class MqttBroker implements MqttCallback {
      * Handle the message directly from server (all clients receive this type of message)
      */
     private void serverMessageHandler(MqttMessage message) {
-        if ((message.toString().length() != 0) && message.toString().contains(";")) {
-            String[] cmd = message.toString().split(";");
-
-            switch(cmd[1]) {
-                case Constants.LOGIN:  // new username login -> update list
-                    System.out.println(cmd[2] + " logged in. ");
-                    gc.renderPlayerList();
-                    break;
-                case Constants.INVITATION: // receive invitation
-                    System.out.println(cmd[2] + "invite you to join " + cmd[3]);
-                    gc.renderRoomPage(Integer.parseInt(cmd[3]));
-            }
+        String[] cmd = message.toString().split(";");
+        switch(cmd[0]) {
+            case Constants.LOGIN:  // new username login -> update list
+                System.out.println(cmd[1] + " logged in. ");
+                gc.renderPlayerList();
+                break;
+            case Constants.INVITATION: // receive invitation (invitation type: all clients)
+                System.out.println(cmd[1] + "invite you to join Room " + cmd[3]);
+                gc.renderRoomPage(Integer.parseInt(cmd[2]));
+                break;
         }
     }
 
@@ -122,7 +124,8 @@ public class MqttBroker implements MqttCallback {
      * Handle the message which all people in this room received
      */
     private void roomMessageHandler(int roomNumber, MqttMessage message) {
-        switch (message.toString()){
+        String[] cmd = message.toString().split(";");
+        switch (cmd[0]){  // action types
             case Constants.GAME_START:
                 gc.startGame();
                 break;
@@ -138,7 +141,13 @@ public class MqttBroker implements MqttCallback {
      * Direct message (only this client received)
      */
     private void clientMessageHandler(String username, MqttMessage message) {
-
+        String[] cmd = message.toString().split(";");
+        switch (cmd[0]){  // action types
+            case Constants.INVITATION:
+                System.out.println(cmd[1] + "invite you to join Room " + cmd[2]);
+                gc.renderRoomPage(Integer.parseInt(cmd[2]));
+                break;
+        }
     }
 
 
