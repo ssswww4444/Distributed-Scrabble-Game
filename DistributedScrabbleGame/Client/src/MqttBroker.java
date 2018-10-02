@@ -11,20 +11,18 @@ public class MqttBroker implements MqttCallback {
     public static final String broker_addr = "tcp://127.0.0.1:1883";
 
     private MqttClient mqttClient;
-
     private Game game;
-
     private GameClient gc;
 
+
     /**
-     * Constructor used in GameClient
+     * Constructor used in Game Server
      * */
     public MqttBroker(String topic, String clientID) {
         try {
             mqttClient = new MqttClient(broker_addr, clientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
-
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
             mqttClient.subscribe(topic);
@@ -35,17 +33,16 @@ public class MqttBroker implements MqttCallback {
         }
     }
 
-    /**
-     * Constructor used in GameServer
-     * */
-    public MqttBroker(String topic, String clientID, Game g) {
-        this.game = g;
 
+    /**
+     * Constructor used in Game Server
+     * */
+    public MqttBroker(String topic, String clientID, GameClient gc) {
         try {
             mqttClient = new MqttClient(broker_addr, clientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
-
+            this.gc = gc;
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
             mqttClient.subscribe(topic);
@@ -55,6 +52,7 @@ public class MqttBroker implements MqttCallback {
             e.printStackTrace();
         }
     }
+
 
     /**
      *  Send message to subscriber based on topic
@@ -76,21 +74,18 @@ public class MqttBroker implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
+        System.out.println("Start of Message: ---> ");
         System.out.println("The topic is : " + topic);
-        System.out.println("The content is : " + new String(message.getPayload()) + "\n");
+        System.out.println("The content is : " + new String(message.getPayload()));
         if(topic.equals("mqtt/server")){
-            System.out.println(message.toString().length());
+            System.out.println("The length of message is " + message.toString().length());
             if((message.toString().length() != 0) && message.toString().contains(";")){
                 String[] cmd = message.toString().split(";");
 
                 System.out.println(cmd[0]);
                 if(cmd[1].equals("Login")){
                     System.out.println("Newly added client: " + cmd[2]);
-                    GameServer.login(cmd[2]);
-                    ArrayList<String> pList = gc.gameServantStub.addPlayer(cmd[2]);
-                    gc.changePlayerList(pList);
-                    GameServer.showPlayerPool();
-
+                    gc.renderPlayerList();
                 }
                 if(cmd[1].equals("Vote")){
 //                game.startVote();
@@ -100,6 +95,7 @@ public class MqttBroker implements MqttCallback {
 
             }
         }
+        System.out.println("End of Message: <---" + "\n");
     }
 
 

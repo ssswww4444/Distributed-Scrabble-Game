@@ -38,8 +38,8 @@ public class Game {
     private void registerGame(int roomID) {
         try {
             Registry registry = LocateRegistry.getRegistry();  // get registry of the server
-            GameServant gameServant = new GameServant(this);   // create servant instance
-            registry.rebind(Integer.toString(roomID), gameServant);   // bind to register
+            //ServerServant gameServant = new ServerServant(this);   // create servant instance
+            //registry.rebind(Integer.toString(roomID), gameServant);   // bind to register
         } catch(RemoteException e) {
             e.printStackTrace();
         }

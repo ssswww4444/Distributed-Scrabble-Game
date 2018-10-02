@@ -1,9 +1,3 @@
-/*
-    COMP90015 Project 2 MenuController.java
-    Group Name: Distributed Otaku
-    Tutor: Alisha Aneja
- */
-
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
@@ -87,13 +81,10 @@ public class MenuController implements Initializable {
     }
 
     public void updatePlayerList(ArrayList<PlayerModel> updatedPlayers){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run(){
-                MenuController.this.playerList.getItems().clear();
-                for(PlayerModel player : updatedPlayers){
-                    MenuController.this.playerList.getItems().add(player);
-                }
+        Platform.runLater(() -> {
+            MenuController.this.playerList.getItems().clear();
+            for(PlayerModel player : updatedPlayers){
+                MenuController.this.playerList.getItems().add(player);
             }
         });
     }
