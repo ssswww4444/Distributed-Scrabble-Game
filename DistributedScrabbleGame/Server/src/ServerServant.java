@@ -7,62 +7,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerServant extends UnicastRemoteObject implements ServerInterface {
 
+    private MqttBroker mqttBroker;
     private ArrayList<Player> playerPool;
     private AtomicInteger roomCount;
-    private MqttBroker mqttBroker;
+    private ArrayList<Game> games;
 
-    /**
-     * Constructor
-     */
     public ServerServant(MqttBroker broker) throws RemoteException {
-        playerPool = new ArrayList<>();
         mqttBroker = broker;
+        playerPool = new ArrayList<>();
         roomCount = new AtomicInteger(0);
+        games = new ArrayList<>();
     }
 
 
     /**
-     * Start voting
+     * Add the login user to playerPool
      */
-    public void startVote(int startI, int startJ, int length, boolean horizontal) {  // horizontal = false --> vertical
-        //game.startVote(startI, startJ, length, horizontal);
-    }
-
-
-    /**
-     * Pass the turn either before inserting letter or before voting
-     */
-    public void passTurn() {
-        //game.passTurn();
-    }
-
-
-    /**
-     * Insert a letter to the board at coordinate (i,j): row i, col j
-     */
-    public void insertLetter(int i, int j, char letter) {
-        //game.insertLetter(i, j, letter);
-    }
-
-
-    /**
-     * Vote for the word highlighted
-     */
-    public void vote(String username, boolean agree) {
-        //game.vote(username, agree);
-
-        System.out.println(username + " " + agree);
-    }
-
-
-    /**
-     * A player with this username has left the game
-     */
-    public void leaveGame(String username) {
-        //game.leaveGame(username);
-    }
-
-// wenqiangk ===> added on Tuesday.
     @Override
     public void addTOPlayerPool(String username) {
         playerPool.add(new Player(username));
@@ -70,18 +30,99 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         System.out.println("new player added. ");
     }
 
+
+    /**
+     * return a list of current users' names
+     */
     @Override
     public ArrayList<String> getPlayerPool() {
         ArrayList<String> playerNames = new ArrayList<>();
-        for(Player p: playerPool){
+        for (Player p : playerPool) {
             playerNames.add(p.getUsername());
         }
         return playerNames;
     }
 
+
+    /**
+     * Increment the room counter when a room is created.
+     */
     @Override
     public int addRoom() {
         return roomCount.incrementAndGet();
     }
-// wenqiangk <===
+
+
+    /**
+     * Decrement the room counter when a room is dismissed.
+     */
+    @Override
+    public void leaveRoom() {
+        roomCount.decrementAndGet();
+    }
+
+
+    /**
+     * Invite all available online users.
+     */
+    @Override
+    public void inviteAll(String inviter) {
+        mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + "Invitation" + ";" + inviter);
+    }
+
+
+    /**
+     * One to One invitation.
+     */
+    @Override
+    public void invite(String inviter) throws RemoteException {
+        // TODO
+    }
+
+
+    /**
+     * Initialize a game and enter the game interface.
+     * Synchronize all players' gui when they are in the same room and the game starts.
+     */
+    @Override
+    public void startNewGame(ArrayList<String> players, int roomNum) {
+        ArrayList<Player> playerObjects = new ArrayList<>();
+        for (String playerName : players) {
+            playerObjects.add(new Player(playerName));
+        }
+        games.add(new Game(playerObjects, roomNum));
+        mqttBroker.notify("ROOM" + roomNum, "GameStart");
+    }
+
+
+    /**
+     * Insert a letter to the board at coordinate (i,j): row i, col j
+     */
+    public void insertLetter(int i, int j, char letter, int roomNum) {
+        //game.insertLetter(i, j, letter);
+    }
+
+
+    @Override
+    public void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum) throws RemoteException {
+
+    }
+
+
+    @Override
+    public void passTurn(int roomNum) throws RemoteException {
+
+    }
+
+
+    @Override
+    public void vote(String username, boolean agree, int roomNum) throws RemoteException {
+
+    }
+
+
+    @Override
+    public void leaveGame(String username, int roomNum) throws RemoteException {
+
+    }
 }

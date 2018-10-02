@@ -13,8 +13,13 @@ public class GameClient {
 
     private ServerInterface serverServantStub;
 
-    //private static String clientID;
+    public String getUsername() {
+        return this.username;
+    }
 
+    public int getRoomNumber() {
+        return this.roomNumber;
+    }
 
     /**
      * Create game client.
@@ -50,9 +55,6 @@ public class GameClient {
         }
     }
 
-    public String getUsername() {
-        return this.username;
-    }
 
     /**
      * Get all current online users.
@@ -71,6 +73,7 @@ public class GameClient {
         return players;
     }
 
+
     /**
      * Get all current available users. (Current implementation is just "Return all users")
      */
@@ -82,17 +85,8 @@ public class GameClient {
             e.printStackTrace();
         }
         return players;
-        /*ArrayList<String> players = new ArrayList<>();
-        Random r = new Random();
-        int n = r.nextInt(6);
-        if (n >= 0) ;
-        if (n >= 1) players.add("dumb_user2");
-        if (n >= 2) players.add("Kuang Laoshi");
-        if (n >= 3) players.add("dumb_user4");
-        if (n >= 4) players.add("Will Laoshi");
-        if (n >= 5) players.add("dumb_user5");
-        return players;*/
     }
+
 
     /**
      * Display all online users.
@@ -116,6 +110,7 @@ public class GameClient {
         }
     }
 
+
     public void createRoom() {
         try {
             this.roomNumber = serverServantStub.addRoom();
@@ -124,9 +119,6 @@ public class GameClient {
         }
     }
 
-    public int getRoomNumber() {
-        return this.roomNumber;
-    }
 
     public void newGame() {
     }

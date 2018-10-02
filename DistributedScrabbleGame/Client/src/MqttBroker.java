@@ -6,7 +6,7 @@ import org.eclipse.paho.client.mqttv3.*;
  */
 public class MqttBroker implements MqttCallback {
 
-    public static final String broker_addr = "tcp://127.0.0.1:1883";
+    public static final String BROKER_ADDR = "tcp://127.0.0.1:1883";
 
     private MqttClient mqttClient;
     private Game game;
@@ -18,7 +18,7 @@ public class MqttBroker implements MqttCallback {
      */
     public MqttBroker(String topic, String clientID) {
         try {
-            mqttClient = new MqttClient(broker_addr, clientID);
+            mqttClient = new MqttClient(BROKER_ADDR, clientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
             System.out.println("Client connected?: " + mqttClient.isConnected());
@@ -37,7 +37,7 @@ public class MqttBroker implements MqttCallback {
      */
     public MqttBroker(String topic, String clientID, GameClient gc) {
         try {
-            mqttClient = new MqttClient(broker_addr, clientID);
+            mqttClient = new MqttClient(BROKER_ADDR, clientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
             this.gc = gc;
@@ -66,13 +66,17 @@ public class MqttBroker implements MqttCallback {
     }
 
 
+    /**
+     * Note: This method is ONLY used by GameClient.
+     * Client -> Server is using RMI.
+     */
     @Override
-    public void messageArrived(String topic, MqttMessage message) throws Exception {
+    public void messageArrived(String topic, MqttMessage message) {
         System.out.println("Start of Message: ---> ");
         System.out.println("The topic is : " + topic);
         System.out.println("The content is : " + new String(message.getPayload()));
+
         if (topic.equals("mqtt/server")) {
-            System.out.println("The length of message is " + message.toString().length());
             if ((message.toString().length() != 0) && message.toString().contains(";")) {
                 String[] cmd = message.toString().split(";");
 
