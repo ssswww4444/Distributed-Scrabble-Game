@@ -10,6 +10,7 @@ public class GameClient {
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
+    private ArrayList<String> gamePlayerNames;
 
     private ServerInterface serverServantStub;
 
@@ -140,22 +141,23 @@ public class GameClient {
      */
     public void startGame() {
         try {
-            serverServantStub.startNewGame(serverServantStub.getUserInRoom(roomNumber), roomNumber);
+            gamePlayerNames = serverServantStub.getUserInRoom(roomNumber);
+            serverServantStub.startNewGame(gamePlayerNames, roomNumber);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
 
+    /**
+     * Send invitation to target user via Server
+     */
     public void invite(String username) {
-
-        /*Random r = new Random();
-        int n = r.nextInt(10);
-        if (n > 7) {
-            roomController.replyInvitation(username, false);
-        } else {
-            roomController.replyInvitation(username, true);
-        }*/
+        try {
+            serverServantStub.invite(this.username, username, roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public void receiveInvitation(String username, String roomNumber){
@@ -218,6 +220,10 @@ public class GameClient {
     }
 
     public void noWord() {
+
+    }
+
+    public void vote() {
 
     }
 

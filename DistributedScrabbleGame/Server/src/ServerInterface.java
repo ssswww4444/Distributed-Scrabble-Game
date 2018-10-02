@@ -15,7 +15,7 @@ public interface ServerInterface extends Remote {
 
     void inviteAll(String inviter, int roomNum) throws RemoteException;
 
-    void invite(String inviter) throws RemoteException;
+    void invite(String inviter, String targetUser, int roomNum) throws RemoteException;
 
     ArrayList<String> getUserInRoom(int roomNum) throws RemoteException;
 

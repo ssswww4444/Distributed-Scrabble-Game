@@ -16,14 +16,14 @@ public class MqttBroker implements MqttCallback {
     /**
      * Constructor used in Game Server
      */
-    public MqttBroker(String topic, String clientID) {
+    public MqttBroker(String topic, String mqttClientID) {
         try {
-            mqttClient = new MqttClient(BROKER_ADDR, clientID);
+            mqttClient = new MqttClient(BROKER_ADDR, mqttClientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
-            mqttClient.subscribe(topic);
+            mqttClient.subscribe(topic);   // client subscribe to its ID
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();
@@ -33,11 +33,11 @@ public class MqttBroker implements MqttCallback {
 
 
     /**
-     * Constructor used in Game Server
+     * Constructor used in Game Client
      */
-    public MqttBroker(String topic, String clientID, GameClient gc) {
+    public MqttBroker(String topic, String mqttClientID, GameClient gc) {
         try {
-            mqttClient = new MqttClient(BROKER_ADDR, clientID);
+            mqttClient = new MqttClient(BROKER_ADDR, mqttClientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
             this.gc = gc;
@@ -77,6 +77,7 @@ public class MqttBroker implements MqttCallback {
         System.out.println("The content is : " + new String(message.getPayload()));
 
         if (topic.equals(Constants.SERVER_TOPIC)) {
+            // Messages for server use
             if ((message.toString().length() != 0) && message.toString().contains(";")) {
                 String[] cmd = message.toString().split(";");
 
@@ -93,6 +94,7 @@ public class MqttBroker implements MqttCallback {
 
             }
         } else if (topic.split(" ")[0].equals(Constants.ROOM)) {
+            // Messages for a room
             int roomNum = Integer.parseInt(topic.split(" ")[1]);
             switch (message.toString()){
                 case Constants.GAME_START:
