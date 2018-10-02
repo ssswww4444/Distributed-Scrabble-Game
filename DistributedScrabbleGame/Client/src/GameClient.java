@@ -143,12 +143,19 @@ public class GameClient {
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<String>();  // empty
             renderRoomPage(roomNumber);
-            // update UI ****
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Receive notification that new player joined room
+     */
+    public void playerJoinedRoom(String username) {
+        roomPlayerNames.add(username); // update list
+        roomController.joinRoom(username);  // update UI
     }
 
 

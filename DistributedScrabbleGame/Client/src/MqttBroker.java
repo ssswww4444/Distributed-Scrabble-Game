@@ -136,7 +136,7 @@ public class MqttBroker implements MqttCallback {
                 gc.renderResultPage();
                 break;
             case Constants.JOIN_ROOM:  // new player joined room
-                // update UI ******  (username: cmd[1])
+                gc.playerJoinedRoom(cmd[1]);
         }
     }
 

@@ -126,22 +126,33 @@ public class RoomController implements Initializable {
         dialog.show();
     }
 
-    public void replyInvitation(String username, boolean accept) {
-        if (accept) {
-            if (roomPlayers.size() <= 4) {
-                Button freeButton = this.getFreeButton();
-                if (freeButton != null) {
-                    freeButton.setText(username);
-                    freeButton.setDisable(true);
-                }
-                this.roomPlayers.add(username);
-            } else {
+//    public void replyInvitation(String username, boolean accept) {
+//        if (accept) {
+//            if (roomPlayers.size() <= 4) {
+//                Button freeButton = this.getFreeButton();
+//                if (freeButton != null) {
+//                    freeButton.setText(username);
+//                    freeButton.setDisable(true);
+//                }
+//                this.roomPlayers.add(username);
+//            } else {
+//
+//            }
+//        } else {
+//
+//        }
+//    }
 
-            }
-        } else {
-
+    public void joinRoom(String username) {
+        Button freeButton = this.getFreeButton();
+        if (freeButton != null) {
+            freeButton.setText(username);
+            freeButton.setDisable(true);
         }
+        this.roomPlayers.add(username);
     }
+
+
 
     private Button getFreeButton() {
         if (!this.btnPlayer2.isDisable()) {
