@@ -158,13 +158,30 @@ public class RoomController implements Initializable {
 
     }
 
-    public void startup(boolean isHost){
+    public void startup(boolean isHost, ArrayList<String> roomPlayers){
         if(isHost){
             hostUsername.setText(this.clientObj.getUsername());
             btnHost.setText(this.clientObj.getUsername());
             this.roomPlayers = new ArrayList<>(4);
-            roomPlayers.add(this.clientObj.getUsername());
+            this.roomPlayers.add(this.clientObj.getUsername());
             btnLeave.setText("Dismiss");
+        }else{
+            this.roomPlayers = roomPlayers;
+            hostUsername.setText(roomPlayers.get(0));
+            btnHost.setText(roomPlayers.get(0));
+            for(String username : roomPlayers){
+                if(!username.equals(roomPlayers.get(0))){
+                    Button freeButton = getFreeButton();
+                    if(freeButton!=null){
+                        freeButton.setText(username);
+                    }
+                }
+            }
+            btnPlayer2.setDisable(true);
+            btnPlayer3.setDisable(true);
+            btnPlayer4.setDisable(true);
+            btnStart.setDisable(true);
+            btnLeave.setText("Leave");
         }
 
         roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));

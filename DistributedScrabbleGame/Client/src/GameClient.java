@@ -133,6 +133,31 @@ public class GameClient {
         }
     }
 
+    public void receiveInvitation(String username, String roomNumber){
+        this.menuController.invitationMsg(username, roomNumber);
+    }
+
+    public void acceptInvitation(String roomNumber){
+        Random r = new Random();
+        int n = r.nextInt(10);
+        if (n > 5) {
+            ArrayList<String> roomPlayers = new ArrayList<>();
+            roomPlayers.add("Shabi");
+            roomPlayers.add("Zhizhang");
+            roomPlayers.add(this.username);
+            joinConfirmed(roomPlayers, Integer.parseInt(roomNumber));
+        } else {
+            menuController.displayMsg();
+        }
+    }
+
+    public void joinConfirmed(ArrayList<String> roomPlayers, int roomNumber){
+        if(this.menuController!=null){
+            this.roomNumber = roomNumber;
+            this.menuController.loadRoom(roomPlayers);
+        }
+    }
+
     public void setMenuController(MenuController controller) {
         this.menuController = controller;
     }
@@ -143,6 +168,10 @@ public class GameClient {
 
     public void setGameController(GameController controller) {
         this.gameController = controller;
+    }
+
+    public void removeMenuController(){
+        this.menuController = null;
     }
 
     public void sendVoteRequest(String word) {

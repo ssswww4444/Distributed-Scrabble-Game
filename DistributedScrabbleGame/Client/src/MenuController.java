@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -49,12 +50,25 @@ public class MenuController implements Initializable {
     @FXML
     private StackPane dialogPane;
 
+
+
+    /**********************Test*******************/
+    @FXML
+    private Button btnTest;
+    @FXML
+    private void testBtnClick(ActionEvent event){
+        this.clientObj.receiveInvitation("Kuanglaoshi", "111");
+    }
+    /**********************Test*******************/
+
+
+
     @FXML
     public void createBtnClick(ActionEvent event) {
         try {
             clientObj.createRoom();
             this.btnCreateRoom.setDisable(true);
-            fadeOut();
+            fadeOut(true, null);
         } catch (Exception e) {
             e.printStackTrace();
             displayMsg();
@@ -103,22 +117,58 @@ public class MenuController implements Initializable {
 
 
     /* This method is used to provide a smoother transition between scences */
-    public void fadeOut() {
+    public void fadeOut(boolean isHost, ArrayList<String> roomPlayers) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));
         fadeTransition.setNode(rootPane);
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScence());
+        fadeTransition.setOnFinished(event -> loadMainScence(isHost, roomPlayers));
         fadeTransition.play();
+    }
+
+    @FXML
+    public void invitationMsg(String username, String roomNumber){
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setHeading(new Text("Room Invitation"));
+        dialogContent.setBody(new Text("User " + username + "invited you to Room: " + roomNumber + ". Accept?"));
+        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+        Button btnYes = new Button("Yes");
+        btnYes.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                dialog.close();
+                dialogPane.setVisible(false);
+                clientObj.acceptInvitation(roomNumber);
+            }
+        });
+
+        Button btnNo = new Button("No");
+        btnNo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                dialog.close();
+                dialogPane.setVisible(false);
+            }
+        });
+
+        dialogContent.setActions(btnYes, btnNo);
+        dialogPane.setVisible(true);
+        dialog.show();
+    }
+
+    @FXML
+    public void loadRoom(ArrayList<String> roomPlayers){
+        fadeOut(false, roomPlayers);
     }
 
     @FXML
     public void displayMsg() {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Error Message"));
-        dialogContent.setBody(new Text("Room creation failed. Please try again."));
+        dialogContent.setBody(new Text("The room is full or dismissed."));
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnClose = new Button("Okay");
@@ -134,7 +184,7 @@ public class MenuController implements Initializable {
         dialog.show();
     }
 
-    private void loadMainScence() {
+    private void loadMainScence(boolean isHost, ArrayList<String> roomPlayers) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
             Parent roomView = loader.load();
@@ -142,7 +192,8 @@ public class MenuController implements Initializable {
             RoomController controller = loader.getController();
             controller.setClientObj(this.clientObj);
             this.clientObj.setRoomController(controller);
-            controller.startup(true);
+            this.clientObj.removeMenuController();
+            controller.startup(isHost, roomPlayers);
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
             currentStage.setScene(roomScene);
 
