@@ -57,7 +57,7 @@ public class MenuController implements Initializable {
     private Button btnTest;
     @FXML
     private void testBtnClick(ActionEvent event){
-        this.clientObj.receiveInvitation("Kuanglaoshi", "111");
+        this.clientObj.receiveInvitation("Kuanglaoshi", 111);
     }
     /**********************Test*******************/
 
@@ -129,7 +129,7 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    public void invitationMsg(String username, String roomNumber){
+    public void invitationMsg(String username, int roomNumber){
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Room Invitation"));
         dialogContent.setBody(new Text("User " + username + "invited you to Room: " + roomNumber + ". Accept?"));

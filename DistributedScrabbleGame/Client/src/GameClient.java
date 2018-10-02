@@ -1,5 +1,6 @@
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -12,7 +13,7 @@ public class GameClient {
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
-    private ArrayList<String> gamePlayerNames;
+    private ArrayList<String> roomPlayerNames;
     private MqttBroker mqttBroker;
 
     private ServerInterface serverServantStub;
@@ -57,6 +58,7 @@ public class GameClient {
             this.username = username;
             mqttBroker = new MqttBroker(username, this);
             serverServantStub.addTOPlayerPool(username);
+
         }
     }
 
@@ -133,11 +135,15 @@ public class GameClient {
      * Create a new room
      * 1. get roomID from server
      * 2. subscribe to "mqtt/room/roomID"
+     * 3. get player names
      */
     public void createRoom() {
         try {
-            this.roomNumber = serverServantStub.addRoom();
-            mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // room number as
+            this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
+            mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
+            this.roomPlayerNames = new ArrayList<String>();  // empty
+            renderRoomPage(roomNumber);
+            // update UI ****
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MqttException e) {
@@ -151,8 +157,7 @@ public class GameClient {
      */
     public void startGame() {
         try {
-            gamePlayerNames = serverServantStub.getUserInRoom(roomNumber);
-            serverServantStub.startNewGame(gamePlayerNames, roomNumber);
+            serverServantStub.startNewGame(roomPlayerNames, roomNumber);
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -171,37 +176,37 @@ public class GameClient {
         }
     }
 
-    public void receiveInvitation(String username, String roomNumber){
+    public void receiveInvitation(String username, int roomNumber){
         this.menuController.invitationMsg(username, roomNumber);
     }
 
-    public void acceptInvitation(String roomNumber){
-        Random r = new Random();
-        int n = r.nextInt(10);
-        if (n > 5) {
-            ArrayList<String> roomPlayers = new ArrayList<>();
-            roomPlayers.add("Shabi");
-            roomPlayers.add("Zhizhang");
-            roomPlayers.add(this.username);
-            joinConfirmed(roomPlayers, Integer.parseInt(roomNumber));
-        } else {
-            menuController.displayMsg();
-        }
-    }
-
-    public void joinConfirmed(ArrayList<String> roomPlayers, int roomNumber){
-        if(this.menuController!=null){
-            this.roomNumber = roomNumber;
-            this.menuController.loadRoom(roomPlayers);
+    public void acceptInvitation(int roomNumber){
+        try {
+            if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
+                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // not including himself
+                renderRoomPage(roomNumber);
+            } else {  // failed
+                menuController.displayMsg();
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 
     /**
-     * Be invited, render the GUI to ROOM(input)
+     * Join room successful
      */
-    public void renderRoomPage(int roomNumber) {
-        this.roomNumber = roomNumber;
-        // TODO
+    public void renderRoomPage(int roomNumber){
+        if(this.menuController!=null){
+            this.roomNumber = roomNumber;
+            this.roomPlayerNames.add(this.username);  // add himself
+            this.menuController.loadRoom(roomPlayerNames);  // render GUI to room
+            try {
+                mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

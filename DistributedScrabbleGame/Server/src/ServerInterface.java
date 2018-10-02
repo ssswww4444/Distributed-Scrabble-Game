@@ -9,7 +9,7 @@ public interface ServerInterface extends Remote {
 
     ArrayList<String> getPlayerPool() throws RemoteException;
 
-    int addRoom() throws RemoteException;
+    int createRoom(String username) throws RemoteException;
 
     void leaveRoom() throws RemoteException;
 
@@ -30,5 +30,7 @@ public interface ServerInterface extends Remote {
     void vote(String username, boolean agree, int roomNum) throws RemoteException;
 
     void leaveGame(String username, int roomNum) throws RemoteException;
+
+    boolean canJoinRoom(String username, int roomNum) throws  RemoteException;
 
 }

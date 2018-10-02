@@ -115,7 +115,7 @@ public class MqttBroker implements MqttCallback {
                 break;
             case Constants.INVITATION: // receive invitation (invitation type: all clients)
                 System.out.println(cmd[1] + "invite you to join Room " + cmd[3]);
-                gc.renderRoomPage(Integer.parseInt(cmd[2]));
+//                gc.renderRoomPage(Integer.parseInt(cmd[2]));
                 break;
         }
     }
@@ -134,6 +134,9 @@ public class MqttBroker implements MqttCallback {
                 break;
             case Constants.GAME_OVER:
                 gc.renderResultPage();
+                break;
+            case Constants.JOIN_ROOM:  // new player joined room
+                // update UI ******  (username: cmd[1])
         }
     }
 
@@ -145,7 +148,7 @@ public class MqttBroker implements MqttCallback {
         switch (cmd[0]){  // action types
             case Constants.INVITATION:
                 System.out.println(cmd[1] + "invite you to join Room " + cmd[2]);
-                gc.renderRoomPage(Integer.parseInt(cmd[2]));
+                gc.receiveInvitation(cmd[1], Integer.parseInt(cmd[2]));
                 break;
         }
     }

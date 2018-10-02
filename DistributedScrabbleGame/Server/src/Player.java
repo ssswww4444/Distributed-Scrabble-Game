@@ -1,12 +1,14 @@
 public class Player {
 
     private String username;
-    private String status;
+    private String status;  // possible values: "available" / "room"
+    private int roomNum;
 
 
     public Player(String username) {
         this.username = username;
         this.status = Constants.STATUS_AVAILABLE;
+        roomNum = -1;  // initially not in any room
     }
 
     public String getUsername() {
@@ -17,7 +19,9 @@ public class Player {
         return status;
     }
 
-    public void setStatus(int roomNum) {
-        this.status = Constants.ROOM + " " + roomNum;
-    }
+    public void setStatus(String status) { this.status = status; }
+
+    public void setRoomNum(int roomNum) { this.roomNum = roomNum; }
+
+    public int getRoomNum() {return roomNum; }
 }
