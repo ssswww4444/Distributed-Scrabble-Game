@@ -28,7 +28,7 @@ import com.jfoenix.controls.JFXDialog;
 /* Controller class for the start scene of the Client App */
 public class LoginController implements Initializable {
 
-    GameClient clientObj;
+    private GameClient clientObj;
 
     /* UI elements */
     @FXML

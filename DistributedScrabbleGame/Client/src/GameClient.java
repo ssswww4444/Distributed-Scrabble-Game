@@ -27,8 +27,8 @@ public class GameClient {
         // get the RMI stub.
         getServerRegistry();
 
-        if (username.equals("ERROR")) {
-            throw new Exception("Error");
+        if (serverServantStub.getPlayerPool().contains(username)) {
+            throw new Exception("Existing user");
         } else {
             //clientID = MqttClient.generateClientId();
             this.username = username;
