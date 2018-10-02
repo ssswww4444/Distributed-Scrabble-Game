@@ -27,10 +27,13 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void addTOPlayerPool(String username) {
+        System.out.println("11");
         Player player = new Player(username);
         playerPool.add(player);
+        System.out.println("12");
         usernamePlayerMap.put(username, player);  // add to hashmap
-        mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + "Login" + ";" + username);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, "Login" + ";" + username);
+        System.out.println("13");
         System.out.println("new player added. ");
     }
 

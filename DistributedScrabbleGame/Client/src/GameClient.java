@@ -57,8 +57,9 @@ public class GameClient {
             //clientID = MqttClient.generateClientId();  // not necessary
             this.username = username;
             mqttBroker = new MqttBroker(username, this);
+            System.out.println("1");
             serverServantStub.addTOPlayerPool(username);
-
+            System.out.println("2");
         }
     }
 
