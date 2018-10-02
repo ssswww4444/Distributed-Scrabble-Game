@@ -143,7 +143,7 @@ public class GameClient {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<String>();  // empty
-            renderRoomPage(roomNumber);
+            renderRoomPage(true, roomNumber);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MqttException e) {
@@ -192,7 +192,7 @@ public class GameClient {
         try {
             if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
                 roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // not including himself
-                renderRoomPage(roomNumber);
+                renderRoomPage(false, roomNumber);
             } else {  // failed
                 menuController.displayMsg();
             }
@@ -204,11 +204,11 @@ public class GameClient {
     /**
      * Join room successful
      */
-    public void renderRoomPage(int roomNumber){
+    public void renderRoomPage(boolean isHost, int roomNumber){
         if(this.menuController!=null){
             this.roomNumber = roomNumber;
             this.roomPlayerNames.add(this.username);  // add himself
-            this.menuController.loadRoom(roomPlayerNames);  // render GUI to room
+            this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
             try {
                 mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             } catch (MqttException e) {

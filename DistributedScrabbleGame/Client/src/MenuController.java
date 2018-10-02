@@ -160,8 +160,8 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    public void loadRoom(ArrayList<String> roomPlayers){
-        fadeOut(false, roomPlayers);
+    public void loadRoom(boolean isHost, ArrayList<String> roomPlayers){
+        fadeOut(isHost, roomPlayers);
     }
 
     @FXML

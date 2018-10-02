@@ -19,6 +19,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         playerPool = new ArrayList<>();
         roomCount = new AtomicInteger(0);
         games = new ArrayList<>();
+        usernamePlayerMap = new HashMap<>();
     }
 
 
@@ -32,7 +33,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         playerPool.add(player);
         System.out.println("12");
         usernamePlayerMap.put(username, player);  // add to hashmap
-        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, "Login" + ";" + username);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGIN + ";" + username);
         System.out.println("13");
         System.out.println("new player added. ");
     }
