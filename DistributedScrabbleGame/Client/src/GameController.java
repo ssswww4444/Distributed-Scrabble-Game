@@ -22,7 +22,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.text.Font;
@@ -30,10 +29,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.swing.*;
-import javax.xml.soap.Text;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -321,74 +317,63 @@ public class GameController implements Initializable {
                 cell.setMaxSize(20,20);
                 cell.setFont(Font.font("System", FontWeight.BOLD, 8));
 
-                cell.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(state.equals("select")){
+                cell.setOnMouseClicked(event -> {
+                    if(state.equals("select")){
 
-                        }else if(state.equals("place")){
-                            TextField cell = (TextField)event.getSource();
-                            confirmPlacement(cell);
-                        }else if(state.equals("choose")){
-                            if(head == null){
-                                head = (TextField)event.getSource();
-                                head.setStyle("-fx-background-color: #d71f5a;");
-                                stateLabel.setText("choose tail");
-                            }else if(tail == null){
-                                tail = (TextField)event.getSource();
-                                chosenWord = getWord(head, tail);
-                                if(chosenWord==null) {
-                                    JFXDialogLayout dialogContent = new JFXDialogLayout();
-                                    dialogContent.setHeading(new javafx.scene.text.Text("Invalid Choice:"));
-                                    dialogContent.setBody(new javafx.scene.text.Text("You must choose from left \nto right, or from top to "
-                                            + "bottm, \nwithout any spaces in between.And \n" +
-                                            "your newly inserted letter must be included"));
-                                    JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
-                                    dialog.setOverlayClose(false);
-                                    Button btnClose = new Button("Okay");
-                                    btnClose.setOnAction(new EventHandler<ActionEvent>() {
-                                        @Override
-                                        public void handle(ActionEvent event) {
-                                            head.setStyle("");
-                                            tail.setStyle("");
-                                            head = null;
-                                            tail = null;
-                                            chosenCell.setStyle("-fx-background-color: #68a429;");
-                                            btnVote.setDisable(true);
-                                            dialog.close();
-                                            dialogPane.setVisible(false);
-                                        }
-                                    });
-                                    dialogContent.setActions(btnClose);
-                                    dialogPane.setVisible(true);
-                                    dialog.show();
-                                }else {
-                                    btnVote.setDisable(false);
-                                }
+                    }else if(state.equals("place")){
+                        TextField cell1 = (TextField)event.getSource();
+                        confirmPlacement(cell1);
+                    }else if(state.equals("choose")){
+                        if(head == null){
+                            head = (TextField)event.getSource();
+                            head.setStyle("-fx-background-color: #d71f5a;");
+                            stateLabel.setText("choose tail");
+                        }else if(tail == null){
+                            tail = (TextField)event.getSource();
+                            chosenWord = getWord(head, tail);
+                            if(chosenWord==null) {
+                                JFXDialogLayout dialogContent = new JFXDialogLayout();
+                                dialogContent.setHeading(new javafx.scene.text.Text("Invalid Choice:"));
+                                dialogContent.setBody(new javafx.scene.text.Text("You must choose from left \nto right, or from top to "
+                                        + "bottm, \nwithout any spaces in between.And \n" +
+                                        "your newly inserted letter must be included"));
+                                JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+                                dialog.setOverlayClose(false);
+                                Button btnClose = new Button("Okay");
+                                btnClose.setOnAction(new EventHandler<ActionEvent>() {
+                                    @Override
+                                    public void handle(ActionEvent event) {
+                                        head.setStyle("");
+                                        tail.setStyle("");
+                                        head = null;
+                                        tail = null;
+                                        chosenCell.setStyle("-fx-background-color: #68a429;");
+                                        btnVote.setDisable(true);
+                                        dialog.close();
+                                        dialogPane.setVisible(false);
+                                    }
+                                });
+                                dialogContent.setActions(btnClose);
+                                dialogPane.setVisible(true);
+                                dialog.show();
                             }else {
-
+                                btnVote.setDisable(false);
                             }
+                        }else {
+
                         }
                     }
                 });
 
-                cell.setOnMouseEntered(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        cell.setStyle(cell.getStyle() + "-fx-border-color : #d71f5a;");
-                    }
-                });
+                cell.setOnMouseEntered(event -> cell.setStyle(cell.getStyle() + "-fx-border-color : #d71f5a;"));
 
-                cell.setOnMouseExited(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(state.equals("select")){
-                            cell.setStyle("");
-                        }else if(state.equals("place")){
-                            cell.setStyle("-fx-border-color : #68a429;");
-                        }else if(state.equals("choose")){
+                cell.setOnMouseExited(event -> {
+                    if(state.equals("select")){
+                        cell.setStyle("");
+                    }else if(state.equals("place")){
+                        cell.setStyle("-fx-border-color : #68a429;");
+                    }else if(state.equals("choose")){
 
-                        }
                     }
                 });
 
@@ -435,29 +420,23 @@ public class GameController implements Initializable {
         dialog.setOverlayClose(false);
         Button btnYes = new Button("Yes");
         Button btnNo = new Button("No");
-        btnYes.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dialog.close();
-                dialogPane.setVisible(false);
-                cell.setText(btnSelected.getText());
+        btnYes.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
+            cell.setText(btnSelected.getText());
 
-                occupiedCells.add(cell);
-                NonOccupiedCells.remove(cell);
-                chosenCell = cell;
+            occupiedCells.add(cell);
+            NonOccupiedCells.remove(cell);
+            chosenCell = cell;
 
-                enterStateChoose();
-            }
+            enterStateChoose();
         });
-        btnNo.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dialog.close();
-                dialogPane.setVisible(false);
-                btnSelected.setSelected(false);
-                enterStateSelect();
+        btnNo.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
+            btnSelected.setSelected(false);
+            enterStateSelect();
 
-            }
         });
         dialogContent.setActions(btnYes, btnNo);
         dialogPane.setVisible(true);
@@ -473,12 +452,7 @@ public class GameController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                loadMainScence();
-            }
-        });
+        fadeTransition.setOnFinished(event -> loadMainScence());
         fadeTransition.play();
     }
 

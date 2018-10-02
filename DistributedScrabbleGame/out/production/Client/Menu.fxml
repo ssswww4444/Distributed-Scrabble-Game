@@ -68,5 +68,6 @@
             </ImageView>
          </graphic></Button>
       <StackPane fx:id="dialogPane" layoutX="99.0" layoutY="139.0" prefHeight="122.0" prefWidth="403.0" visible="false" />
+      <Button fx:id="btnTest" layoutX="48.0" layoutY="325.0" mnemonicParsing="false" onAction="#testBtnClick" text="Invitation Test" />
    </children>
 </AnchorPane>

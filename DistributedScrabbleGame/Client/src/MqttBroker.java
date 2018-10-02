@@ -1,30 +1,26 @@
 import org.eclipse.paho.client.mqttv3.*;
 
-import java.util.ArrayList;
-
 
 /**
  * Connection callback will be triggered by mqttClient.connect()
- * */
+ */
 public class MqttBroker implements MqttCallback {
 
-    public static final String broker_addr = "tcp://127.0.0.1:1883";
+    public static final String BROKER_ADDR = "tcp://127.0.0.1:1883";
 
     private MqttClient mqttClient;
-
     private Game game;
-
     private GameClient gc;
 
+
     /**
-     * Constructor used in GameClient
-     * */
+     * Constructor used in Game Server
+     */
     public MqttBroker(String topic, String clientID) {
         try {
-            mqttClient = new MqttClient(broker_addr, clientID);
+            mqttClient = new MqttClient(BROKER_ADDR, clientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
-
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
             mqttClient.subscribe(topic);
@@ -35,17 +31,16 @@ public class MqttBroker implements MqttCallback {
         }
     }
 
-    /**
-     * Constructor used in GameServer
-     * */
-    public MqttBroker(String topic, String clientID, Game g) {
-        this.game = g;
 
+    /**
+     * Constructor used in Game Server
+     */
+    public MqttBroker(String topic, String clientID, GameClient gc) {
         try {
-            mqttClient = new MqttClient(broker_addr, clientID);
+            mqttClient = new MqttClient(BROKER_ADDR, clientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
-
+            this.gc = gc;
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
             mqttClient.subscribe(topic);
@@ -56,50 +51,62 @@ public class MqttBroker implements MqttCallback {
         }
     }
 
+
     /**
-     *  Send message to subscriber based on topic
-     * */
-    public void notify(String topic, String s) {
-        MqttMessage message = new MqttMessage();
-        message.setPayload(s.getBytes());
+     * Send message to subscriber based on topic
+     */
+    public void notify(String topic, String message) {
+        MqttMessage mqttMessage = new MqttMessage();
+        mqttMessage.setPayload(message.getBytes());
         try {
-            mqttClient.publish(topic, message);
-        } catch (MqttPersistenceException e) {
-            e.printStackTrace();
+            mqttClient.publish(topic, mqttMessage);
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
 
 
-
-
+    /**
+     * Note: This method is ONLY used by GameClient.
+     * Client -> Server is using RMI.
+     */
     @Override
-    public void messageArrived(String topic, MqttMessage message) throws Exception {
+    public void messageArrived(String topic, MqttMessage message) {
+        System.out.println("Start of Message: ---> ");
         System.out.println("The topic is : " + topic);
-        System.out.println("The content is : " + new String(message.getPayload()) + "\n");
-        if(topic.equals("mqtt/server")){
-            System.out.println(message.toString().length());
-            if((message.toString().length() != 0) && message.toString().contains(";")){
+        System.out.println("The content is : " + new String(message.getPayload()));
+
+        if (topic.equals(Constants.SERVER_TOPIC)) {
+            if ((message.toString().length() != 0) && message.toString().contains(";")) {
                 String[] cmd = message.toString().split(";");
 
-                System.out.println(cmd[0]);
-                if(cmd[1].equals("Login")){
-                    System.out.println("Newly added client: " + cmd[2]);
-                    GameServer.login(cmd[2]);
-                    ArrayList<String> pList = gc.gameServantStub.addPlayer(cmd[2]);
-                    gc.changePlayerList(pList);
-                    GameServer.showPlayerPool();
-
+                switch(cmd[1]){
+                    case Constants.LOGIN:
+                        System.out.println(cmd[2] + " logged in. ");
+                        gc.renderPlayerList();
+                        break;
+                    case Constants.INVITATION: // inviteAll
+                        System.out.println(cmd[2] + "invite you to join " + cmd[3]);
+                        gc.renderRoomPage(Integer.parseInt(cmd[3]));
                 }
-                if(cmd[1].equals("Vote")){
-//                game.startVote();
-                }
-
 
 
             }
+        } else if (topic.split(" ")[0].equals(Constants.ROOM)) {
+            int roomNum = Integer.parseInt(topic.split(" ")[1]);
+            switch (message.toString()){
+                case Constants.GAME_START:
+                    gc.startGame();
+                    break;
+                case Constants.VOTE:
+                    gc.vote();
+                    break;
+                case Constants.GAME_OVER:
+                    gc.renderResultPage();
+            }
+
         }
+        System.out.println("End of Message: <---" + "\n");
     }
 
 

@@ -19,12 +19,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -68,35 +65,34 @@ public class RoomController implements Initializable {
     /* UI element methods */
 
     @FXML
-    public void startBtnClick(ActionEvent event){
-        try{
-            clientObj.newGame();
+    public void startBtnClick(ActionEvent event) {
+        try {
+            clientObj.startGame();
+
+            // Note: logic of switching to game interface is written in fadeout()
             fadeOut();
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
     }
 
     @FXML
-    public void inviteBtnClick(){
+    public void inviteBtnClick() {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Please select a player from the list"));
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
 
         ArrayList<String> availablePlayers = clientObj.getAvailablePlayers();
-        if(availablePlayers.isEmpty()){
+        if (availablePlayers.isEmpty()) {
             dialogContent.setBody(new Text("No available players. Try again later."));
             Button btnCancel = new Button("Okay");
             dialogContent.setActions(btnCancel);
-            btnCancel.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    dialog.close();
-                    dialogPane.setVisible(false);
-                }
+            btnCancel.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
             });
-        }else{
+        } else {
             ListView<String> playerList = new ListView<String>();
             ObservableList<String> playerNames = FXCollections.observableArrayList();
             playerNames.addAll(availablePlayers);
@@ -105,31 +101,22 @@ public class RoomController implements Initializable {
             playerList.setPrefHeight(230);
             Button btnInvite = new Button("Invite");
             btnInvite.setDisable(true);
-            btnInvite.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    clientObj.invite(playerList.getSelectionModel().getSelectedItem());
-                    dialog.close();
-                    dialogPane.setVisible(false);
-                }
+            btnInvite.setOnAction(event -> {
+                clientObj.invite(playerList.getSelectionModel().getSelectedItem());
+                dialog.close();
+                dialogPane.setVisible(false);
             });
 
-            playerList.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if(playerList.getSelectionModel().getSelectedItem()!=null){
-                        btnInvite.setDisable(false);
-                    }
+            playerList.setOnMouseClicked(event -> {
+                if (playerList.getSelectionModel().getSelectedItem() != null) {
+                    btnInvite.setDisable(false);
                 }
             });
 
             Button btnCancel = new Button("Cancel");
-            btnCancel.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    dialog.close();
-                    dialogPane.setVisible(false);
-                }
+            btnCancel.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
             });
 
             dialogContent.setActions(playerList, btnInvite, btnCancel);
@@ -139,75 +126,90 @@ public class RoomController implements Initializable {
         dialog.show();
     }
 
-    public void replyInvitation(String username, boolean accept){
-        if(accept){
-            if(roomPlayers.size()<=4){
+    public void replyInvitation(String username, boolean accept) {
+        if (accept) {
+            if (roomPlayers.size() <= 4) {
                 Button freeButton = this.getFreeButton();
-                if(freeButton!=null){
+                if (freeButton != null) {
                     freeButton.setText(username);
                     freeButton.setDisable(true);
                 }
                 this.roomPlayers.add(username);
-            }else {
+            } else {
 
             }
-        }else{
+        } else {
 
         }
     }
 
-    private Button getFreeButton(){
-        if(!this.btnPlayer2.isDisable()){
+    private Button getFreeButton() {
+        if (!this.btnPlayer2.isDisable()) {
             return btnPlayer2;
-        }else if(!this.btnPlayer3.isDisable()){
+        } else if (!this.btnPlayer3.isDisable()) {
             return btnPlayer3;
-        }else if(!this.btnPlayer4.isDisable()){
+        } else if (!this.btnPlayer4.isDisable()) {
             return btnPlayer4;
-        }else {
+        } else {
             return null;
         }
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
 
     }
 
-    public void startup(boolean isHost){
+    public void startup(boolean isHost, ArrayList<String> roomPlayers){
         if(isHost){
             hostUsername.setText(this.clientObj.getUsername());
             btnHost.setText(this.clientObj.getUsername());
-            this.roomPlayers = new ArrayList<String>(4);
-            roomPlayers.add(this.clientObj.getUsername());
+            this.roomPlayers = new ArrayList<>(4);
+            this.roomPlayers.add(this.clientObj.getUsername());
             btnLeave.setText("Dismiss");
+        }else{
+            this.roomPlayers = roomPlayers;
+            hostUsername.setText(roomPlayers.get(0));
+            btnHost.setText(roomPlayers.get(0));
+            for(String username : roomPlayers){
+                if(!username.equals(roomPlayers.get(0))){
+                    Button freeButton = getFreeButton();
+                    if(freeButton!=null){
+                        freeButton.setText(username);
+                    }
+                }
+            }
+            btnPlayer2.setDisable(true);
+            btnPlayer3.setDisable(true);
+            btnPlayer4.setDisable(true);
+            btnStart.setDisable(true);
+            btnLeave.setText("Leave");
         }
 
         roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
     }
 
-    public void setClientObj(GameClient clientObj){
+
+    public void setClientObj(GameClient clientObj) {
         this.clientObj = clientObj;
     }
 
+
     /* This method is used to provide a smoother transition between scences */
-    public void fadeOut(){
+    public void fadeOut() {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));
         fadeTransition.setNode(rootPane);
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                loadMainScence();
-            }
-        });
+        fadeTransition.setOnFinished(event -> loadMainScence());
         fadeTransition.play();
     }
 
-    private void loadMainScence(){
-        try{
+
+    private void loadMainScence() {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
             Parent gameView = loader.load();
             Scene gameScene = new Scene(gameView);
@@ -218,7 +220,7 @@ public class RoomController implements Initializable {
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
             currentStage.setScene(gameScene);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Cannot find game scene fxml");
         }
     }

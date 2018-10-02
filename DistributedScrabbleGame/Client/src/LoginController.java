@@ -13,7 +13,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -29,7 +28,7 @@ import com.jfoenix.controls.JFXDialog;
 /* Controller class for the start scene of the Client App */
 public class LoginController implements Initializable {
 
-    GameClient clientObj;
+    private GameClient clientObj;
 
     /* UI elements */
     @FXML
@@ -60,12 +59,9 @@ public class LoginController implements Initializable {
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnClose = new Button("Okay");
-        btnClose.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dialog.close();
-                dialogPane.setVisible(false);
-            }
+        btnClose.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
         });
         dialogContent.setActions(btnClose);
         dialogPane.setVisible(true);
@@ -85,12 +81,7 @@ public class LoginController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                loadMenuScence();
-            }
-        });
+        fadeTransition.setOnFinished(event -> loadMenuScence());
         fadeTransition.play();
     }
 

@@ -1,9 +1,3 @@
-/*
-    COMP90015 Project 2 MenuController.java
-    Group Name: Distributed Otaku
-    Tutor: Alisha Aneja
- */
-
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
@@ -26,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -55,18 +50,33 @@ public class MenuController implements Initializable {
     @FXML
     private StackPane dialogPane;
 
+
+
+    /**********************Test*******************/
     @FXML
-    public void createBtnClick(ActionEvent event){
-        try{
+    private Button btnTest;
+    @FXML
+    private void testBtnClick(ActionEvent event){
+        this.clientObj.receiveInvitation("Kuanglaoshi", "111");
+    }
+    /**********************Test*******************/
+
+
+
+    @FXML
+    public void createBtnClick(ActionEvent event) {
+        try {
             clientObj.createRoom();
             this.btnCreateRoom.setDisable(true);
-            fadeOut();
-        }catch(Exception e){
+            fadeOut(true, null);
+        } catch (Exception e) {
+            e.printStackTrace();
             displayMsg();
         }
     }
+
     @FXML
-    public void refreshBtnClick(ActionEvent event){
+    public void refreshBtnClick(ActionEvent event) {
         btnRefreshPlayers.setDisable(true);
         refreshPlayerList();
         btnRefreshPlayers.setDisable(false);
@@ -75,65 +85,90 @@ public class MenuController implements Initializable {
     private GameClient clientObj;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
         /* Initialize the association of columns in TableView elements */
         username.setCellValueFactory(new PropertyValueFactory<>("username"));
         status.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
-    public void refresh(){
+    public void refresh() {
         this.userLabel.setText(this.clientObj.getUsername());
         refreshPlayerList();
     }
 
-    public void updatePlayerList(ArrayList<PlayerModel> updatedPlayers){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run(){
-                MenuController.this.playerList.getItems().clear();
-                for(PlayerModel player : updatedPlayers){
-                    MenuController.this.playerList.getItems().add(player);
-                }
+    public void updatePlayerList(ArrayList<PlayerModel> updatedPlayers) {
+        Platform.runLater(() -> {
+            MenuController.this.playerList.getItems().clear();
+            for (PlayerModel player : updatedPlayers) {
+                MenuController.this.playerList.getItems().add(player);
             }
         });
     }
 
-    public void refreshPlayerList(){
+    public void refreshPlayerList() {
         ArrayList<PlayerModel> refreshedPlayers = clientObj.getPlayerList();
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run(){
-                MenuController.this.playerList.getItems().clear();
-                for(PlayerModel player : refreshedPlayers){
-                    MenuController.this.playerList.getItems().add(player);
-                }
+        Platform.runLater(() -> {
+            MenuController.this.playerList.getItems().clear();
+            for (PlayerModel player : refreshedPlayers) {
+                MenuController.this.playerList.getItems().add(player);
             }
         });
     }
 
 
     /* This method is used to provide a smoother transition between scences */
-    public void fadeOut(){
+    public void fadeOut(boolean isHost, ArrayList<String> roomPlayers) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));
         fadeTransition.setNode(rootPane);
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                loadMainScence();
-            }
-        });
+        fadeTransition.setOnFinished(event -> loadMainScence(isHost, roomPlayers));
         fadeTransition.play();
     }
 
     @FXML
-    public void displayMsg(){
+    public void invitationMsg(String username, String roomNumber){
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setHeading(new Text("Room Invitation"));
+        dialogContent.setBody(new Text("User " + username + "invited you to Room: " + roomNumber + ". Accept?"));
+        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+        Button btnYes = new Button("Yes");
+        btnYes.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                dialog.close();
+                dialogPane.setVisible(false);
+                clientObj.acceptInvitation(roomNumber);
+            }
+        });
+
+        Button btnNo = new Button("No");
+        btnNo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                dialog.close();
+                dialogPane.setVisible(false);
+            }
+        });
+
+        dialogContent.setActions(btnYes, btnNo);
+        dialogPane.setVisible(true);
+        dialog.show();
+    }
+
+    @FXML
+    public void loadRoom(ArrayList<String> roomPlayers){
+        fadeOut(false, roomPlayers);
+    }
+
+    @FXML
+    public void displayMsg() {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Error Message"));
-        dialogContent.setBody(new Text("Room creation failed. Please try again."));
+        dialogContent.setBody(new Text("The room is full or dismissed."));
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnClose = new Button("Okay");
@@ -149,24 +184,25 @@ public class MenuController implements Initializable {
         dialog.show();
     }
 
-    private void loadMainScence(){
-        try{
+    private void loadMainScence(boolean isHost, ArrayList<String> roomPlayers) {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
             Parent roomView = loader.load();
             Scene roomScene = new Scene(roomView);
             RoomController controller = loader.getController();
             controller.setClientObj(this.clientObj);
             this.clientObj.setRoomController(controller);
-            controller.startup(true);
+            this.clientObj.removeMenuController();
+            controller.startup(isHost, roomPlayers);
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
             currentStage.setScene(roomScene);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Cannot find main scene fxml");
         }
     }
 
-    public void setClientObj(GameClient clientObj){
+    public void setClientObj(GameClient clientObj) {
         this.clientObj = clientObj;
     }
 }
