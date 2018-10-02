@@ -88,6 +88,8 @@ public class MqttBroker implements MqttCallback {
 
         String[] topics = topic.split("/") ; // always starts with mqtt
 
+        System.out.println("topics[1]: " + topics[1]);
+
         switch(topics[1]) {
             case Constants.SERVER_TOPIC:
                 serverMessageHandler(message);
@@ -114,8 +116,7 @@ public class MqttBroker implements MqttCallback {
                 gc.renderPlayerList();
                 break;
             case Constants.INVITATION: // receive invitation (invitation type: all clients)
-                System.out.println(cmd[1] + "invite you to join Room " + cmd[3]);
-//                gc.renderRoomPage(Integer.parseInt(cmd[2]));
+                System.out.println(cmd[1] + "invite you to join Room " + cmd[2]);
                 break;
         }
     }

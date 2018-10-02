@@ -185,6 +185,7 @@ public class GameClient {
     }
 
     public void receiveInvitation(String username, int roomNumber){
+        System.out.println("received invitation from " + username + " to room " + roomNumber);
         this.menuController.invitationMsg(username, roomNumber);
     }
 
