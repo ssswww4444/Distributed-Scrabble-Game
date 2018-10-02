@@ -12,6 +12,7 @@ public class MqttBroker implements MqttCallback {
     private Game game;
     private GameClient gc;
 
+    public MqttClient getMqttClient() { return mqttClient; }
 
     /**
      * Constructor used in Game Server (Broker at Server)
@@ -23,7 +24,7 @@ public class MqttBroker implements MqttCallback {
             mqttClient.connect();
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
-            mqttClient.subscribe(topic);   // game server subscribe to SERVER_TOPIC
+            mqttClient.subscribe(topic);   // game server currently subscribe to nothing: PLACEHOLDER " "
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();
@@ -43,7 +44,8 @@ public class MqttBroker implements MqttCallback {
             this.gc = gc;
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
-            mqttClient.subscribe(mqttClientID);   //
+            mqttClient.subscribe(Constants.SERVER_TOPIC);  // all clients must subscribe to SERVER_TOPIC
+            mqttClient.subscribe("mqtt/client/" + mqttClientID);   // subscribe to its username (For one-to-one)
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();
@@ -76,25 +78,24 @@ public class MqttBroker implements MqttCallback {
         System.out.println("The topic is : " + topic);
         System.out.println("The content is : " + new String(message.getPayload()));
 
-        if (topic.equals(Constants.SERVER_TOPIC)) {
-            // Messages for server use
+        if (topic.equals(Constants.SERVER_TOPIC)) { // Messages directly from server (all players receive)
             if ((message.toString().length() != 0) && message.toString().contains(";")) {
                 String[] cmd = message.toString().split(";");
 
                 switch(cmd[1]){
-                    case Constants.LOGIN:
+                    case Constants.LOGIN:  // new username login -> update list
                         System.out.println(cmd[2] + " logged in. ");
                         gc.renderPlayerList();
                         break;
-                    case Constants.INVITATION: // inviteAll
+                    case Constants.INVITATION: // receive invitation
                         System.out.println(cmd[2] + "invite you to join " + cmd[3]);
                         gc.renderRoomPage(Integer.parseInt(cmd[3]));
                 }
 
 
             }
-        } else if (topic.split(" ")[0].equals(Constants.ROOM)) {
-            // Messages for a room
+        } else if (topic.split("/")[1].equals(Constants.ROOM)) {  // Messages within room
+            // Messages from room
             int roomNum = Integer.parseInt(topic.split(" ")[1]);
             switch (message.toString()){
                 case Constants.GAME_START:

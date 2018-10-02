@@ -1,3 +1,5 @@
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -11,6 +13,7 @@ public class GameClient {
     private RoomController roomController;
     private GameController gameController;
     private ArrayList<String> gamePlayerNames;
+    private MqttBroker mqttBroker;
 
     private ServerInterface serverServantStub;
 
@@ -52,7 +55,7 @@ public class GameClient {
         } else {
             //clientID = MqttClient.generateClientId();  // not necessary
             this.username = username;
-            MqttBroker mqttBroker = new MqttBroker(username, this);
+            mqttBroker = new MqttBroker(username, this);
             serverServantStub.addTOPlayerPool(username);
         }
     }
@@ -132,7 +135,10 @@ public class GameClient {
     public void createRoom() {
         try {
             this.roomNumber = serverServantStub.addRoom();
+            mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // room number as
         } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (MqttException e) {
             e.printStackTrace();
         }
     }

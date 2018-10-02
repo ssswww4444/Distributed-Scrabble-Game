@@ -58,7 +58,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void leaveRoom() {
-        roomCount.decrementAndGet();
+//        roomCount.decrementAndGet();
     }
 
 
