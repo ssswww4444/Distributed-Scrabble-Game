@@ -66,8 +66,8 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      * Invite all available online users.
      */
     @Override
-    public void inviteAll(String inviter) {
-        mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + "Invitation" + ";" + inviter);
+    public void inviteAll(String inviter, int roomNum) {
+        mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + Constants.INVITATION + ";" + inviter + ";" + roomNum);
     }
 
 
@@ -77,6 +77,20 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     @Override
     public void invite(String inviter) throws RemoteException {
         // TODO
+    }
+
+    /**
+     * Return all the users given the room number.
+     */
+    @Override
+    public ArrayList<String> getUserInRoom(int roomNum) throws RemoteException {
+        ArrayList<String> userNames = new ArrayList<>();
+        for(Player player : playerPool){
+            if(Integer.parseInt(player.getStatus().split(" ")[1]) == roomNum){
+                userNames.add(player.getUsername());
+            }
+        }
+        return userNames;
     }
 
 
@@ -91,7 +105,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
             playerObjects.add(new Player(playerName));
         }
         games.add(new Game(playerObjects, roomNum));
-        mqttBroker.notify("ROOM" + roomNum, "GameStart");
+        mqttBroker.notify(Constants.ROOM + " " + roomNum, Constants.GAME_START);
     }
 
 

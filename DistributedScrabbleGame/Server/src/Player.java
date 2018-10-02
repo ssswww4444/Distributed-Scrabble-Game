@@ -1,17 +1,23 @@
 public class Player {
 
     private String username;
+    private String status;
 
 
-    /**
-     * Constructor
-     */
     public Player(String username) {
         this.username = username;
+        this.status = Constants.STATUS_AVAILABLE;
     }
 
-    /**
-     * Accessors
-     */
-    public String getUsername() { return username; }
+    public String getUsername() {
+        return username;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(int roomNum) {
+        this.status = Constants.ROOM + " " + roomNum;
+    }
 }

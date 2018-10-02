@@ -55,11 +55,11 @@ public class MqttBroker implements MqttCallback {
     /**
      * Send message to subscriber based on topic
      */
-    public void notify(String topic, String s) {
-        MqttMessage message = new MqttMessage();
-        message.setPayload(s.getBytes());
+    public void notify(String topic, String message) {
+        MqttMessage mqttMessage = new MqttMessage();
+        mqttMessage.setPayload(message.getBytes());
         try {
-            mqttClient.publish(topic, message);
+            mqttClient.publish(topic, mqttMessage);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -76,21 +76,35 @@ public class MqttBroker implements MqttCallback {
         System.out.println("The topic is : " + topic);
         System.out.println("The content is : " + new String(message.getPayload()));
 
-        if (topic.equals("mqtt/server")) {
+        if (topic.equals(Constants.SERVER_TOPIC)) {
             if ((message.toString().length() != 0) && message.toString().contains(";")) {
                 String[] cmd = message.toString().split(";");
 
-                System.out.println(cmd[0]);
-                if (cmd[1].equals("Login")) {
-                    System.out.println("Newly added client: " + cmd[2]);
-                    gc.renderPlayerList();
-                }
-                if (cmd[1].equals("Vote")) {
-//                game.startVote();
+                switch(cmd[1]){
+                    case Constants.LOGIN:
+                        System.out.println(cmd[2] + " logged in. ");
+                        gc.renderPlayerList();
+                        break;
+                    case Constants.INVITATION: // inviteAll
+                        System.out.println(cmd[2] + "invite you to join " + cmd[3]);
+                        gc.renderRoomPage(Integer.parseInt(cmd[3]));
                 }
 
 
             }
+        } else if (topic.split(" ")[0].equals(Constants.ROOM)) {
+            int roomNum = Integer.parseInt(topic.split(" ")[1]);
+            switch (message.toString()){
+                case Constants.GAME_START:
+                    gc.startGame();
+                    break;
+                case Constants.VOTE:
+                    gc.vote();
+                    break;
+                case Constants.GAME_OVER:
+                    gc.renderResultPage();
+            }
+
         }
         System.out.println("End of Message: <---" + "\n");
     }

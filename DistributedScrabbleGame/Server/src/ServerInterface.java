@@ -13,9 +13,11 @@ public interface ServerInterface extends Remote {
 
     void leaveRoom() throws RemoteException;
 
-    void inviteAll(String inviter) throws RemoteException;
+    void inviteAll(String inviter, int roomNum) throws RemoteException;
 
     void invite(String inviter) throws RemoteException;
+
+    ArrayList<String> getUserInRoom(int roomNum) throws RemoteException;
 
     void startNewGame(ArrayList<String> players, int roomNum) throws RemoteException;
 
