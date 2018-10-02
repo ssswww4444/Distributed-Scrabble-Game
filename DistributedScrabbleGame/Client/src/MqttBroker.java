@@ -14,16 +14,16 @@ public class MqttBroker implements MqttCallback {
 
 
     /**
-     * Constructor used in Game Server
+     * Constructor used in Game Server (Broker at Server)
      */
-    public MqttBroker(String topic, String mqttClientID) {
+    public MqttBroker(String topic, String mqttClientID) {   // mqttClientID = "gameServer"
         try {
             mqttClient = new MqttClient(BROKER_ADDR, mqttClientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
-            mqttClient.subscribe(topic);   // client subscribe to its ID
+            mqttClient.subscribe(topic);   // game server subscribe to SERVER_TOPIC
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();
@@ -33,9 +33,9 @@ public class MqttBroker implements MqttCallback {
 
 
     /**
-     * Constructor used in Game Client
+     * Constructor used in Game Client (Broker at Client)
      */
-    public MqttBroker(String topic, String mqttClientID, GameClient gc) {
+    public MqttBroker(String mqttClientID, GameClient gc) {  // mqttClientID = username
         try {
             mqttClient = new MqttClient(BROKER_ADDR, mqttClientID);
             mqttClient.setCallback(this);
@@ -43,7 +43,7 @@ public class MqttBroker implements MqttCallback {
             this.gc = gc;
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
-            mqttClient.subscribe(topic);
+            mqttClient.subscribe(mqttClientID);   //
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();

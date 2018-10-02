@@ -47,10 +47,12 @@ public class GameClient {
 
         if (serverServantStub.getPlayerPool().contains(username)) {
             throw new Exception("Existing user");
+        } else if (username.equals("gameServer")) {  // username cannot be "gameServer" (for mqtt id purpose)
+            throw new Exception("Username cannot be 'gameServer'");
         } else {
-            //clientID = MqttClient.generateClientId();
+            //clientID = MqttClient.generateClientId();  // not necessary
             this.username = username;
-            MqttBroker mqttBroker = new MqttBroker(Constants.SERVER_TOPIC, username, this);
+            MqttBroker mqttBroker = new MqttBroker(username, this);
             serverServantStub.addTOPlayerPool(username);
         }
     }
