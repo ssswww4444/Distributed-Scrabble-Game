@@ -105,7 +105,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
             playerObjects.add(new Player(playerName));
         }
         games.add(new Game(playerObjects, roomNum));
-        mqttBroker.notify(Constants.ROOM + " " + roomNum, Constants.GAME_START);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.GAME_START);
     }
 
 

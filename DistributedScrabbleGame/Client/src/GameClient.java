@@ -130,7 +130,9 @@ public class GameClient {
 
 
     /**
-     * Create a new room, room ID is assigned by server.
+     * Create a new room
+     * 1. get roomID from server
+     * 2. subscribe to "mqtt/room/roomID"
      */
     public void createRoom() {
         try {
@@ -151,6 +153,7 @@ public class GameClient {
         try {
             gamePlayerNames = serverServantStub.getUserInRoom(roomNumber);
             serverServantStub.startNewGame(gamePlayerNames, roomNumber);
+
         } catch (RemoteException e) {
             e.printStackTrace();
         }

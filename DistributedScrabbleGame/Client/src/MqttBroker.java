@@ -44,8 +44,12 @@ public class MqttBroker implements MqttCallback {
             this.gc = gc;
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
-            mqttClient.subscribe(Constants.SERVER_TOPIC);  // all clients must subscribe to SERVER_TOPIC
-            mqttClient.subscribe("mqtt/client/" + mqttClientID);   // subscribe to its username (For one-to-one)
+            // all clients must subscribe to SERVER_TOPIC
+            mqttClient.subscribe(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC);
+
+            // subscribe to its client topic (username) for one-to-one messages
+            mqttClient.subscribe(Constants.MQTT_TOPIC + "/" + Constants.CLIENT_TOPIC + mqttClientID);
+
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();
@@ -78,39 +82,66 @@ public class MqttBroker implements MqttCallback {
         System.out.println("The topic is : " + topic);
         System.out.println("The content is : " + new String(message.getPayload()));
 
-        if (topic.equals(Constants.SERVER_TOPIC)) { // Messages directly from server (all players receive)
-            if ((message.toString().length() != 0) && message.toString().contains(";")) {
-                String[] cmd = message.toString().split(";");
+        String[] topics = topic.split("/") ; // always starts with mqtt
 
-                switch(cmd[1]){
-                    case Constants.LOGIN:  // new username login -> update list
-                        System.out.println(cmd[2] + " logged in. ");
-                        gc.renderPlayerList();
-                        break;
-                    case Constants.INVITATION: // receive invitation
-                        System.out.println(cmd[2] + "invite you to join " + cmd[3]);
-                        gc.renderRoomPage(Integer.parseInt(cmd[3]));
-                }
-
-
-            }
-        } else if (topic.split("/")[1].equals(Constants.ROOM)) {  // Messages within room
-            // Messages from room
-            int roomNum = Integer.parseInt(topic.split(" ")[1]);
-            switch (message.toString()){
-                case Constants.GAME_START:
-                    gc.startGame();
-                    break;
-                case Constants.VOTE:
-                    gc.vote();
-                    break;
-                case Constants.GAME_OVER:
-                    gc.renderResultPage();
-            }
-
+        switch(topics[1]) {
+            case Constants.SERVER_TOPIC:
+                serverMessageHandler(message);
+                break;
+            case Constants.ROOM_TOPIC:
+                roomMessageHandler(Integer.parseInt(topics[2]), message);
+                break;
+            case Constants.CLIENT_TOPIC:
+                clientMessageHandler(topics[2], message);
+                break;
         }
+
         System.out.println("End of Message: <---" + "\n");
     }
+
+    /**
+     * Handle the message directly from server (all clients receive this type of message)
+     */
+    private void serverMessageHandler(MqttMessage message) {
+        if ((message.toString().length() != 0) && message.toString().contains(";")) {
+            String[] cmd = message.toString().split(";");
+
+            switch(cmd[1]) {
+                case Constants.LOGIN:  // new username login -> update list
+                    System.out.println(cmd[2] + " logged in. ");
+                    gc.renderPlayerList();
+                    break;
+                case Constants.INVITATION: // receive invitation
+                    System.out.println(cmd[2] + "invite you to join " + cmd[3]);
+                    gc.renderRoomPage(Integer.parseInt(cmd[3]));
+            }
+        }
+    }
+
+    /**
+     * Handle the message which all people in this room received
+     */
+    private void roomMessageHandler(int roomNumber, MqttMessage message) {
+        switch (message.toString()){
+            case Constants.GAME_START:
+                gc.startGame();
+                break;
+            case Constants.VOTE:
+                gc.vote();
+                break;
+            case Constants.GAME_OVER:
+                gc.renderResultPage();
+        }
+    }
+
+    /**
+     * Direct message (only this client received)
+     */
+    private void clientMessageHandler(String username, MqttMessage message) {
+
+    }
+
+
 
 
     @Override
