@@ -4,12 +4,12 @@ import java.rmi.registry.Registry;
 public class GameServer {
     private static final String PLACEHOLDER = " ";
     private static String clientID = "gameServer";
+    private static ServerServant serverServant;
 
     public static void main(String[] args) {
 
-        // there is no need for server to subscribe any topic at current stage.
+        // There is no need for server to subscribe any topic at current stage.
         MqttBroker mqttBroker = new MqttBroker(PLACEHOLDER, clientID);
-
         bindServerRegistry(mqttBroker);
     }
 
@@ -19,10 +19,10 @@ public class GameServer {
      */
     private static void bindServerRegistry(MqttBroker mqttBroker) {
         try {
-            ServerServant gs = new ServerServant(mqttBroker);
+            serverServant = new ServerServant(mqttBroker);
             //ServerInterface stub = (ServerInterface) UnicastRemoteObject.exportObject(gs, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("ServerInterface", gs);
+            registry.rebind("ServerInterface", serverServant);
             System.err.println("Game Server ready");
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());

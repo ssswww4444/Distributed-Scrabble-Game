@@ -21,10 +21,6 @@ public class ClientApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
-        for(String s: args){
-            System.out.print("args: ");
-            System.out.println(s);
-        }
     }
 
 }

@@ -81,12 +81,7 @@ public class LoginController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                loadMenuScence();
-            }
-        });
+        fadeTransition.setOnFinished(event -> loadMenuScence());
         fadeTransition.play();
     }
 

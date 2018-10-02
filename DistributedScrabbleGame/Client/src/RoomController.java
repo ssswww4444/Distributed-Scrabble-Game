@@ -86,12 +86,9 @@ public class RoomController implements Initializable {
             dialogContent.setBody(new Text("No available players. Try again later."));
             Button btnCancel = new Button("Okay");
             dialogContent.setActions(btnCancel);
-            btnCancel.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    dialog.close();
-                    dialogPane.setVisible(false);
-                }
+            btnCancel.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
             });
         }else{
             ListView<String> playerList = new ListView<String>();
@@ -102,31 +99,22 @@ public class RoomController implements Initializable {
             playerList.setPrefHeight(230);
             Button btnInvite = new Button("Invite");
             btnInvite.setDisable(true);
-            btnInvite.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    clientObj.invite(playerList.getSelectionModel().getSelectedItem());
-                    dialog.close();
-                    dialogPane.setVisible(false);
-                }
+            btnInvite.setOnAction(event -> {
+                clientObj.invite(playerList.getSelectionModel().getSelectedItem());
+                dialog.close();
+                dialogPane.setVisible(false);
             });
 
-            playerList.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if(playerList.getSelectionModel().getSelectedItem()!=null){
-                        btnInvite.setDisable(false);
-                    }
+            playerList.setOnMouseClicked(event -> {
+                if(playerList.getSelectionModel().getSelectedItem()!=null){
+                    btnInvite.setDisable(false);
                 }
             });
 
             Button btnCancel = new Button("Cancel");
-            btnCancel.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    dialog.close();
-                    dialogPane.setVisible(false);
-                }
+            btnCancel.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
             });
 
             dialogContent.setActions(playerList, btnInvite, btnCancel);
@@ -174,7 +162,7 @@ public class RoomController implements Initializable {
         if(isHost){
             hostUsername.setText(this.clientObj.getUsername());
             btnHost.setText(this.clientObj.getUsername());
-            this.roomPlayers = new ArrayList<String>(4);
+            this.roomPlayers = new ArrayList<>(4);
             roomPlayers.add(this.clientObj.getUsername());
             btnLeave.setText("Dismiss");
         }
@@ -194,12 +182,7 @@ public class RoomController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                loadMainScence();
-            }
-        });
+        fadeTransition.setOnFinished(event -> loadMainScence());
         fadeTransition.play();
     }
 

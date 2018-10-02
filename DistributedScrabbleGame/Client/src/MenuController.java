@@ -50,17 +50,19 @@ public class MenuController implements Initializable {
     private StackPane dialogPane;
 
     @FXML
-    public void createBtnClick(ActionEvent event){
-        try{
+    public void createBtnClick(ActionEvent event) {
+        try {
             clientObj.createRoom();
             this.btnCreateRoom.setDisable(true);
             fadeOut();
-        }catch(Exception e){
+        } catch (Exception e) {
+            e.printStackTrace();
             displayMsg();
         }
     }
+
     @FXML
-    public void refreshBtnClick(ActionEvent event){
+    public void refreshBtnClick(ActionEvent event) {
         btnRefreshPlayers.setDisable(true);
         refreshPlayerList();
         btnRefreshPlayers.setDisable(false);
@@ -69,31 +71,31 @@ public class MenuController implements Initializable {
     private GameClient clientObj;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
+    public void initialize(URL location, ResourceBundle resources) {
         /* Initialize the association of columns in TableView elements */
         username.setCellValueFactory(new PropertyValueFactory<>("username"));
         status.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
-    public void refresh(){
+    public void refresh() {
         this.userLabel.setText(this.clientObj.getUsername());
         refreshPlayerList();
     }
 
-    public void updatePlayerList(ArrayList<PlayerModel> updatedPlayers){
+    public void updatePlayerList(ArrayList<PlayerModel> updatedPlayers) {
         Platform.runLater(() -> {
             MenuController.this.playerList.getItems().clear();
-            for(PlayerModel player : updatedPlayers){
+            for (PlayerModel player : updatedPlayers) {
                 MenuController.this.playerList.getItems().add(player);
             }
         });
     }
 
-    public void refreshPlayerList(){
+    public void refreshPlayerList() {
         ArrayList<PlayerModel> refreshedPlayers = clientObj.getPlayerList();
         Platform.runLater(() -> {
             MenuController.this.playerList.getItems().clear();
-            for(PlayerModel player : refreshedPlayers){
+            for (PlayerModel player : refreshedPlayers) {
                 MenuController.this.playerList.getItems().add(player);
             }
         });
@@ -101,24 +103,19 @@ public class MenuController implements Initializable {
 
 
     /* This method is used to provide a smoother transition between scences */
-    public void fadeOut(){
+    public void fadeOut() {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));
         fadeTransition.setNode(rootPane);
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                loadMainScence();
-            }
-        });
+        fadeTransition.setOnFinished(event -> loadMainScence());
         fadeTransition.play();
     }
 
     @FXML
-    public void displayMsg(){
+    public void displayMsg() {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Error Message"));
         dialogContent.setBody(new Text("Room creation failed. Please try again."));
@@ -137,8 +134,8 @@ public class MenuController implements Initializable {
         dialog.show();
     }
 
-    private void loadMainScence(){
-        try{
+    private void loadMainScence() {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
             Parent roomView = loader.load();
             Scene roomScene = new Scene(roomView);
@@ -149,12 +146,12 @@ public class MenuController implements Initializable {
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
             currentStage.setScene(roomScene);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Cannot find main scene fxml");
         }
     }
 
-    public void setClientObj(GameClient clientObj){
+    public void setClientObj(GameClient clientObj) {
         this.clientObj = clientObj;
     }
 }

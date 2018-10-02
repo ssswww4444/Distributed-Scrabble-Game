@@ -3,7 +3,7 @@ import org.eclipse.paho.client.mqttv3.*;
 
 /**
  * Connection callback will be triggered by mqttClient.connect()
- * */
+ */
 public class MqttBroker implements MqttCallback {
 
     public static final String broker_addr = "tcp://127.0.0.1:1883";
@@ -15,7 +15,7 @@ public class MqttBroker implements MqttCallback {
 
     /**
      * Constructor used in Game Server
-     * */
+     */
     public MqttBroker(String topic, String clientID) {
         try {
             mqttClient = new MqttClient(broker_addr, clientID);
@@ -34,7 +34,7 @@ public class MqttBroker implements MqttCallback {
 
     /**
      * Constructor used in Game Server
-     * */
+     */
     public MqttBroker(String topic, String clientID, GameClient gc) {
         try {
             mqttClient = new MqttClient(broker_addr, clientID);
@@ -53,21 +53,17 @@ public class MqttBroker implements MqttCallback {
 
 
     /**
-     *  Send message to subscriber based on topic
-     * */
+     * Send message to subscriber based on topic
+     */
     public void notify(String topic, String s) {
         MqttMessage message = new MqttMessage();
         message.setPayload(s.getBytes());
         try {
             mqttClient.publish(topic, message);
-        } catch (MqttPersistenceException e) {
-            e.printStackTrace();
         } catch (MqttException e) {
             e.printStackTrace();
         }
     }
-
-
 
 
     @Override
@@ -75,20 +71,19 @@ public class MqttBroker implements MqttCallback {
         System.out.println("Start of Message: ---> ");
         System.out.println("The topic is : " + topic);
         System.out.println("The content is : " + new String(message.getPayload()));
-        if(topic.equals("mqtt/server")){
+        if (topic.equals("mqtt/server")) {
             System.out.println("The length of message is " + message.toString().length());
-            if((message.toString().length() != 0) && message.toString().contains(";")){
+            if ((message.toString().length() != 0) && message.toString().contains(";")) {
                 String[] cmd = message.toString().split(";");
 
                 System.out.println(cmd[0]);
-                if(cmd[1].equals("Login")){
+                if (cmd[1].equals("Login")) {
                     System.out.println("Newly added client: " + cmd[2]);
                     gc.renderPlayerList();
                 }
-                if(cmd[1].equals("Vote")){
+                if (cmd[1].equals("Vote")) {
 //                game.startVote();
                 }
-
 
 
             }

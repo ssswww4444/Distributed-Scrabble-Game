@@ -1,5 +1,3 @@
-import org.eclipse.paho.client.mqttv3.MqttClient;
-
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -7,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameClient {
-
-
     private String username;
     private int roomNumber;
     private MenuController menuController;
@@ -58,6 +54,9 @@ public class GameClient {
         return this.username;
     }
 
+    /**
+     * Get all current online users.
+     */
     public ArrayList<PlayerModel> getPlayerList() {
         ArrayList<PlayerModel> players = new ArrayList<>();
         try {
@@ -69,22 +68,36 @@ public class GameClient {
             e.printStackTrace();
         }
 
-        /*Random r = new Random();
-        int n = r.nextInt(9);
-        if(n>=0);
-        if(n>=1) players.add(new PlayerModel("dumb_user1", "Room102"));
-        if(n>=2) players.add(new PlayerModel("dumb_user2", "Available"));
-        if(n>=3) players.add(new PlayerModel("Kuang Laoshi", "Available"));
-        if(n>=4) players.add(new PlayerModel("Man Laoshi", "Room102"));
-        if(n>=5) players.add(new PlayerModel("dumb_user3", "Room219"));
-        if(n>=6) players.add(new PlayerModel("dumb_user4", "Available"));
-        if(n>=7) players.add(new PlayerModel("Will Laoshi", "Room219"));
-        if(n>=8) players.add(new PlayerModel("dumb_user5", "Room102"));*/
         return players;
     }
 
+    /**
+     * Get all current available users. (Current implementation is just "Return all users")
+     */
+    public ArrayList<String> getAvailablePlayers() {
+        ArrayList<String> players = new ArrayList<>();
+        try {
+            players = serverServantStub.getPlayerPool();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return players;
+        /*ArrayList<String> players = new ArrayList<>();
+        Random r = new Random();
+        int n = r.nextInt(6);
+        if (n >= 0) ;
+        if (n >= 1) players.add("dumb_user2");
+        if (n >= 2) players.add("Kuang Laoshi");
+        if (n >= 3) players.add("dumb_user4");
+        if (n >= 4) players.add("Will Laoshi");
+        if (n >= 5) players.add("dumb_user5");
+        return players;*/
+    }
+
+    /**
+     * Display all online users.
+     */
     public void renderPlayerList() {
-        System.out.println("try to render. ");
         ArrayList<String> players;
         try {
             players = serverServantStub.getPlayerPool();
@@ -104,25 +117,15 @@ public class GameClient {
     }
 
     public void createRoom() {
-        this.roomNumber = 666;
+        try {
+            this.roomNumber = serverServantStub.addRoom();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     public int getRoomNumber() {
         return this.roomNumber;
-    }
-
-    public ArrayList<String> getAvailablePlayers() {
-        ArrayList<String> players = new ArrayList<>();
-
-        Random r = new Random();
-        int n = r.nextInt(6);
-        if (n >= 0) ;
-        if (n >= 1) players.add("dumb_user2");
-        if (n >= 2) players.add("Kuang Laoshi");
-        if (n >= 3) players.add("dumb_user4");
-        if (n >= 4) players.add("Will Laoshi");
-        if (n >= 5) players.add("dumb_user5");
-        return players;
     }
 
     public void newGame() {

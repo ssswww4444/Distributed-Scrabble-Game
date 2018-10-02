@@ -3,10 +3,12 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerServant extends UnicastRemoteObject implements ServerInterface {
 
     private ArrayList<Player> playerPool;
+    private AtomicInteger roomCount;
     private MqttBroker mqttBroker;
 
     /**
@@ -15,6 +17,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     public ServerServant(MqttBroker broker) throws RemoteException {
         playerPool = new ArrayList<>();
         mqttBroker = broker;
+        roomCount = new AtomicInteger(0);
     }
 
 
@@ -59,7 +62,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         //game.leaveGame(username);
     }
 
-
+// wenqiangk ===> added on Tuesday.
     @Override
     public void addTOPlayerPool(String username) {
         playerPool.add(new Player(username));
@@ -75,4 +78,10 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         }
         return playerNames;
     }
+
+    @Override
+    public int addRoom() {
+        return roomCount.incrementAndGet();
+    }
+// wenqiangk <===
 }

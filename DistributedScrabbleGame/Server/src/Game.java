@@ -15,9 +15,11 @@ public class Game {
     private int voteAgreeNum;
     private int voteTotalNum;
     private int currWordLength;  // current voting word
+
     private enum GameStatus {
         INSERTING, VOTING
     }
+
     private GameStatus currStatus;
     private boolean hasInserted;  // insertion made in this turn
     private int passCount;
@@ -40,7 +42,7 @@ public class Game {
             Registry registry = LocateRegistry.getRegistry();  // get registry of the server
             //ServerServant gameServant = new ServerServant(this);   // create servant instance
             //registry.rebind(Integer.toString(roomID), gameServant);   // bind to register
-        } catch(RemoteException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -50,9 +52,9 @@ public class Game {
      */
     private void initGame() {
         // init board
-        for (int i=0; i < boardHeight; i++) {
+        for (int i = 0; i < boardHeight; i++) {
             ArrayList<Cell> row = new ArrayList<>();
-            for (int j=0; j < boardWidth; j++) {
+            for (int j = 0; j < boardWidth; j++) {
                 Cell cell = new Cell();
                 row.add(cell);
             }
@@ -60,7 +62,7 @@ public class Game {
         }
 
         // init scores
-        for (Player player: players) {
+        for (Player player : players) {
             scores.put(player, 0);
         }
 
@@ -77,7 +79,7 @@ public class Game {
      * Notify all players that game has started
      */
     private void notifyGameStart() {
-        for (Player player: players) {
+        for (Player player : players) {
             //ClientInterface clientServant = player.getClientServant();
             Player currPlayer = players.get(turn - 1);  // will be p1
 
@@ -151,6 +153,7 @@ public class Game {
 
     /**
      * Insert letter to the board at (i,j)
+     *
      * @return success or fail
      */
     public void insertLetter(int i, int j, Character letter) {
@@ -313,11 +316,10 @@ public class Game {
     }
 
 
-
     public ArrayList<String> getPlayers() {
         ArrayList<String> pList = new ArrayList<String>();
-        for(int i=0; i<players.size(); i++){
-             pList.add(players.get(i).getUsername());
+        for (int i = 0; i < players.size(); i++) {
+            pList.add(players.get(i).getUsername());
 
         }
         return pList;
