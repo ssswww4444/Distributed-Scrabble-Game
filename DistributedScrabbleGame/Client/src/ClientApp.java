@@ -22,8 +22,7 @@ public class ClientApp extends Application {
         primaryStage.show();
 
         primaryStage.setOnCloseRequest(t -> {
-            System.out.println("Stage is closing");
-            System.out.println("send notifications? ");
+            System.out.println("Primary Stage is closing, process is killed! ");
             Platform.exit();
             System.exit(0);
         });

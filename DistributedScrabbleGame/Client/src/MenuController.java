@@ -183,6 +183,14 @@ public class MenuController implements Initializable {
             this.clientObj.removeMenuController();
             controller.startup(isHost, roomPlayers);
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
+            // override the onCloseRequest and notify server to remove user.
+            currentStage.setOnCloseRequest(t -> {
+                System.out.println("Closing at the Room scene. ");
+                Platform.exit();
+                System.exit(0);
+            });
+
             currentStage.setScene(roomScene);
 
         } catch (IOException e) {

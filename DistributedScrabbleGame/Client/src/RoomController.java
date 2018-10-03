@@ -219,6 +219,14 @@ public class RoomController implements Initializable {
             this.clientObj.setGameController(controller);
             controller.startup();
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
+            // override the onCloseRequest and notify server to remove user.
+            currentStage.setOnCloseRequest(t -> {
+                System.out.println("Closing at the Game scene. ");
+                Platform.exit();
+                System.exit(0);
+            });
+
             currentStage.setScene(gameScene);
 
         } catch (IOException e) {

@@ -6,6 +6,7 @@
 
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -95,6 +96,14 @@ public class LoginController implements Initializable {
             this.clientObj.setMenuController(controller);
             controller.refresh();
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
+            // override the onCloseRequest and notify server to remove user.
+            currentStage.setOnCloseRequest(t -> {
+                System.out.println("Closing at the Menu scene. ");
+                Platform.exit();
+                System.exit(0);
+            });
+
             currentStage.setScene(menuScene);
 
         }catch(IOException e){
