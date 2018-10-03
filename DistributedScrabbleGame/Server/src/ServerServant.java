@@ -30,6 +30,16 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         playerPool.add(player);
         usernamePlayerMap.put(username, player);  // add to hashmap
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGIN + ";" + username);
+
+        // debug printings
+        System.out.println("Login info start ---> ");
+        System.out.println("new user logged in, " + username);
+        System.out.print("Current users are : ");
+        for(Player p : playerPool){
+            System.out.print(p.getUsername() + " ");
+        }
+        System.out.println();
+        System.out.println("Login info end <---" + "\n");
     }
 
 
