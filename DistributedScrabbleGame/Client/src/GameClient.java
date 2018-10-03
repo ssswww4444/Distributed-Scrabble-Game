@@ -86,7 +86,7 @@ public class GameClient {
         try {
             ArrayList<String> playerObjects = serverServantStub.getPlayerPool();
             for (String s : playerObjects) {
-                players.add(new PlayerModel(s, "Available"));
+                players.add(new PlayerModel(s, Constants.STATUS_AVAILABLE));
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -145,7 +145,6 @@ public class GameClient {
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<String>();  // empty
             renderRoomPage(true, roomNumber);
-            System.out.println("end of create room");
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MqttException e) {
@@ -184,25 +183,20 @@ public class GameClient {
      * Send invitation to target user via Server
      */
     public void invite(String username) {
-        System.out.println("try to invite: " + username);
         try {
-            System.out.println("1");
             serverServantStub.invite(this.username, username, roomNumber);
-            System.out.println("2");
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
     public void receiveInvitation(String username, int roomNumber){
-        System.out.println("received invitation from " + username + " to room " + roomNumber);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {   // avoid update directly from non-application thread
                 GameClient.this.menuController.invitationMsg(username, roomNumber);  // update UI
             }
         });
-        this.menuController.invitationMsg(username, roomNumber);
     }
 
     public void acceptInvitation(int roomNumber){
