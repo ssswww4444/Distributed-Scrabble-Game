@@ -48,7 +48,7 @@ public class MqttBroker implements MqttCallback {
             mqttClient.subscribe(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC);
 
             // subscribe to its client topic (username) for one-to-one messages
-            mqttClient.subscribe(Constants.MQTT_TOPIC + "/" + Constants.CLIENT_TOPIC + mqttClientID);
+            mqttClient.subscribe(Constants.MQTT_TOPIC + "/" + Constants.CLIENT_TOPIC + "/" + mqttClientID);
 
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
@@ -96,6 +96,7 @@ public class MqttBroker implements MqttCallback {
                 roomMessageHandler(Integer.parseInt(topics[2]), message);
                 break;
             case Constants.CLIENT_TOPIC:
+                System.out.println("get client topic: " + message.toString());
                 clientMessageHandler(topics[2], message);
                 break;
         }
@@ -136,6 +137,7 @@ public class MqttBroker implements MqttCallback {
                 break;
             case Constants.JOIN_ROOM:  // new player joined room
                 gc.playerJoinedRoom(cmd[1]);
+                break;
         }
     }
 
@@ -151,9 +153,6 @@ public class MqttBroker implements MqttCallback {
                 break;
         }
     }
-
-
-
 
     @Override
     public void connectionLost(Throwable e) {

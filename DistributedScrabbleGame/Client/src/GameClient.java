@@ -1,3 +1,4 @@
+import javafx.application.Platform;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.rmi.Remote;
@@ -144,6 +145,7 @@ public class GameClient {
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<String>();  // empty
             renderRoomPage(true, roomNumber);
+            System.out.println("end of create room");
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (MqttException e) {
@@ -177,8 +179,11 @@ public class GameClient {
      * Send invitation to target user via Server
      */
     public void invite(String username) {
+        System.out.println("try to invite: " + username);
         try {
+            System.out.println("1");
             serverServantStub.invite(this.username, username, roomNumber);
+            System.out.println("2");
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -186,6 +191,12 @@ public class GameClient {
 
     public void receiveInvitation(String username, int roomNumber){
         System.out.println("received invitation from " + username + " to room " + roomNumber);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {   // avoid update directly from non-application thread
+                GameClient.this.menuController.invitationMsg(username, roomNumber);
+            }
+        });
         this.menuController.invitationMsg(username, roomNumber);
     }
 
@@ -206,7 +217,6 @@ public class GameClient {
      * Join room successful
      */
     public void renderRoomPage(boolean isHost, int roomNumber){
-        System.out.println("rendering room");
         if(this.menuController!=null){
             try {
                 this.roomNumber = roomNumber;

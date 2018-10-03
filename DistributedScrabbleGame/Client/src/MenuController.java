@@ -68,7 +68,6 @@ public class MenuController implements Initializable {
         try {
             clientObj.createRoom();
             this.btnCreateRoom.setDisable(true);
-            fadeOut(true, null);
         } catch (Exception e) {
             e.printStackTrace();
             displayMsg();
