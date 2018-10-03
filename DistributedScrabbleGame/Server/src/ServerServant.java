@@ -3,6 +3,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ServerServant extends UnicastRemoteObject implements ServerInterface {
@@ -11,12 +12,14 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     private ArrayList<Player> playerPool;
     private AtomicInteger roomCount;
     private ArrayList<Game> games;
+    private HashMap<String, Player> usernamePlayerMap;
 
     public ServerServant(MqttBroker broker) throws RemoteException {
         mqttBroker = broker;
         playerPool = new ArrayList<>();
         roomCount = new AtomicInteger(0);
         games = new ArrayList<>();
+        usernamePlayerMap = new HashMap<>();
     }
 
 
@@ -25,9 +28,10 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void addTOPlayerPool(String username) {
-        playerPool.add(new Player(username));
-        mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + "Login" + ";" + username);
-        System.out.println("new player added. ");
+        Player player = new Player(username);
+        playerPool.add(player);
+        usernamePlayerMap.put(username, player);  // add to hashmap
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGIN + ";" + username);
     }
 
 
@@ -43,13 +47,20 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         return playerNames;
     }
 
-
     /**
      * Increment the room counter when a room is created.
      */
     @Override
-    public int addRoom() {
-        return roomCount.incrementAndGet();
+    public int createRoom(String username) {
+        // get roomID
+        int roomID = roomCount.incrementAndGet();
+
+        // update player status
+        Player player = usernamePlayerMap.get(username);
+        player.setStatus(Constants.STATUS_ROOM);
+        player.setRoomNum(roomID);
+
+        return roomID;
     }
 
 
@@ -58,7 +69,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void leaveRoom() {
-        roomCount.decrementAndGet();
+//        roomCount.decrementAndGet();
     }
 
 
@@ -67,7 +78,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void inviteAll(String inviter, int roomNum) {
-        mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + Constants.INVITATION + ";" + inviter + ";" + roomNum);
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.INVITATION + ";" + inviter + ";" + roomNum);
     }
 
 
@@ -75,8 +86,12 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      * One to One invitation.
      */
     @Override
-    public void invite(String inviter) throws RemoteException {
-        // TODO
+    public void invite(String inviter, String targetUser, int roomNum) throws RemoteException {
+        System.out.println("server receive invitation request");
+        System.out.println("inviter: " + inviter);
+        System.out.println("target: " + targetUser);
+        System.out.println("roomNum: " + roomNum);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.CLIENT_TOPIC + "/" + targetUser, Constants.INVITATION + ";" + inviter + ";" + roomNum);
     }
 
     /**
@@ -86,7 +101,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     public ArrayList<String> getUserInRoom(int roomNum) throws RemoteException {
         ArrayList<String> userNames = new ArrayList<>();
         for(Player player : playerPool){
-            if(Integer.parseInt(player.getStatus().split(" ")[1]) == roomNum){
+            if(player.getRoomNum() == roomNum) {
                 userNames.add(player.getUsername());
             }
         }
@@ -105,7 +120,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
             playerObjects.add(new Player(playerName));
         }
         games.add(new Game(playerObjects, roomNum));
-        mqttBroker.notify(Constants.ROOM + " " + roomNum, Constants.GAME_START);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.GAME_START);
     }
 
 
@@ -138,5 +153,22 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     @Override
     public void leaveGame(String username, int roomNum) throws RemoteException {
 
+    }
+
+    @Override
+    public boolean canJoinRoom(String username, int roomNum) throws  RemoteException {
+        ArrayList<String> players = getUserInRoom(roomNum);
+        if (players.size() < Constants.ROOM_MAX_PLAYER) {
+            // notify all players currently in the room that new player joined
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.JOIN_ROOM + ";" + username);
+
+            // update player status
+            Player player = usernamePlayerMap.get(username);
+            player.setStatus(Constants.STATUS_ROOM);
+            player.setRoomNum(roomNum);
+
+            return true;
+        }
+        return false;
     }
 }

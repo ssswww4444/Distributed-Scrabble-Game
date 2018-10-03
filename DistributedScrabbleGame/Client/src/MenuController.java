@@ -57,7 +57,7 @@ public class MenuController implements Initializable {
     private Button btnTest;
     @FXML
     private void testBtnClick(ActionEvent event){
-        this.clientObj.receiveInvitation("Kuanglaoshi", "111");
+        this.clientObj.receiveInvitation("Kuanglaoshi", 111);
     }
     /**********************Test*******************/
 
@@ -68,7 +68,6 @@ public class MenuController implements Initializable {
         try {
             clientObj.createRoom();
             this.btnCreateRoom.setDisable(true);
-            fadeOut(true, null);
         } catch (Exception e) {
             e.printStackTrace();
             displayMsg();
@@ -129,7 +128,7 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    public void invitationMsg(String username, String roomNumber){
+    public void invitationMsg(String username, int roomNumber){
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Room Invitation"));
         dialogContent.setBody(new Text("User " + username + "invited you to Room: " + roomNumber + ". Accept?"));
@@ -160,8 +159,8 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    public void loadRoom(ArrayList<String> roomPlayers){
-        fadeOut(false, roomPlayers);
+    public void loadRoom(boolean isHost, ArrayList<String> roomPlayers){
+        fadeOut(isHost, roomPlayers);
     }
 
     @FXML
