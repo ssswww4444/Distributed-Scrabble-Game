@@ -49,16 +49,16 @@ public class MenuController implements Initializable {
     private StackPane dialogPane;
 
 
-
     /**********************Test*******************/
     @FXML
     private Button btnTest;
+
     @FXML
-    private void testBtnClick(ActionEvent event){
+    private void testBtnClick(ActionEvent event) {
         this.clientObj.receiveInvitation("Kuanglaoshi", 111);
     }
-    /**********************Test*******************/
 
+    /**********************Test*******************/
 
 
     @FXML
@@ -126,7 +126,7 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    public void invitationMsg(String username, int roomNumber){
+    public void invitationMsg(String username, int roomNumber) {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Room Invitation"));
         dialogContent.setBody(new Text("User " + username + "invited you to Room: " + roomNumber + ". Accept?"));
@@ -151,7 +151,7 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    public void loadRoom(boolean isHost, ArrayList<String> roomPlayers){
+    public void loadRoom(boolean isHost, ArrayList<String> roomPlayers) {
         fadeOut(isHost, roomPlayers);
     }
 
@@ -183,6 +183,14 @@ public class MenuController implements Initializable {
             this.clientObj.removeMenuController();
             controller.startup(isHost, roomPlayers);
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
+            // override the onCloseRequest and notify server to remove user.
+            currentStage.setOnCloseRequest(t -> {
+                System.out.println("Closing at the Room scene. ");
+                Platform.exit();
+                System.exit(0);
+            });
+
             currentStage.setScene(roomScene);
 
         } catch (IOException e) {
@@ -193,4 +201,5 @@ public class MenuController implements Initializable {
     public void setClientObj(GameClient clientObj) {
         this.clientObj = clientObj;
     }
+
 }

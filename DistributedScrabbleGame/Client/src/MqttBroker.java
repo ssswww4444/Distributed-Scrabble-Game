@@ -111,7 +111,9 @@ public class MqttBroker implements MqttCallback {
         String[] cmd = message.toString().split(";");
         switch(cmd[0]) {
             case Constants.LOGIN:  // new username login -> update list
-                System.out.println(cmd[1] + " logged in. ");
+                gc.renderPlayerList();
+                break;
+            case Constants.LOGOUT:
                 gc.renderPlayerList();
                 break;
             case Constants.INVITATION: // receive invitation (invitation type: all clients)

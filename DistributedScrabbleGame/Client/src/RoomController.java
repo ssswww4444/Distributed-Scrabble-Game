@@ -1,10 +1,10 @@
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
@@ -115,6 +114,7 @@ public class RoomController implements Initializable {
         dialogPane.setVisible(true);
         dialog.show();
     }
+
 
 //    public void replyInvitation(String username, boolean accept) {
 //        if (accept) {
@@ -219,6 +219,14 @@ public class RoomController implements Initializable {
             this.clientObj.setGameController(controller);
             controller.startup();
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
+            // override the onCloseRequest and notify server to remove user.
+            currentStage.setOnCloseRequest(t -> {
+                System.out.println("Closing at the Game scene. ");
+                Platform.exit();
+                System.exit(0);
+            });
+
             currentStage.setScene(gameScene);
 
         } catch (IOException e) {

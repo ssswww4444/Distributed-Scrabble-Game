@@ -265,4 +265,14 @@ public class GameClient {
     }
 
 
+    /**
+     * Tell server to remove the user from playerPoll.
+     */
+    public void logout() {
+        try {
+            serverServantStub.removeFromPlayerPool(username);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
 }

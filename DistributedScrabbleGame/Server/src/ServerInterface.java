@@ -7,6 +7,8 @@ public interface ServerInterface extends Remote {
 
     void addTOPlayerPool(String username) throws RemoteException;
 
+    void removeFromPlayerPool(String username) throws RemoteException;
+
     ArrayList<String> getPlayerPool() throws RemoteException;
 
     int createRoom(String username) throws RemoteException;
