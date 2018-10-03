@@ -81,11 +81,11 @@ public class LoginController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMenuScence());
+        fadeTransition.setOnFinished(event -> loadMenuScene());
         fadeTransition.play();
     }
 
-    private void loadMenuScence(){
+    private void loadMenuScene(){
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Menu.fxml"));
             Parent menuView = loader.load();
