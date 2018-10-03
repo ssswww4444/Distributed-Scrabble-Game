@@ -1,3 +1,5 @@
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -12,6 +14,8 @@ public class GameClient {
     private GameController gameController;
 
     private ServerInterface serverServantStub;
+
+    private MqttBroker mqttBroker;
 
     public String getUsername() {
         return this.username;
@@ -49,7 +53,7 @@ public class GameClient {
         } else {
             //clientID = MqttClient.generateClientId();
             this.username = username;
-            MqttBroker mqttBroker = new MqttBroker(Constants.SERVER_TOPIC, username, this);
+            mqttBroker = new MqttBroker(Constants.SERVER_TOPIC, username, this);
             serverServantStub.addTOPlayerPool(username);
         }
     }
@@ -61,7 +65,7 @@ public class GameClient {
     private void getServerRegistry() {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost");
-            serverServantStub = (ServerInterface) registry.lookup("ServerInterface");
+            this.serverServantStub = (ServerInterface) registry.lookup("ServerInterface");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,11 +129,19 @@ public class GameClient {
 
     /**
      * Create a new room, room ID is assigned by server.
+     * player who creates the room will subscribe the roomID as a topic
      */
     public void createRoom() {
+
         try {
             this.roomNumber = serverServantStub.addRoom();
+            System.out.println(Constants.ROOM + " " + this.roomNumber);
+            this.mqttBroker.getMqttClient().subscribe(Constants.ROOM + "_" + this.roomNumber);
+
         } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (MqttException e) {
+            e.getCause();
             e.printStackTrace();
         }
     }
@@ -140,7 +152,10 @@ public class GameClient {
      */
     public void startGame() {
         try {
+            System.out.println("Game ready to start");
+            System.out.println(this.serverServantStub.getUserInRoom(roomNumber));
             serverServantStub.startNewGame(serverServantStub.getUserInRoom(roomNumber), roomNumber);
+            System.out.println("Game started");
         } catch (RemoteException e) {
             e.printStackTrace();
         }

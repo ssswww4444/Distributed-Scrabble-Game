@@ -66,7 +66,7 @@ public class MenuController implements Initializable {
     @FXML
     public void createBtnClick(ActionEvent event) {
         try {
-            clientObj.createRoom();
+            clientObj. createRoom();
             this.btnCreateRoom.setDisable(true);
             fadeOut(true, null);
         } catch (Exception e) {

@@ -13,6 +13,7 @@ public class MqttBroker implements MqttCallback {
     private GameClient gc;
 
 
+
     /**
      * Constructor used in Game Server
      */
@@ -34,6 +35,8 @@ public class MqttBroker implements MqttCallback {
 
     /**
      * Constructor used in Game Server
+     * 1.subscribe server topic
+     * 2.subscribe their own clientID as topic
      */
     public MqttBroker(String topic, String clientID, GameClient gc) {
         try {
@@ -44,6 +47,7 @@ public class MqttBroker implements MqttCallback {
             System.out.println("Client connected?: " + mqttClient.isConnected());
 
             mqttClient.subscribe(topic);
+            mqttClient.subscribe(clientID);
         } catch (MqttException e) {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();
@@ -99,7 +103,7 @@ public class MqttBroker implements MqttCallback {
                     gc.startGame();
                     break;
                 case Constants.VOTE:
-                    gc.vote();
+//                    gc.vote();
                     break;
                 case Constants.GAME_OVER:
                     gc.renderResultPage();
@@ -121,5 +125,14 @@ public class MqttBroker implements MqttCallback {
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
 //       System.out.println("deliveryComplete---------" + token.isComplete());
+    }
+
+
+    public MqttClient getMqttClient() {
+        return this.mqttClient;
+    }
+
+    public void setMqttClient(MqttClient mc) {
+        this.mqttClient = mc;
     }
 }

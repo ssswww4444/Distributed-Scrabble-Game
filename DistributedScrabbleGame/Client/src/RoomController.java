@@ -68,7 +68,6 @@ public class RoomController implements Initializable {
     public void startBtnClick(ActionEvent event) {
         try {
             clientObj.startGame();
-
             // Note: logic of switching to game interface is written in fadeout()
             fadeOut();
         } catch (Exception e) {

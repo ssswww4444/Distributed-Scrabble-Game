@@ -12,6 +12,8 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     private AtomicInteger roomCount;
     private ArrayList<Game> games;
 
+    private Player player;
+
     public ServerServant(MqttBroker broker) throws RemoteException {
         mqttBroker = broker;
         playerPool = new ArrayList<>();
@@ -25,7 +27,8 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void addTOPlayerPool(String username) {
-        playerPool.add(new Player(username));
+        player = new Player(username);
+        playerPool.add(player);
         mqttBroker.notify(Constants.SERVER_TOPIC, Constants.SERVER_TOPIC + ";" + "Login" + ";" + username);
         System.out.println("new player added. ");
     }
@@ -49,6 +52,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public int addRoom() {
+        player.setStatus(roomCount.incrementAndGet());
         return roomCount.incrementAndGet();
     }
 
@@ -86,6 +90,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     public ArrayList<String> getUserInRoom(int roomNum) throws RemoteException {
         ArrayList<String> userNames = new ArrayList<>();
         for(Player player : playerPool){
+            System.err.println(player.getStatus());
             if(Integer.parseInt(player.getStatus().split(" ")[1]) == roomNum){
                 userNames.add(player.getUsername());
             }
@@ -100,12 +105,16 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void startNewGame(ArrayList<String> players, int roomNum) {
+        System.out.println(roomNum);
         ArrayList<Player> playerObjects = new ArrayList<>();
+        System.out.println("000");
         for (String playerName : players) {
             playerObjects.add(new Player(playerName));
         }
+        System.out.println("111");
         games.add(new Game(playerObjects, roomNum));
-        mqttBroker.notify(Constants.ROOM + " " + roomNum, Constants.GAME_START);
+        System.out.println("222");
+        mqttBroker.notify(Constants.ROOM + "_" + roomNum, Constants.GAME_START);
     }
 
 
