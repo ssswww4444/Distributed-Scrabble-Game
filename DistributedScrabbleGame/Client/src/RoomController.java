@@ -1,10 +1,3 @@
-/*
-    COMP90015 Project 1 ClientAppStartController.java
-    Student Name: Haowen Tang
-    Student Number: 706892
-    Tutor: Alisha Aneja
- */
-
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
@@ -68,9 +61,6 @@ public class RoomController implements Initializable {
     public void startBtnClick(ActionEvent event) {
         try {
             clientObj.startGame();
-
-            // Note: logic of switching to game interface is written in fadeout()
-            fadeOut();
         } catch (Exception e) {
 
         }

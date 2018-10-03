@@ -1,12 +1,10 @@
 import javafx.application.Platform;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class GameClient {
     private String username;
@@ -57,7 +55,6 @@ public class GameClient {
         } else if (username.equals("")) {  // empty string
             throw new Exception("Username cannot be empty");
         } else {
-            //clientID = MqttClient.generateClientId();  // not necessary
             this.username = username;
             mqttBroker = new MqttBroker(username, this);
             serverServantStub.addTOPlayerPool(username);
@@ -143,31 +140,28 @@ public class GameClient {
         try {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
-            this.roomPlayerNames = new ArrayList<String>();  // empty
+            this.roomPlayerNames = new ArrayList<>();  // empty
             renderRoomPage(true, roomNumber);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (MqttException e) {
+        } catch (RemoteException | MqttException e) {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Receive notification that new player joined room
      */
     public void playerJoinedRoom(String username) {
         roomPlayerNames.add(username); // update list
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                GameClient.this.roomController.joinRoom(username);  // update UI
-            }
+        Platform.runLater(() -> {
+            GameClient.this.roomController.joinRoom(username);  // update UI
         });
     }
 
 
     /**
      * Create a new room, room ID is assigned by server.
+     * Host start a game and server then send broadcasts to others in the room
      */
     public void startGame() {
         try {
@@ -176,6 +170,14 @@ public class GameClient {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Note!! This is used by guests in the room, be notified to update UI to "game".
+     */
+    public void renderGamePage() {
+        roomController.fadeOut();
     }
 
 
@@ -190,16 +192,15 @@ public class GameClient {
         }
     }
 
-    public void receiveInvitation(String username, int roomNumber){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {   // avoid update directly from non-application thread
-                GameClient.this.menuController.invitationMsg(username, roomNumber);  // update UI
-            }
+
+    public void receiveInvitation(String username, int roomNumber) {
+        Platform.runLater(() -> {   // avoid update directly from non-application thread
+            GameClient.this.menuController.invitationMsg(username, roomNumber);  // update UI
         });
     }
 
-    public void acceptInvitation(int roomNumber){
+
+    public void acceptInvitation(int roomNumber) {
         try {
             if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
                 roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // not including himself
@@ -212,11 +213,12 @@ public class GameClient {
         }
     }
 
+
     /**
      * Join room successful
      */
-    public void renderRoomPage(boolean isHost, int roomNumber){
-        if(this.menuController!=null){
+    public void renderRoomPage(boolean isHost, int roomNumber) {
+        if (this.menuController != null) {
             try {
                 this.roomNumber = roomNumber;
                 this.roomPlayerNames.add(this.username);  // add himself
@@ -237,7 +239,7 @@ public class GameClient {
     }
 
 
-    public void removeMenuController(){
+    public void removeMenuController() {
         this.menuController = null;
     }
 

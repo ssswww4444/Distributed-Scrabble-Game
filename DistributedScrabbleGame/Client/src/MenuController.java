@@ -3,7 +3,6 @@ import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,7 +19,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -123,7 +121,7 @@ public class MenuController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScence(isHost, roomPlayers));
+        fadeTransition.setOnFinished(event -> loadMainScene(isHost, roomPlayers));
         fadeTransition.play();
     }
 
@@ -135,22 +133,16 @@ public class MenuController implements Initializable {
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnYes = new Button("Yes");
-        btnYes.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dialog.close();
-                dialogPane.setVisible(false);
-                clientObj.acceptInvitation(roomNumber);
-            }
+        btnYes.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
+            clientObj.acceptInvitation(roomNumber);
         });
 
         Button btnNo = new Button("No");
-        btnNo.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dialog.close();
-                dialogPane.setVisible(false);
-            }
+        btnNo.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
         });
 
         dialogContent.setActions(btnYes, btnNo);
@@ -171,19 +163,16 @@ public class MenuController implements Initializable {
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnClose = new Button("Okay");
-        btnClose.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                dialog.close();
-                dialogPane.setVisible(false);
-            }
+        btnClose.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
         });
         dialogContent.setActions(btnClose);
         dialogPane.setVisible(true);
         dialog.show();
     }
 
-    private void loadMainScence(boolean isHost, ArrayList<String> roomPlayers) {
+    private void loadMainScene(boolean isHost, ArrayList<String> roomPlayers) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
             Parent roomView = loader.load();

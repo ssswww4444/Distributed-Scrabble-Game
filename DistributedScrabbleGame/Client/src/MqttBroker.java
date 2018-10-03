@@ -127,7 +127,7 @@ public class MqttBroker implements MqttCallback {
         String[] cmd = message.toString().split(";");
         switch (cmd[0]){  // action types
             case Constants.GAME_START:
-                gc.startGame();
+                gc.renderGamePage();
                 break;
             case Constants.VOTE:
                 gc.vote();
