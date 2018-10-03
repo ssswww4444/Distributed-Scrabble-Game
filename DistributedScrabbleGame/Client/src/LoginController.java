@@ -100,6 +100,7 @@ public class LoginController implements Initializable {
             // override the onCloseRequest and notify server to remove user.
             currentStage.setOnCloseRequest(t -> {
                 System.out.println("Closing at the Menu scene. ");
+                clientObj.logout();
                 Platform.exit();
                 System.exit(0);
             });

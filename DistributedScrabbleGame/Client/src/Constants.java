@@ -15,6 +15,7 @@ public class Constants {
     public static final String VOTE = "Vote";
     public static final String GAME_OVER = "GameOver";
     public static final String LOGIN = "Login";
+    public static final String LOGOUT = "Logout";
     public static final String INVITATION = "Invitation";
     public static final String JOIN_ROOM = "JoinRoom";
 

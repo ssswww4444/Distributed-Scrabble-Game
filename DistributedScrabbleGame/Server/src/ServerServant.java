@@ -44,6 +44,27 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
 
 
     /**
+     * remove the user from playerPool, when closing the client program.
+     */
+    @Override
+    public void removeFromPlayerPool(String username) {
+        playerPool.removeIf(player -> player.getUsername().equals(username));
+        usernamePlayerMap.remove(username);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGOUT + ";" + username);
+
+        // debug printings
+        System.out.println("Logout info start ---> ");
+        System.out.println("user logged out, " + username);
+        System.out.print("Current users are : ");
+        for(Player p : playerPool){
+            System.out.print(p.getUsername() + " ");
+        }
+        System.out.println();
+        System.out.println("Logout info end <---" + "\n");
+    }
+
+
+    /**
      * return a list of current users' names
      */
     @Override
