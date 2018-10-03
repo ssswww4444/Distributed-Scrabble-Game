@@ -158,7 +158,12 @@ public class GameClient {
      */
     public void playerJoinedRoom(String username) {
         roomPlayerNames.add(username); // update list
-        roomController.joinRoom(username);  // update UI
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                GameClient.this.roomController.joinRoom(username);  // update UI
+            }
+        });
     }
 
 
@@ -194,7 +199,7 @@ public class GameClient {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {   // avoid update directly from non-application thread
-                GameClient.this.menuController.invitationMsg(username, roomNumber);
+                GameClient.this.menuController.invitationMsg(username, roomNumber);  // update UI
             }
         });
         this.menuController.invitationMsg(username, roomNumber);
