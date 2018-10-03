@@ -1,10 +1,10 @@
+import javafx.application.Platform;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class GameClient {
     private String username;
@@ -12,10 +12,10 @@ public class GameClient {
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
+    private ArrayList<String> roomPlayerNames;
+    private MqttBroker mqttBroker;
 
     private ServerInterface serverServantStub;
-
-    private MqttBroker mqttBroker;
 
     public String getUsername() {
         return this.username;
@@ -50,10 +50,13 @@ public class GameClient {
 
         if (serverServantStub.getPlayerPool().contains(username)) {
             throw new Exception("Existing user");
+        } else if (username.equals("gameServer")) {  // username cannot be "gameServer" (for mqtt id purpose)
+            throw new Exception("Username cannot be 'gameServer'");
+        } else if (username.equals("")) {  // empty string
+            throw new Exception("Username cannot be empty");
         } else {
-            //clientID = MqttClient.generateClientId();
             this.username = username;
-            mqttBroker = new MqttBroker(Constants.SERVER_TOPIC, username, this);
+            mqttBroker = new MqttBroker(username, this);
             serverServantStub.addTOPlayerPool(username);
         }
     }
@@ -80,7 +83,7 @@ public class GameClient {
         try {
             ArrayList<String> playerObjects = serverServantStub.getPlayerPool();
             for (String s : playerObjects) {
-                players.add(new PlayerModel(s, "Available"));
+                players.add(new PlayerModel(s, Constants.STATUS_AVAILABLE));
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -128,19 +131,24 @@ public class GameClient {
 
 
     /**
+<<<<<<< HEAD
      * Create a new room, room ID is assigned by server.
      * player who creates the room will subscribe the roomID as a topic
+=======
+     * Create a new room
+     * 1. get roomID from server
+     * 2. subscribe to "mqtt/room/roomID"
+     * 3. get player names
+>>>>>>> 1bc66dce33b0f7283d36bd28cf922dbb8d3b559b
      */
     public void createRoom() {
 
         try {
-            this.roomNumber = serverServantStub.addRoom();
-            System.out.println(Constants.ROOM + " " + this.roomNumber);
-            this.mqttBroker.getMqttClient().subscribe(Constants.ROOM + "_" + this.roomNumber);
-
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        } catch (MqttException e) {
+            this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
+            mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
+            this.roomPlayerNames = new ArrayList<>();  // empty
+            renderRoomPage(true, roomNumber);
+        } catch (RemoteException | MqttException e) {
             e.getCause();
             e.printStackTrace();
         }
@@ -148,62 +156,88 @@ public class GameClient {
 
 
     /**
+     * Receive notification that new player joined room
+     */
+    public void playerJoinedRoom(String username) {
+        roomPlayerNames.add(username); // update list
+        Platform.runLater(() -> {
+            GameClient.this.roomController.joinRoom(username);  // update UI
+        });
+    }
+
+
+    /**
      * Create a new room, room ID is assigned by server.
+     * Host start a game and server then send broadcasts to others in the room
      */
     public void startGame() {
         try {
             System.out.println("Game ready to start");
             System.out.println(this.serverServantStub.getUserInRoom(roomNumber));
-            serverServantStub.startNewGame(serverServantStub.getUserInRoom(roomNumber), roomNumber);
             System.out.println("Game started");
+            serverServantStub.startNewGame(roomPlayerNames, roomNumber);
+
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
 
 
-    public void invite(String username) {
-
-        /*Random r = new Random();
-        int n = r.nextInt(10);
-        if (n > 7) {
-            roomController.replyInvitation(username, false);
-        } else {
-            roomController.replyInvitation(username, true);
-        }*/
+    /**
+     * Note!! This is used by guests in the room, be notified to update UI to "game".
+     */
+    public void renderGamePage() {
+        roomController.fadeOut();
     }
 
-    public void receiveInvitation(String username, String roomNumber){
-        this.menuController.invitationMsg(username, roomNumber);
-    }
-
-    public void acceptInvitation(String roomNumber){
-        Random r = new Random();
-        int n = r.nextInt(10);
-        if (n > 5) {
-            ArrayList<String> roomPlayers = new ArrayList<>();
-            roomPlayers.add("Shabi");
-            roomPlayers.add("Zhizhang");
-            roomPlayers.add(this.username);
-            joinConfirmed(roomPlayers, Integer.parseInt(roomNumber));
-        } else {
-            menuController.displayMsg();
-        }
-    }
-
-    public void joinConfirmed(ArrayList<String> roomPlayers, int roomNumber){
-        if(this.menuController!=null){
-            this.roomNumber = roomNumber;
-            this.menuController.loadRoom(roomPlayers);
-        }
-    }
 
     /**
-     * Be invited, render the GUI to ROOM(input)
+     * Send invitation to target user via Server
      */
-    public void renderRoomPage(int roomNumber) {
-        this.roomNumber = roomNumber;
-        // TODO
+    public void invite(String username) {
+        try {
+            serverServantStub.invite(this.username, username, roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void receiveInvitation(String username, int roomNumber) {
+        Platform.runLater(() -> {   // avoid update directly from non-application thread
+            GameClient.this.menuController.invitationMsg(username, roomNumber);  // update UI
+        });
+    }
+
+
+    public void acceptInvitation(int roomNumber) {
+        try {
+            if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
+                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // not including himself
+                renderRoomPage(false, roomNumber);
+            } else {  // failed
+                menuController.displayMsg();
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Join room successful
+     */
+    public void renderRoomPage(boolean isHost, int roomNumber) {
+        if (this.menuController != null) {
+            try {
+                this.roomNumber = roomNumber;
+                this.roomPlayerNames.add(this.username);  // add himself
+                this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
+                mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
@@ -215,7 +249,7 @@ public class GameClient {
     }
 
 
-    public void removeMenuController(){
+    public void removeMenuController() {
         this.menuController = null;
     }
 
@@ -233,6 +267,10 @@ public class GameClient {
     }
 
     public void noWord() {
+
+    }
+
+    public void vote() {
 
     }
 
