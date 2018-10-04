@@ -162,31 +162,27 @@ public class RoomController implements Initializable {
     }
 
     public void startup(boolean isHost, ArrayList<String> roomPlayers){
+        hostUsername.setText(roomPlayers.get(0));
+        btnHost.setText(roomPlayers.get(0));
+        for(String username : roomPlayers){
+            if(!username.equals(roomPlayers.get(0))){
+                Button freeButton = getFreeButton();
+                if(freeButton!=null){
+                    freeButton.setText(username);
+                }
+            }
+        }
         if(isHost){
-            hostUsername.setText(this.clientObj.getUsername());
-            btnHost.setText(this.clientObj.getUsername());
             this.roomPlayers = new ArrayList<>(4);
             this.roomPlayers.add(this.clientObj.getUsername());
             btnLeave.setText("Dismiss");
         }else{
             this.roomPlayers = roomPlayers;
-            hostUsername.setText(roomPlayers.get(0));
-            btnHost.setText(roomPlayers.get(0));
             btnPlayer2.setDisable(true);
             btnPlayer3.setDisable(true);
             btnPlayer4.setDisable(true);
             btnStart.setDisable(true);
             btnLeave.setText("Leave");
-        }
-        if(roomPlayers!=null){
-            for(String username : roomPlayers){
-                if(!username.equals(roomPlayers.get(0))){
-                    Button freeButton = getFreeButton();
-                    if(freeButton!=null){
-                        freeButton.setText(username);
-                    }
-                }
-            }
         }
 
         roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
@@ -206,12 +202,12 @@ public class RoomController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScence());
+        fadeTransition.setOnFinished(event -> loadMainScene());
         fadeTransition.play();
     }
 
 
-    private void loadMainScence() {
+    private void loadMainScene() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
             Parent gameView = loader.load();

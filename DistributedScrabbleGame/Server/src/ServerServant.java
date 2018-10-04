@@ -11,6 +11,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     private AtomicInteger roomCount;
     private ArrayList<Game> games;
     private HashMap<String, Player> usernamePlayerMap;
+    private HashMap<Integer, Game> roomNumGameMap;
 
     public ServerServant(MqttBroker broker) throws RemoteException {
         mqttBroker = broker;
@@ -18,6 +19,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         roomCount = new AtomicInteger(0);
         games = new ArrayList<>();
         usernamePlayerMap = new HashMap<>();
+        roomNumGameMap = new HashMap<>();
     }
 
 
@@ -148,7 +150,9 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         for (String playerName : players) {
             playerObjects.add(new Player(playerName));
         }
-        games.add(new Game(playerObjects, roomNum));
+        Game g = new Game(playerObjects, roomNum);
+        games.add(g);
+        roomNumGameMap.put(roomNum, g);
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.GAME_START);
     }
 
@@ -162,8 +166,11 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
 
 
     @Override
-    public void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum) throws RemoteException {
-
+    public void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum, String word) throws RemoteException {
+        Game currGame = roomNumGameMap.get(roomNum);
+        currGame.startVote(startI, startJ, length, horizontal);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                Constants.VOTE + ";" + startI + ";" + startJ + ";" + length + ";" + horizontal + ";" + word);
     }
 
 
@@ -175,9 +182,35 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
 
     @Override
     public void vote(String username, boolean agree, int roomNum) throws RemoteException {
+        Game currGame = roomNumGameMap.get(roomNum);
+        String playername = currGame.getCurrPlayer();
+        int result = currGame.vote(playername, agree);
 
+        HashMap<String, Integer> scores = currGame.getScores();
+
+        System.out.println("score get username: " + scores.get(playername));
+        if(result == 1){    //if all voted yes
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.VOTE_RESULT + ";" + playername + ";" +
+                            scores.get(playername) + ";" + "true");
+        }else if(result == 0){
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.VOTE_RESULT + ";" + playername + ";" +
+                            scores.get(playername) + ";" + "false");
+        }
+        else{  //if somebody has not voted
+                System.out.println("Waiting for voting");
+        }
     }
 
+
+
+    @Override
+    public void notifyVoteResult(String username, int score, int roomNum) throws RemoteException {
+        Game currGame = roomNumGameMap.get(roomNum);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                username + ";" + score);
+    }
 
     @Override
     public void leaveGame(String username, int roomNum) throws RemoteException {

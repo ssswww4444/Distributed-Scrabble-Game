@@ -150,6 +150,7 @@ public class GameClient {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<>();  // empty
+            this.roomPlayerNames.add(this.username);
             renderRoomPage(true, roomNumber);
         } catch (RemoteException | MqttException e) {
             e.printStackTrace();
@@ -231,7 +232,6 @@ public class GameClient {
             try {
                 this.isHost = isHost;
                 this.roomNumber = roomNumber;
-                this.roomPlayerNames.add(this.username);  // add himself
                 this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
                 mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
             } catch (MqttException e) {
@@ -269,16 +269,25 @@ public class GameClient {
         this.roomController = null;
     }
 
-    public void sendVoteRequest(String word) {
+    public void sendVoteRequest(int startRow, int startCol, String word,
+                                boolean horizontal, int insertRow, int insertCol) {
 
         // RMI Server
 
-        this.gameController.voteMsg(word);
+//        this.gameController.voteMsg(word);
         /*if (word.equals("HAPPY")) {
             this.gameController.voteResponse(false);
         } else {
             this.gameController.voteResponse(true);
         }*/
+
+        try {
+            serverServantStub.startVote(startRow, startCol, word.length(),
+                    horizontal, roomNumber, word);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void pass() {
@@ -296,8 +305,33 @@ public class GameClient {
         this.gameController.renderNext();
     }
 
-    public void vote() {
 
+
+    public void updatePlayerScore(String username, int score){
+        try {
+            serverServantStub.notifyVoteResult(username, score, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Boolean isValidWord(Boolean isWord) {
+        return true;
+    }
+
+
+    public void vote(String word) {
+        System.out.println("Lets vote: " + word);
+
+
+        this.gameController.voteMsg(word);
+//
+//
+//        try {
+//            serverServantStub.vote(this.username, result, this.roomNumber);
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -310,13 +344,23 @@ public class GameClient {
         }
     }
 
-    public void yesVote(){
-        renderVoteResult(true, 111);
+    public void yesVote(String word){
+        try {
+            serverServantStub.vote(this.username,true, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+//        renderVoteResult(true, 111);
         this.nextTurn();
     }
 
     public void noVote(){
-        renderVoteResult(false, 0);
+        try {
+            serverServantStub.vote(this.username,false, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+//        renderVoteResult(false, 0);
         this.nextTurn();
     }
 

@@ -105,7 +105,16 @@ public class GameController implements Initializable {
         this.enterStateWait();
         this.btnVote.setDisable(true);
         System.out.println(chosenWord);
-        this.clientObj.sendVoteRequest(this.chosenWord);
+        this.clientObj.sendVoteRequest(getRow(head), getCol(head), this.chosenWord, isHorizontal(head, tail),
+                getRow(chosenCell), getCol(chosenCell));
+    }
+
+    private boolean isHorizontal(TextField start, TextField end){
+        if(getRow(start)==getRow(end)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     private String getWord(TextField head, TextField tail){
@@ -244,7 +253,6 @@ public class GameController implements Initializable {
         }
         this.state = "NotMyTurn";
         this.stateLabel.setText("NotMyTurn");
-
         this.enterStateSelect();
     }
 
@@ -456,28 +464,30 @@ public class GameController implements Initializable {
 
     @FXML
     public void voteMsg(String word) {
-        JFXDialogLayout dialogContent = new JFXDialogLayout();
-        dialogContent.setHeading(new Text("Vote"));
-        dialogContent.setBody(new Text("Do you think " + word + " is a word?"));
-        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
-        dialog.setOverlayClose(false);
-        Button btnYes = new Button("Yes");
-        btnYes.setOnAction(event -> {
-            dialog.close();
-            dialogPane.setVisible(false);
-            clientObj.yesVote();
-        });
+        Platform.runLater(() -> {
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Vote"));
+            dialogContent.setBody(new Text("Do you think " + word + " is a word?"));
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnYes = new Button("Yes");
+            btnYes.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+                clientObj.yesVote(word);
+            });
 
-        Button btnNo = new Button("No");
-        btnNo.setOnAction(event -> {
-            dialog.close();
-            dialogPane.setVisible(false);
-            clientObj.noVote();
-        });
+            Button btnNo = new Button("No");
+            btnNo.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+                clientObj.noVote();
+            });
 
-        dialogContent.setActions(btnYes, btnNo);
-        dialogPane.setVisible(true);
-        dialog.show();
+            dialogContent.setActions(btnYes, btnNo);
+            dialogPane.setVisible(true);
+            dialog.show();
+        });
     }
 
 
@@ -489,11 +499,11 @@ public class GameController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScence());
+        fadeTransition.setOnFinished(event -> loadMainScene());
         fadeTransition.play();
     }
 
-    private void loadMainScence(){
+    private void loadMainScene(){
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
             Parent mainView = loader.load();
@@ -514,25 +524,27 @@ public class GameController implements Initializable {
      * Display voting result
      */
     public void voteResultMsg(boolean isWord, int score){
-        JFXDialogLayout dialogContent = new JFXDialogLayout();
-        dialogContent.setHeading(new Text("Vote result"));
-        if(isWord){
-            dialogContent.setBody(new Text("Vote PASSED!!"));
+        Platform.runLater(() -> {
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Vote result"));
+            if (isWord) {
+                dialogContent.setBody(new Text("Vote PASSED!!"));
 
-        }else{
-            dialogContent.setBody(new Text("Vote FAILED!!"));
-        }
-        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
-        dialog.setOverlayClose(false);
-        Button btnClose = new Button("Okay");
-        btnClose.setOnAction(event -> {
-            dialog.close();
-            dialogPane.setVisible(false);
+            } else {
+                dialogContent.setBody(new Text("Vote FAILED!!"));
+            }
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnClose = new Button("Okay");
+            btnClose.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+            });
+
+            dialogContent.setActions(btnClose);
+            dialogPane.setVisible(true);
+            dialog.show();
         });
-
-        dialogContent.setActions(btnClose);
-        dialogPane.setVisible(true);
-        dialog.show();
     }
 
     /**
@@ -577,68 +589,70 @@ public class GameController implements Initializable {
      * Display the end-game result dialog
      */
     public void renderResultPage(){
-        JFXDialogLayout dialogContent = new JFXDialogLayout();
-        dialogContent.setHeading(new Text("Game Over"));
-        ArrayList<String> winners = new ArrayList<>();
-        int highScore = 0;
-        int myScore = 0;
+        Platform.runLater(() -> {
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Game Over"));
+            ArrayList<String> winners = new ArrayList<>();
+            int highScore = 0;
+            int myScore = 0;
 
-        for(ScoreModel playerScore : scoreList.getItems()){
-            int score = Integer.parseInt(playerScore.getScore());
+            for (ScoreModel playerScore : scoreList.getItems()) {
+                int score = Integer.parseInt(playerScore.getScore());
 
-            if(playerScore.getUsername().equals(clientObj.getUsername())){
-                myScore = score;
-            }
+                if (playerScore.getUsername().equals(clientObj.getUsername())) {
+                    myScore = score;
+                }
 
-            if(score > highScore){
-                highScore = score;
-                winners.clear();
-                winners.add(playerScore.getUsername());
-            }else if(score == highScore){
-                winners.add(playerScore.getUsername());
-            }
-        }
-        StringBuilder msg = new StringBuilder();
-        msg.append("Highest score is " + highScore + "\n");
-
-        boolean iAmWinner = false;
-
-        if(winners.size()==1){
-            String winner = winners.get(0);
-            msg.append("The Winner is: " + winner);
-            if(winner.equals(clientObj.getUsername())){
-                iAmWinner = true;
-            }
-        }else{
-            msg.append("The Winners are: " + "\n");
-            for(String winner : winners){
-                msg.append(winner + "\n");
-                if(winner.equals(clientObj.getUsername())){
-                    iAmWinner = true;
+                if (score > highScore) {
+                    highScore = score;
+                    winners.clear();
+                    winners.add(playerScore.getUsername());
+                } else if (score == highScore) {
+                    winners.add(playerScore.getUsername());
                 }
             }
-        }
+            StringBuilder msg = new StringBuilder();
+            msg.append("Highest score is " + highScore + "\n");
 
-        if(iAmWinner){
-            msg.append("\n" + "You are the winner!!!");
-        }else{
-            msg.append("Your score is: " + myScore);
-        }
+            boolean iAmWinner = false;
 
-        dialogContent.setBody(new Text(msg.toString()));
+            if (winners.size() == 1) {
+                String winner = winners.get(0);
+                msg.append("The Winner is: " + winner);
+                if (winner.equals(clientObj.getUsername())) {
+                    iAmWinner = true;
+                }
+            } else {
+                msg.append("The Winners are: " + "\n");
+                for (String winner : winners) {
+                    msg.append(winner + "\n");
+                    if (winner.equals(clientObj.getUsername())) {
+                        iAmWinner = true;
+                    }
+                }
+            }
 
-        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
-        dialog.setOverlayClose(false);
-        Button btnClose = new Button("Okay");
-        btnClose.setOnAction(event -> {
-            dialog.close();
-            dialogPane.setVisible(false);
-            roomFadeOut();
+            if (iAmWinner) {
+                msg.append("\n" + "You are the winner!!!");
+            } else {
+                msg.append("Your score is: " + myScore);
+            }
+
+            dialogContent.setBody(new Text(msg.toString()));
+
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnClose = new Button("Okay");
+            btnClose.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+                roomFadeOut();
+            });
+
+            dialogContent.setActions(btnClose);
+            dialogPane.setVisible(true);
+            dialog.show();
         });
-
-        dialogContent.setActions(btnClose);
-        dialogPane.setVisible(true);
-        dialog.show();
     }
 
     /**
