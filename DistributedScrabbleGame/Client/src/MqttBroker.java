@@ -138,6 +138,17 @@ public class MqttBroker implements MqttCallback {
 //                gc.updatePlayerScore(cmd[1], Integer.parseInt(cmd[2])); // cmd[2] is the score
                 gc.renderVoteResult(Boolean.parseBoolean(cmd[3]), Integer.parseInt(cmd[2]));
                 break;
+            case Constants.SYNCHRONIZE_GAME:
+                if(Boolean.parseBoolean(cmd[1])){
+                    gc.synchronizeGameBoard(Integer.parseInt(cmd[2]), Integer.parseInt(cmd[3]), Integer.parseInt(cmd[4])
+                            , Boolean.parseBoolean(cmd[5]), Integer.parseInt(cmd[6]), Integer.parseInt(cmd[7]), cmd[8]);
+                }else{
+                    gc.synchronizeGameBoard(Integer.parseInt(cmd[2]), Integer.parseInt(cmd[3]), cmd[4]);
+                }
+                break;
+            case Constants.NO_WORD:
+                gc.noWordResponse(Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]), cmd[3]);
+                break;
             case Constants.GAME_OVER:
                 gc.renderResultPage();
                 break;

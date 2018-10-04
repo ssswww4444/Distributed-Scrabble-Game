@@ -164,11 +164,21 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         //game.insertLetter(i, j, letter);
     }
 
+    /**
+     * No word is found by player
+     */
+    @Override
+    public void noWord(int insertedI, int insertedJ, String insertedLetter, int roomNum) throws RemoteException{
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                Constants.NO_WORD + ";" + insertedI + ";" + insertedJ + ";" + insertedLetter);
+    }
+
 
     @Override
-    public void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum, String word) throws RemoteException {
+    public void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum, String word,
+                          int insertedI, int insertedJ, String insertLetter) throws RemoteException {
         Game currGame = roomNumGameMap.get(roomNum);
-        currGame.startVote(startI, startJ, length, horizontal);
+        currGame.startVote(startI, startJ, length, horizontal, insertedI, insertedJ, insertLetter);
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                 Constants.VOTE + ";" + startI + ";" + startJ + ";" + length + ";" + horizontal + ";" + word);
     }
@@ -193,10 +203,18 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                     Constants.VOTE_RESULT + ";" + playername + ";" +
                             scores.get(playername) + ";" + "true");
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.SYNCHRONIZE_GAME + ";" + "true" + ";" + currGame.getCurrStartRow() + ";" +
+                            currGame.getCurrStartCol() + ";" + currGame.getCurrWordLength() + ";" +
+                            currGame.getCurrHorizontal() + ";" + currGame.getCurrInsertedRow() + ";" +
+                            currGame.getCurrInsertedCol() + ";" + currGame.getCurrInsertedLetter());
         }else if(result == 0){
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                     Constants.VOTE_RESULT + ";" + playername + ";" +
                             scores.get(playername) + ";" + "false");
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.SYNCHRONIZE_GAME + ";" + "false" + ";" + currGame.getCurrInsertedRow() + ";" +
+                            currGame.getCurrInsertedCol() + ";" + currGame.getCurrInsertedLetter());
         }
         else{  //if somebody has not voted
                 System.out.println("Waiting for voting");

@@ -94,7 +94,7 @@ public class GameController implements Initializable {
 
     @FXML
     private void noWordBtnClick(ActionEvent event){
-        this.clientObj.noWord();
+        this.clientObj.noWord(getRow(this.chosenCell), getCol(this.chosenCell), chosenCell.getText());
         this.btnNoWord.setDisable(true);
         this.enterStateNotMyTurn();
     }
@@ -106,7 +106,7 @@ public class GameController implements Initializable {
         this.btnVote.setDisable(true);
         System.out.println(chosenWord);
         this.clientObj.sendVoteRequest(getRow(head), getCol(head), this.chosenWord, isHorizontal(head, tail),
-                getRow(chosenCell), getCol(chosenCell));
+                getRow(chosenCell), getCol(chosenCell), chosenCell.getText());
     }
 
     private boolean isHorizontal(TextField start, TextField end){
@@ -257,28 +257,30 @@ public class GameController implements Initializable {
     }
 
     private void enterStateSelect(){
-        for(TextField occupiedCell : this.occupiedCells) {
-            occupiedCell.setDisable(true);
-            occupiedCell.setStyle("");
-        }
-        for(TextField NonOccupiedCell : this.NonOccupiedCells) {
-            NonOccupiedCell.setDisable(false);
-            NonOccupiedCell.setStyle("");
-        }
-        for(ToggleButton letterBtn : this.letterBtns){
-            letterBtn.setDisable(false);
-        }
+        Platform.runLater(()->{
+            for(TextField occupiedCell : this.occupiedCells) {
+                occupiedCell.setDisable(true);
+                occupiedCell.setStyle("");
+            }
+            for(TextField NonOccupiedCell : this.NonOccupiedCells) {
+                NonOccupiedCell.setDisable(false);
+                NonOccupiedCell.setStyle("");
+            }
+            for(ToggleButton letterBtn : this.letterBtns){
+                letterBtn.setDisable(false);
+            }
 
 
-        this.head = null;
-        this.tail = null;
-        this.chosenCell = null;
-        this.btnNoWord.setDisable(true);
-        this.btnVote.setDisable(true);
-        this.btnSelected = null;
-        this.btnPass.setDisable(false);
-        this.state = "select";
-        this.stateLabel.setText("select");
+            this.head = null;
+            this.tail = null;
+            this.chosenCell = null;
+            this.btnNoWord.setDisable(true);
+            this.btnVote.setDisable(true);
+            this.btnSelected = null;
+            this.btnPass.setDisable(false);
+            this.state = "select";
+            this.stateLabel.setText("select");
+        });
     }
     /* ********************************************************************************************** */
 
@@ -551,24 +553,26 @@ public class GameController implements Initializable {
      * Display message when the player either pass or can't select a word
      */
     public void passMsg(boolean wordSelected){
-        JFXDialogLayout dialogContent = new JFXDialogLayout();
-        dialogContent.setHeading(new Text("Vote result"));
-        if(wordSelected){
-            dialogContent.setBody(new Text("The player can't find a word"));
-        }else{
-            dialogContent.setBody(new Text("The player chooses to pass"));
-        }
-        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
-        dialog.setOverlayClose(false);
-        Button btnClose = new Button("Okay");
-        btnClose.setOnAction(event -> {
-            dialog.close();
-            dialogPane.setVisible(false);
-        });
+        Platform.runLater(()->{
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Vote result"));
+            if(wordSelected){
+                dialogContent.setBody(new Text("The player can't find a word"));
+            }else{
+                dialogContent.setBody(new Text("The player chooses to pass"));
+            }
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnClose = new Button("Okay");
+            btnClose.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+            });
 
-        dialogContent.setActions(btnClose);
-        dialogPane.setVisible(true);
-        dialog.show();
+            dialogContent.setActions(btnClose);
+            dialogPane.setVisible(true);
+            dialog.show();
+        });
     }
 
     public void renderNext(){
@@ -578,7 +582,7 @@ public class GameController implements Initializable {
     public void updateScore(String username, int score){
         for(ScoreModel userScore : scoreList.getItems()){
             if(userScore.getUsername().equals(username)){
-                userScore.setScore(Integer.toString(Integer.parseInt(userScore.getScore())+score));
+                userScore.setScore(Integer.toString(score));
                 break;
             }
         }
@@ -699,4 +703,32 @@ public class GameController implements Initializable {
         }
     }
 
+    /**
+     * highlight an inserted letter in the specified cell
+     */
+    public void highlightInsertedLetter(int insertedRow, int insertedCol, String insertedLetter){
+        TilePane row = (TilePane)this.gameBoard.getChildren().get(insertedRow);
+        TextField cell = (TextField)row.getChildren().get(insertedCol);
+        cell.setText(insertedLetter);
+        cell.setStyle("-fx-background-color: #fcdb62");
+    }
+
+    /**
+     * highlight a chosen word
+     */
+    public void highlightChosenWord(int startRow, int startCol, int length, boolean horizontal){
+        if(horizontal){
+            TilePane row = (TilePane)this.gameBoard.getChildren().get(startRow);
+            for(int i=startCol; i<startCol+length; i++){
+                TextField cell = (TextField)row.getChildren().get(i);
+                cell.setStyle("-fx-border-color : #fcdb62;");
+            }
+        }else{
+            for(int i=startRow; i<startRow+length; i++){
+                TilePane row = (TilePane)this.gameBoard.getChildren().get(i);
+                TextField cell = (TextField)row.getChildren().get(startCol);
+                cell.setStyle("-fx-border-color : #fcdb62;");
+            }
+        }
+    }
 }

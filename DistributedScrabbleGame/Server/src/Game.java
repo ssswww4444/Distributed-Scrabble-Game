@@ -20,7 +20,13 @@ public class Game {
     private int voteAgreeNum;
     private int voteTotalNum;
 
+    private int currStartRow;
+    private int currStartCol;
     private int currWordLength;  // current voting word
+    private boolean currHorizontal;
+    private int currInsertedRow;
+    private int currInsertedCol;
+    private String currInsertedLetter;
 
     private enum GameStatus {
         INSERTING, VOTING
@@ -199,7 +205,8 @@ public class Game {
     /**
      * Initialise a vote and notify all clients
      */
-    public void startVote(int startI, int startJ, int length, boolean horizontal) {
+    public void startVote(int startI, int startJ, int length, boolean horizontal, int insertedI, int insertedJ,
+                          String insertedLetter) {
 
         // init vote
         currStatus = GameStatus.VOTING;
@@ -207,6 +214,12 @@ public class Game {
         voteTotalNum = 0;
 
         currWordLength = length;
+        currStartRow = startI;
+        currStartCol = startJ;
+        currHorizontal = horizontal;
+        currInsertedRow = insertedI;
+        currInsertedCol = insertedJ;
+        currInsertedLetter = insertedLetter;
         // Obsolete if using MQTT
         /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
@@ -386,4 +399,30 @@ public class Game {
         this.voteTotalNum = voteTotalNum;
     }
 
+    public int getCurrStartRow(){
+        return this.currStartRow;
+    }
+
+    public int getCurrStartCol(){
+        return this.currStartCol;
+    }
+
+    public int getCurrWordLength(){
+        return this.currWordLength;
+    }
+
+    public String getCurrInsertedLetter(){
+        return this.currInsertedLetter;
+    }
+
+    public boolean getCurrHorizontal() {
+        return this.currHorizontal;
+    }
+
+    public int getCurrInsertedRow(){
+        return this.currInsertedRow;
+    }
+    public int getCurrInsertedCol(){
+        return this.currInsertedCol;
+    }
 }

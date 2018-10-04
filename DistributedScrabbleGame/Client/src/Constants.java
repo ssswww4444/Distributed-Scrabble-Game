@@ -19,6 +19,8 @@ public class Constants {
     public static final String LOGOUT = "Logout";
     public static final String INVITATION = "Invitation";
     public static final String JOIN_ROOM = "JoinRoom";
+    public static final String SYNCHRONIZE_GAME = "SynchronizeGame";
+    public static final String NO_WORD = "NoWord";
 
     // player status
     public static final String STATUS_AVAILABLE = "available";

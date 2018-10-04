@@ -269,21 +269,14 @@ public class GameClient {
         this.roomController = null;
     }
 
-    public void sendVoteRequest(int startRow, int startCol, String word,
-                                boolean horizontal, int insertRow, int insertCol) {
-
-        // RMI Server
-
-//        this.gameController.voteMsg(word);
-        /*if (word.equals("HAPPY")) {
-            this.gameController.voteResponse(false);
-        } else {
-            this.gameController.voteResponse(true);
-        }*/
-
+    /**
+     * Notify the server servant to broadcast the voting request
+     */
+    public void sendVoteRequest(int startRow, int startCol, String word, boolean horizontal, int insertRow,
+                                int insertCol, String insertedLetter) {
         try {
             serverServantStub.startVote(startRow, startCol, word.length(),
-                    horizontal, roomNumber, word);
+                    horizontal, roomNumber, word, insertRow, insertCol, insertedLetter);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -296,10 +289,23 @@ public class GameClient {
 //        this.nextTurn();
     }
 
-    public void noWord() {
+    public void noWord(int insertedRow, int insertedCol, String insertedLetter) {
+        try {
+            serverServantStub.noWord(insertedRow, insertedCol, insertedLetter, roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Other players did not choose a word
+     */
+    public void noWordResponse(int insertedRow, int insertedCol, String insertedLetter){
         this.gameController.passMsg(true);
+        this.synchronizeGameBoard(insertedRow, insertedCol, insertedLetter);
         this.nextTurn();
     }
+
 
     public void nextTurn(){
         this.gameController.renderNext();
@@ -342,6 +348,24 @@ public class GameClient {
         if(isWord){
             this.gameController.updateScore(this.roomPlayerNames.get(0), score);
         }
+    }
+
+    /**
+     * Synchronize selected word and modified cell
+     * when the vote is passed by all players
+     */
+    public void synchronizeGameBoard(int startRow, int startCol, int length, boolean horizontal, int insertRow,
+                                     int insertCol, String insertedLetter){
+        this.gameController.highlightInsertedLetter(insertRow, insertCol, insertedLetter);
+        this.gameController.highlightChosenWord(startRow, startCol, length, horizontal);
+    }
+
+    /**
+     * Synchronize selected word and modified cell
+     * when the vote is NOT agreed among all players
+     */
+    public void synchronizeGameBoard(int insertRow, int insertCol, String insertedLetter){
+        this.gameController.highlightInsertedLetter(insertRow, insertCol, insertedLetter);
     }
 
     public void yesVote(String word){
