@@ -11,9 +11,10 @@ public class Game {
     private static final int boardHeight = 20;
     private static final int boardWidth = 20;
     private ArrayList<Player> players;
-    private HashMap<Player, Integer> scores;
+    private HashMap<String, Integer> scores;
     private int voteAgreeNum;
     private int voteTotalNum;
+
     private int currWordLength;  // current voting word
 
     private enum GameStatus {
@@ -29,9 +30,24 @@ public class Game {
      */
     public Game(ArrayList<Player> players, int roomID) {
         this.players = players;
-        //initGame();
+
+//        initGame();
         //registerGame(roomID);   // create & bind game servant
         //notifyGameStart();
+
+        // init scores
+        scores = new HashMap<>();
+        for (Player player : players) {
+            scores.put(player.getUsername(), 0);
+        }
+
+        // init pass count
+        passCount = 0;
+
+        // init turn 1
+        turn = 1;
+        hasInserted = false;
+
     }
 
     /**
@@ -63,7 +79,7 @@ public class Game {
 
         // init scores
         for (Player player : players) {
-            scores.put(player, 0);
+            scores.put(player.getUsername(), 0);
         }
 
         // init pass count
@@ -185,6 +201,7 @@ public class Game {
         voteAgreeNum = 0;
         voteTotalNum = 0;
 
+        currWordLength = length;
         // Obsolete if using MQTT
         /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
@@ -200,13 +217,15 @@ public class Game {
     /**
      * Get voting response from a player, and notify all, if all voted, notify result: success,fail
      */
-    public void vote(String username, boolean agree) {
+    public int vote(String username, boolean agree) {
 
         // update vote response
         if (agree) {
             voteAgreeNum++;
         }
         voteTotalNum++;
+
+        System.out.println("vote total number: " + voteTotalNum);
 
         // check if all voted
         if (voteTotalNum == players.size()) {
@@ -216,6 +235,8 @@ public class Game {
                 voteFail();
             }
         }
+
+        return scores.get(username);
 
         // Obsolete if using MQTT
         /*for (Player player: players) {
@@ -253,8 +274,8 @@ public class Game {
 
         // increment score
         Player currPlayer = players.get(turn - 1);
-        Integer newScore = scores.get(currPlayer) + currWordLength;
-        scores.put(currPlayer, newScore);
+        Integer newScore = scores.get(currPlayer.getUsername()) + currWordLength;
+        scores.put(currPlayer.getUsername(), newScore);
 
         // notify score change, Obsolete if using MQTT
         /*for (Player player: players) {
@@ -327,6 +348,23 @@ public class Game {
 
     public void setPlayers(ArrayList<Player> players) {
         this.players = players;
+    }
+
+
+    public int getVoteAgreeNum() {
+        return voteAgreeNum;
+    }
+
+    public void setVoteAgreeNum(int voteAgreeNum) {
+        this.voteAgreeNum = voteAgreeNum;
+    }
+
+    public int getVoteTotalNum() {
+        return voteTotalNum;
+    }
+
+    public void setVoteTotalNum(int voteTotalNum) {
+        this.voteTotalNum = voteTotalNum;
     }
 
 }

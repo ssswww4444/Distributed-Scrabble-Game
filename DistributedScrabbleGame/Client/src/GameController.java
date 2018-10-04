@@ -242,11 +242,11 @@ public class GameController implements Initializable {
         this.state = "NotMyTurn";
         this.stateLabel.setText("NotMyTurn");
 
-        try {
-            Thread.sleep(3000);
-        }catch(Exception e){
-
-        }
+//        try {
+//            Thread.sleep(3000);
+//        }catch(Exception e){
+//
+//        }
 
         this.enterStateSelect();
     }
@@ -452,11 +452,11 @@ public class GameController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScence());
+        fadeTransition.setOnFinished(event -> loadMainScene());
         fadeTransition.play();
     }
 
-    private void loadMainScence(){
+    private void loadMainScene(){
         try{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
             Parent mainView = loader.load();

@@ -25,7 +25,7 @@ public interface ServerInterface extends Remote {
 
     void insertLetter(int x, int y, char letter, int roomNum) throws RemoteException;  // ps: should check if cell empty at client GUI
 
-    void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum) throws RemoteException;
+    void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum, String word) throws RemoteException;
 
     void passTurn(int roomNum) throws RemoteException;
 
@@ -34,5 +34,7 @@ public interface ServerInterface extends Remote {
     void leaveGame(String username, int roomNum) throws RemoteException;
 
     boolean canJoinRoom(String username, int roomNum) throws  RemoteException;
+
+    void notifyVoteResult(String username, int score, int roomNum) throws RemoteException;
 
 }

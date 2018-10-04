@@ -204,12 +204,12 @@ public class RoomController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScence());
+        fadeTransition.setOnFinished(event -> loadMainScene());
         fadeTransition.play();
     }
 
 
-    private void loadMainScence() {
+    private void loadMainScene() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Game.fxml"));
             Parent gameView = loader.load();

@@ -13,6 +13,7 @@ public class Constants {
     // action types
     public static final String GAME_START = "GameStart";
     public static final String VOTE = "Vote";
+    public static final String VOTE_RESULT = "VoteResult";
     public static final String GAME_OVER = "GameOver";
     public static final String LOGIN = "Login";
     public static final String LOGOUT = "Logout";

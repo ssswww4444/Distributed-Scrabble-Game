@@ -250,6 +250,13 @@ public class GameClient {
         } else {
             this.gameController.voteResponse(true);
         }*/
+
+        try {
+            serverServantStub.startVote(0, 0, word.length(), true, roomNumber, word);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void pass() {
@@ -260,8 +267,37 @@ public class GameClient {
 
     }
 
-    public void vote() {
 
+
+    public void updatePlayerScore(int score){
+        try {
+            serverServantStub.notifyVoteResult(this.username, score, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Boolean isValidWord(Boolean isWord) {
+        return true;
+    }
+
+
+    public void vote(String word) {
+        System.out.println("Lets vote: " + word);
+
+        // remove this after connect to Voting UI
+        try {
+            Thread.sleep(3000);
+        }catch(Exception e){
+        }
+
+        Boolean result = isValidWord(true);
+
+        try {
+            serverServantStub.vote(this.username, result, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
 
