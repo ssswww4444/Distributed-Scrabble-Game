@@ -135,7 +135,8 @@ public class MqttBroker implements MqttCallback {
                 gc.vote(cmd[5]);    //cmd[5] is the voting word
                 break;
             case Constants.VOTE_RESULT:
-                gc.updatePlayerScore(Integer.parseInt(cmd[2])); // cmd[2] is the score
+//                gc.updatePlayerScore(cmd[1], Integer.parseInt(cmd[2])); // cmd[2] is the score
+                gc.renderVoteResult(Boolean.parseBoolean(cmd[3]), Integer.parseInt(cmd[2]));
                 break;
             case Constants.GAME_OVER:
                 gc.renderResultPage();

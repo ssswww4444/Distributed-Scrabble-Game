@@ -183,10 +183,24 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     @Override
     public void vote(String username, boolean agree, int roomNum) throws RemoteException {
         Game currGame = roomNumGameMap.get(roomNum);
-        int score = currGame.vote(username, agree);
-        System.out.println("voteNum: " + score);
-        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
-                Constants.VOTE_RESULT + ";" + username + ";" + score + ";" + "ye");
+        String playername = currGame.getCurrPlayer();
+        int result = currGame.vote(playername, agree);
+
+        HashMap<String, Integer> scores = currGame.getScores();
+
+        System.out.println("score get username: " + scores.get(playername));
+        if(result == 1){    //if all voted yes
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.VOTE_RESULT + ";" + playername + ";" +
+                            scores.get(playername) + ";" + "true");
+        }else if(result == 0){
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.VOTE_RESULT + ";" + playername + ";" +
+                            scores.get(playername) + ";" + "false");
+        }
+        else{  //if somebody has not voted
+                System.out.println("Waiting for voting");
+        }
     }
 
 

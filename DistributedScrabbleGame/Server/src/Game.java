@@ -11,6 +11,11 @@ public class Game {
     private static final int boardHeight = 20;
     private static final int boardWidth = 20;
     private ArrayList<Player> players;
+
+    public HashMap<String, Integer> getScores() {
+        return scores;
+    }
+
     private HashMap<String, Integer> scores;
     private int voteAgreeNum;
     private int voteTotalNum;
@@ -231,12 +236,17 @@ public class Game {
         if (voteTotalNum == players.size()) {
             if (voteAgreeNum == voteTotalNum) {  // all agree
                 voteSuccess();
+
+                System.out.println("vote success: " + scores.get(players.get(turn - 1).getUsername()));
+                return 1;
             } else {
                 voteFail();
+
+                return 0;
             }
         }
 
-        return scores.get(username);
+        return 2;
 
         // Obsolete if using MQTT
         /*for (Player player: players) {
@@ -265,6 +275,13 @@ public class Game {
         }*/
     }
 
+
+    public String getCurrPlayer() {
+        Player player = players.get(turn-1);
+        return player.getUsername();
+    }
+
+
     /**
      * If success, gives score to current player
      */
@@ -274,6 +291,8 @@ public class Game {
 
         // increment score
         Player currPlayer = players.get(turn - 1);
+
+        System.out.println("Word length: " + currWordLength);
         Integer newScore = scores.get(currPlayer.getUsername()) + currWordLength;
         scores.put(currPlayer.getUsername(), newScore);
 

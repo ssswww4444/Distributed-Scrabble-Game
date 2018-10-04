@@ -8,6 +8,7 @@
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,40 +17,60 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /* Controller class for the start scene of the Client App */
 public class GameController implements Initializable {
 
+    /* UI elements */
     @FXML
     private AnchorPane rootPane;
-    /* UI elements */
     @FXML
     private Button btnVote;
     @FXML
     private Button btnNoWord;
-
     @FXML
     private Label roomNumber;
-
     @FXML
     private Label stateLabel;
+    @FXML
+    private TilePane gameBoard;
+    @FXML
+    private TilePane letterBoard;
+    @FXML
+    private Button btnPass;
+    @FXML
+    private StackPane dialogPane;
+    @FXML
+    private TableView<ScoreModel> scoreList;
+    @FXML
+    private TableColumn username;
+    @FXML
+    private TableColumn score;
+
+    private ArrayList<TextField> occupiedCells;
+
+    private ArrayList<TextField> NonOccupiedCells;
+
+    private TextField chosenCell;
+
+    private ArrayList<ToggleButton> letterBtns;
 
     private ToggleButton btnSelected;
 
@@ -62,24 +83,6 @@ public class GameController implements Initializable {
     private GameClient clientObj;
 
     private String chosenWord;
-    @FXML
-    private TilePane gameBoard;
-    @FXML
-    private TilePane letterBoard;
-
-    @FXML
-    private Button btnPass;
-
-    @FXML
-    private StackPane dialogPane;
-
-    private ArrayList<TextField> occupiedCells;
-
-    private ArrayList<TextField> NonOccupiedCells;
-
-    private TextField chosenCell;
-
-    private ArrayList<ToggleButton> letterBtns;
 
 
     @FXML
@@ -102,7 +105,16 @@ public class GameController implements Initializable {
         this.enterStateWait();
         this.btnVote.setDisable(true);
         System.out.println(chosenWord);
-        this.clientObj.sendVoteRequest(this.chosenWord);
+        this.clientObj.sendVoteRequest(getRow(head), getCol(head), this.chosenWord, isHorizontal(head, tail),
+                getRow(chosenCell), getCol(chosenCell));
+    }
+
+    private boolean isHorizontal(TextField start, TextField end){
+        if(getRow(start)==getRow(end)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     private String getWord(TextField head, TextField tail){
@@ -241,17 +253,14 @@ public class GameController implements Initializable {
         }
         this.state = "NotMyTurn";
         this.stateLabel.setText("NotMyTurn");
-
-//        try {
-//            Thread.sleep(3000);
-//        }catch(Exception e){
-//
-//        }
-
         this.enterStateSelect();
     }
 
     private void enterStateSelect(){
+        for(TextField occupiedCell : this.occupiedCells) {
+            occupiedCell.setDisable(true);
+            occupiedCell.setStyle("");
+        }
         for(TextField NonOccupiedCell : this.NonOccupiedCells) {
             NonOccupiedCell.setDisable(false);
             NonOccupiedCell.setStyle("");
@@ -289,10 +298,17 @@ public class GameController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
-
+        /* Initialize the association of columns in TableView elements */
+        username.setCellValueFactory(new PropertyValueFactory<>("username"));
+        score.setCellValueFactory(new PropertyValueFactory<>("score"));
     }
 
     public void startup(){
+        ArrayList<String> playerNames = this.clientObj.getRoomPlayerNames();
+        for(String player : playerNames){
+            this.scoreList.getItems().add(new ScoreModel(player, Integer.toString(0)));
+        }
+
         this.NonOccupiedCells = new ArrayList<>(400);
         this.occupiedCells = new ArrayList<>(400);
         this.letterBtns = new ArrayList<>(26);
@@ -412,6 +428,9 @@ public class GameController implements Initializable {
         }
     }
 
+    /**
+     * Create a dialog to confirm letter placement. Players are not allowed to change placement afterwards.
+     */
     private void confirmPlacement(TextField cell){
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new javafx.scene.text.Text("Please Confirm Placement:"));
@@ -443,6 +462,34 @@ public class GameController implements Initializable {
         dialog.show();
     }
 
+    @FXML
+    public void voteMsg(String word) {
+        Platform.runLater(() -> {
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Vote"));
+            dialogContent.setBody(new Text("Do you think " + word + " is a word?"));
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnYes = new Button("Yes");
+            btnYes.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+                clientObj.yesVote(word);
+            });
+
+            Button btnNo = new Button("No");
+            btnNo.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+                clientObj.noVote();
+            });
+
+            dialogContent.setActions(btnYes, btnNo);
+            dialogPane.setVisible(true);
+            dialog.show();
+        });
+    }
+
 
     /* This method is used to provide a smoother transition between scences */
     public void fadeOut(){
@@ -472,4 +519,184 @@ public class GameController implements Initializable {
     public void setClientObj(GameClient clientObj){
         this.clientObj = clientObj;
     }
+
+    /**
+     * Display voting result
+     */
+    public void voteResultMsg(boolean isWord, int score){
+        Platform.runLater(() -> {
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Vote result"));
+            if (isWord) {
+                dialogContent.setBody(new Text("Vote PASSED!!"));
+
+            } else {
+                dialogContent.setBody(new Text("Vote FAILED!!"));
+            }
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnClose = new Button("Okay");
+            btnClose.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+            });
+
+            dialogContent.setActions(btnClose);
+            dialogPane.setVisible(true);
+            dialog.show();
+        });
+    }
+
+    /**
+     * Display message when the player either pass or can't select a word
+     */
+    public void passMsg(boolean wordSelected){
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setHeading(new Text("Vote result"));
+        if(wordSelected){
+            dialogContent.setBody(new Text("The player can't find a word"));
+        }else{
+            dialogContent.setBody(new Text("The player chooses to pass"));
+        }
+        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+        Button btnClose = new Button("Okay");
+        btnClose.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
+        });
+
+        dialogContent.setActions(btnClose);
+        dialogPane.setVisible(true);
+        dialog.show();
+    }
+
+    public void renderNext(){
+        this.enterStateSelect();
+    }
+
+    public void updateScore(String username, int score){
+        for(ScoreModel userScore : scoreList.getItems()){
+            if(userScore.getUsername().equals(username)){
+                userScore.setScore(Integer.toString(Integer.parseInt(userScore.getScore())+score));
+                break;
+            }
+        }
+        scoreList.refresh();
+    }
+
+    /**
+     * Display the end-game result dialog
+     */
+    public void renderResultPage(){
+        Platform.runLater(() -> {
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Game Over"));
+            ArrayList<String> winners = new ArrayList<>();
+            int highScore = 0;
+            int myScore = 0;
+
+            for (ScoreModel playerScore : scoreList.getItems()) {
+                int score = Integer.parseInt(playerScore.getScore());
+
+                if (playerScore.getUsername().equals(clientObj.getUsername())) {
+                    myScore = score;
+                }
+
+                if (score > highScore) {
+                    highScore = score;
+                    winners.clear();
+                    winners.add(playerScore.getUsername());
+                } else if (score == highScore) {
+                    winners.add(playerScore.getUsername());
+                }
+            }
+            StringBuilder msg = new StringBuilder();
+            msg.append("Highest score is " + highScore + "\n");
+
+            boolean iAmWinner = false;
+
+            if (winners.size() == 1) {
+                String winner = winners.get(0);
+                msg.append("The Winner is: " + winner);
+                if (winner.equals(clientObj.getUsername())) {
+                    iAmWinner = true;
+                }
+            } else {
+                msg.append("The Winners are: " + "\n");
+                for (String winner : winners) {
+                    msg.append(winner + "\n");
+                    if (winner.equals(clientObj.getUsername())) {
+                        iAmWinner = true;
+                    }
+                }
+            }
+
+            if (iAmWinner) {
+                msg.append("\n" + "You are the winner!!!");
+            } else {
+                msg.append("Your score is: " + myScore);
+            }
+
+            dialogContent.setBody(new Text(msg.toString()));
+
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnClose = new Button("Okay");
+            btnClose.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+                roomFadeOut();
+            });
+
+            dialogContent.setActions(btnClose);
+            dialogPane.setVisible(true);
+            dialog.show();
+        });
+    }
+
+    /**
+     * The fading-out animation for changing to room scene
+     */
+    private void roomFadeOut(){
+        FadeTransition fadeTransition = new FadeTransition();
+        fadeTransition.setDuration(Duration.millis(500));
+        fadeTransition.setNode(rootPane);
+        fadeTransition.setFromValue(1);
+        fadeTransition.setToValue(0);
+
+        fadeTransition.setOnFinished(event -> loadRoomScene());
+        fadeTransition.play();
+    }
+
+    /**
+     * Load the room scene after game successfully ended.
+     */
+    private void loadRoomScene() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
+            Parent roomView = loader.load();
+            Scene roomScene = new Scene(roomView);
+            RoomController controller = loader.getController();
+            controller.setClientObj(this.clientObj);
+            this.clientObj.setRoomController(controller);
+            this.clientObj.removeGameController();
+            controller.startup(this.clientObj.isHost(), this.clientObj.getRoomPlayerNames());
+            Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
+            // override the onCloseRequest and notify server to remove user.
+            currentStage.setOnCloseRequest(t -> {
+                System.out.println("Closing at the Room scene. ");
+                Platform.exit();
+                System.exit(0);
+            });
+
+            currentStage.setScene(roomScene);
+
+        } catch (IOException e) {
+            /* Need to do a pop-up dialog instead of printing in terminal here! */
+            System.out.println("Cannot find room scene fxml");
+        }
+    }
+
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class GameClient {
     private String username;
     private int roomNumber;
+    private boolean isHost;
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
@@ -25,6 +26,10 @@ public class GameClient {
         return this.roomNumber;
     }
 
+    public boolean isHost() {
+        return isHost;
+    }
+
     public void setMenuController(MenuController controller) {
         this.menuController = controller;
     }
@@ -35,6 +40,10 @@ public class GameClient {
 
     public void setGameController(GameController controller) {
         this.gameController = controller;
+    }
+
+    public void setIsHost(boolean isHost){
+        this.isHost = isHost;
     }
 
     /**
@@ -141,6 +150,7 @@ public class GameClient {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<>();  // empty
+            this.roomPlayerNames.add(this.username);
             renderRoomPage(true, roomNumber);
         } catch (RemoteException | MqttException e) {
             e.printStackTrace();
@@ -220,8 +230,8 @@ public class GameClient {
     public void renderRoomPage(boolean isHost, int roomNumber) {
         if (this.menuController != null) {
             try {
+                this.isHost = isHost;
                 this.roomNumber = roomNumber;
-                this.roomPlayerNames.add(this.username);  // add himself
                 this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
                 mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
             } catch (MqttException e) {
@@ -238,13 +248,33 @@ public class GameClient {
         //TODO
     }
 
-
+    /**
+     * Clear the menu controller when entering a new scene
+     */
     public void removeMenuController() {
         this.menuController = null;
     }
 
-    public void sendVoteRequest(String word) {
+    /**
+     * Clear the game controller when entering a new scene
+     */
+    public void removeGameController() {
+        this.gameController = null;
+    }
 
+    /**
+     * Clear the room controller when entering a new scene
+     */
+    public void removeRoomController() {
+        this.roomController = null;
+    }
+
+    public void sendVoteRequest(int startRow, int startCol, String word,
+                                boolean horizontal, int insertRow, int insertCol) {
+
+        // RMI Server
+
+//        this.gameController.voteMsg(word);
         /*if (word.equals("HAPPY")) {
             this.gameController.voteResponse(false);
         } else {
@@ -252,7 +282,8 @@ public class GameClient {
         }*/
 
         try {
-            serverServantStub.startVote(0, 0, word.length(), true, roomNumber, word);
+            serverServantStub.startVote(startRow, startCol, word.length(),
+                    horizontal, roomNumber, word);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -260,18 +291,25 @@ public class GameClient {
     }
 
     public void pass() {
-
+        this.gameController.renderResultPage();
+//        this.gameController.passMsg(false);
+//        this.nextTurn();
     }
 
     public void noWord() {
+        this.gameController.passMsg(true);
+        this.nextTurn();
+    }
 
+    public void nextTurn(){
+        this.gameController.renderNext();
     }
 
 
 
-    public void updatePlayerScore(int score){
+    public void updatePlayerScore(String username, int score){
         try {
-            serverServantStub.notifyVoteResult(this.username, score, this.roomNumber);
+            serverServantStub.notifyVoteResult(username, score, this.roomNumber);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -285,21 +323,46 @@ public class GameClient {
     public void vote(String word) {
         System.out.println("Lets vote: " + word);
 
-        // remove this after connect to Voting UI
-        try {
-            Thread.sleep(3000);
-        }catch(Exception e){
-        }
 
-        Boolean result = isValidWord(true);
+        this.gameController.voteMsg(word);
+//
+//
+//        try {
+//            serverServantStub.vote(this.username, result, this.roomNumber);
+//        } catch (RemoteException e) {
+//            e.printStackTrace();
+//        }
+    }
 
-        try {
-            serverServantStub.vote(this.username, result, this.roomNumber);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+    /**
+     * Render Vote Result Dialog on UI and update score if neccessary
+     */
+    public void renderVoteResult(boolean isWord, int score){
+        this.gameController.voteResultMsg(isWord, score);
+        if(isWord){
+            this.gameController.updateScore(this.roomPlayerNames.get(0), score);
         }
     }
 
+    public void yesVote(String word){
+        try {
+            serverServantStub.vote(this.username,true, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+//        renderVoteResult(true, 111);
+        this.nextTurn();
+    }
+
+    public void noVote(){
+        try {
+            serverServantStub.vote(this.username,false, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+//        renderVoteResult(false, 0);
+        this.nextTurn();
+    }
 
     /**
      * Tell server to remove the user from playerPoll.
@@ -311,4 +374,12 @@ public class GameClient {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Get room player names
+     */
+    public ArrayList<String> getRoomPlayerNames(){
+        return this.roomPlayerNames;
+    }
+
 }
