@@ -172,6 +172,13 @@ public class RoomController implements Initializable {
             this.roomPlayers = roomPlayers;
             hostUsername.setText(roomPlayers.get(0));
             btnHost.setText(roomPlayers.get(0));
+            btnPlayer2.setDisable(true);
+            btnPlayer3.setDisable(true);
+            btnPlayer4.setDisable(true);
+            btnStart.setDisable(true);
+            btnLeave.setText("Leave");
+        }
+        if(roomPlayers!=null){
             for(String username : roomPlayers){
                 if(!username.equals(roomPlayers.get(0))){
                     Button freeButton = getFreeButton();
@@ -180,11 +187,6 @@ public class RoomController implements Initializable {
                     }
                 }
             }
-            btnPlayer2.setDisable(true);
-            btnPlayer3.setDisable(true);
-            btnPlayer4.setDisable(true);
-            btnStart.setDisable(true);
-            btnLeave.setText("Leave");
         }
 
         roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
@@ -230,7 +232,7 @@ public class RoomController implements Initializable {
             currentStage.setScene(gameScene);
 
         } catch (IOException e) {
-            System.out.println("Cannot find game scene fxml");
+            e.printStackTrace();
         }
     }
 }

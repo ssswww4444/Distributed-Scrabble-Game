@@ -179,6 +179,7 @@ public class MenuController implements Initializable {
             Scene roomScene = new Scene(roomView);
             RoomController controller = loader.getController();
             controller.setClientObj(this.clientObj);
+            this.clientObj.setIsHost(isHost);
             this.clientObj.setRoomController(controller);
             this.clientObj.removeMenuController();
             controller.startup(isHost, roomPlayers);

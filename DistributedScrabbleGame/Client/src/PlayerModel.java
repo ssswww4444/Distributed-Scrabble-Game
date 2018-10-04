@@ -1,12 +1,12 @@
 /*
-    COMP90015 Project 1 Player.java
+    COMP90015 Project 2 PlayerModel
     Group Name: Distributed Otaku
     Tutor: Alisha Aneja
  */
 
 import javafx.beans.property.SimpleStringProperty;
 
-/* A model used for the Client TableView UI element */
+/* A model used for the Player TableView UI element */
 public class PlayerModel {
     private final SimpleStringProperty username;
     private final SimpleStringProperty status;

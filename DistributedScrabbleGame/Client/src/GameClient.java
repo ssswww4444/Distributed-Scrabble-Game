@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class GameClient {
     private String username;
     private int roomNumber;
+    private boolean isHost;
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
@@ -25,6 +26,10 @@ public class GameClient {
         return this.roomNumber;
     }
 
+    public boolean isHost() {
+        return isHost;
+    }
+
     public void setMenuController(MenuController controller) {
         this.menuController = controller;
     }
@@ -35,6 +40,10 @@ public class GameClient {
 
     public void setGameController(GameController controller) {
         this.gameController = controller;
+    }
+
+    public void setIsHost(boolean isHost){
+        this.isHost = isHost;
     }
 
     /**
@@ -220,6 +229,7 @@ public class GameClient {
     public void renderRoomPage(boolean isHost, int roomNumber) {
         if (this.menuController != null) {
             try {
+                this.isHost = isHost;
                 this.roomNumber = roomNumber;
                 this.roomPlayerNames.add(this.username);  // add himself
                 this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
@@ -238,13 +248,32 @@ public class GameClient {
         //TODO
     }
 
-
+    /**
+     * Clear the menu controller when entering a new scene
+     */
     public void removeMenuController() {
         this.menuController = null;
     }
 
+    /**
+     * Clear the game controller when entering a new scene
+     */
+    public void removeGameController() {
+        this.gameController = null;
+    }
+
+    /**
+     * Clear the room controller when entering a new scene
+     */
+    public void removeRoomController() {
+        this.roomController = null;
+    }
+
     public void sendVoteRequest(String word) {
 
+        // RMI Server
+
+        this.gameController.voteMsg(word);
         /*if (word.equals("HAPPY")) {
             this.gameController.voteResponse(false);
         } else {
@@ -253,17 +282,43 @@ public class GameClient {
     }
 
     public void pass() {
-
+        this.gameController.renderResultPage();
+//        this.gameController.passMsg(false);
+//        this.nextTurn();
     }
 
     public void noWord() {
+        this.gameController.passMsg(true);
+        this.nextTurn();
+    }
 
+    public void nextTurn(){
+        this.gameController.renderNext();
     }
 
     public void vote() {
 
     }
 
+    /**
+     * Render Vote Result Dialog on UI and update score if neccessary
+     */
+    public void renderVoteResult(boolean isWord, int score){
+        this.gameController.voteResultMsg(isWord, score);
+        if(isWord){
+            this.gameController.updateScore(this.roomPlayerNames.get(0), score);
+        }
+    }
+
+    public void yesVote(){
+        renderVoteResult(true, 111);
+        this.nextTurn();
+    }
+
+    public void noVote(){
+        renderVoteResult(false, 0);
+        this.nextTurn();
+    }
 
     /**
      * Tell server to remove the user from playerPoll.
@@ -275,4 +330,12 @@ public class GameClient {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Get room player names
+     */
+    public ArrayList<String> getRoomPlayerNames(){
+        return this.roomPlayerNames;
+    }
+
 }
