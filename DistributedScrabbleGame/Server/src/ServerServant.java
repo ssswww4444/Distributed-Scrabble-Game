@@ -168,25 +168,39 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      * No word is found by player
      */
     @Override
-    public void noWord(int insertedI, int insertedJ, String insertedLetter, int roomNum) throws RemoteException{
+    public void noWord(int roomNum) throws RemoteException{
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
-                Constants.NO_WORD + ";" + insertedI + ";" + insertedJ + ";" + insertedLetter);
+                Constants.NO_WORD);
     }
 
 
     @Override
-    public void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum, String word,
-                          int insertedI, int insertedJ, String insertLetter) throws RemoteException {
+    public void startVote(int startI, int startJ, int length, boolean horizontal, int roomNum, String word) throws RemoteException {
         Game currGame = roomNumGameMap.get(roomNum);
-        currGame.startVote(startI, startJ, length, horizontal, insertedI, insertedJ, insertLetter);
+        currGame.startVote(startI, startJ, length, horizontal);
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                 Constants.VOTE + ";" + startI + ";" + startJ + ";" + length + ";" + horizontal + ";" + word);
     }
 
+    @Override
+    public void placeLetter(int insertedI, int insertedJ, String insertLetter, int roomNum) throws RemoteException {
+        Game currGame = roomNumGameMap.get(roomNum);
+        currGame.placeLetter(insertedI, insertedJ, insertLetter);
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                Constants.PLACE_LETTER + ";" + insertedI + ";" + insertedJ + ";"  + insertLetter);
+    }
 
     @Override
     public void passTurn(int roomNum) throws RemoteException {
-
+        Game currGame = roomNumGameMap.get(roomNum);
+        boolean endGame = currGame.passTurn();
+        if(endGame){
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.END_GAME);
+        }else{
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
+                    Constants.PASS);
+        }
     }
 
 
@@ -203,31 +217,14 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                     Constants.VOTE_RESULT + ";" + playername + ";" +
                             scores.get(playername) + ";" + "true");
-            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
-                    Constants.SYNCHRONIZE_GAME + ";" + "true" + ";" + currGame.getCurrStartRow() + ";" +
-                            currGame.getCurrStartCol() + ";" + currGame.getCurrWordLength() + ";" +
-                            currGame.getCurrHorizontal() + ";" + currGame.getCurrInsertedRow() + ";" +
-                            currGame.getCurrInsertedCol() + ";" + currGame.getCurrInsertedLetter());
         }else if(result == 0){
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                     Constants.VOTE_RESULT + ";" + playername + ";" +
                             scores.get(playername) + ";" + "false");
-            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
-                    Constants.SYNCHRONIZE_GAME + ";" + "false" + ";" + currGame.getCurrInsertedRow() + ";" +
-                            currGame.getCurrInsertedCol() + ";" + currGame.getCurrInsertedLetter());
         }
         else{  //if somebody has not voted
                 System.out.println("Waiting for voting");
         }
-    }
-
-
-
-    @Override
-    public void notifyVoteResult(String username, int score, int roomNum) throws RemoteException {
-        Game currGame = roomNumGameMap.get(roomNum);
-        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
-                username + ";" + score);
     }
 
     @Override

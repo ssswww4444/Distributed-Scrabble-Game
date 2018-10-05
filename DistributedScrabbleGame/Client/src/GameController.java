@@ -50,6 +50,8 @@ public class GameController implements Initializable {
     @FXML
     private Label stateLabel;
     @FXML
+    private Label turnLabel;
+    @FXML
     private TilePane gameBoard;
     @FXML
     private TilePane letterBoard;
@@ -89,12 +91,11 @@ public class GameController implements Initializable {
     private void passBtnClick(ActionEvent event){
         this.clientObj.pass();
         this.btnPass.setDisable(true);
-        this.enterStateNotMyTurn();
     }
 
     @FXML
     private void noWordBtnClick(ActionEvent event){
-        this.clientObj.noWord(getRow(this.chosenCell), getCol(this.chosenCell), chosenCell.getText());
+        this.clientObj.noWord();
         this.btnNoWord.setDisable(true);
         this.enterStateNotMyTurn();
     }
@@ -105,8 +106,7 @@ public class GameController implements Initializable {
         this.enterStateWait();
         this.btnVote.setDisable(true);
         System.out.println(chosenWord);
-        this.clientObj.sendVoteRequest(getRow(head), getCol(head), this.chosenWord, isHorizontal(head, tail),
-                getRow(chosenCell), getCol(chosenCell), chosenCell.getText());
+        this.clientObj.sendVoteRequest(getRow(head), getCol(head), this.chosenWord, isHorizontal(head, tail));
     }
 
     private boolean isHorizontal(TextField start, TextField end){
@@ -251,9 +251,19 @@ public class GameController implements Initializable {
                 cell.setStyle("");
             }
         }
+        for(ToggleButton letterBtn : this.letterBtns){
+            letterBtn.setDisable(true);
+        }
+
+        this.head = null;
+        this.tail = null;
+        this.chosenCell = null;
+        this.btnNoWord.setDisable(true);
+        this.btnVote.setDisable(true);
+        this.btnSelected = null;
+        this.btnPass.setDisable(true);
         this.state = "NotMyTurn";
         this.stateLabel.setText("NotMyTurn");
-        this.enterStateSelect();
     }
 
     private void enterStateSelect(){
@@ -318,7 +328,12 @@ public class GameController implements Initializable {
 
         this.setUpGameBoard();
         this.setUpLetterBoard();
-        this.state = "select";
+        if(this.clientObj.isMyTurn()){
+            this.enterStateSelect();
+        }else{
+            this.enterStateNotMyTurn();
+        }
+        turnLabel.setText(clientObj.getCurrTurnPlayer());
     }
 
     private void setUpGameBoard(){
@@ -449,6 +464,7 @@ public class GameController implements Initializable {
             occupiedCells.add(cell);
             NonOccupiedCells.remove(cell);
             chosenCell = cell;
+            this.clientObj.sendPlacedLetter(getRow(chosenCell), getCol(chosenCell), btnSelected.getText());
 
             enterStateChoose();
         });
@@ -576,7 +592,14 @@ public class GameController implements Initializable {
     }
 
     public void renderNext(){
-        this.enterStateSelect();
+        Platform.runLater(()->{
+            if(clientObj.isMyTurn()){
+                this.enterStateSelect();
+            }else{
+                this.enterStateNotMyTurn();
+            }
+            turnLabel.setText(clientObj.getCurrTurnPlayer());
+        });
     }
 
     public void updateScore(String username, int score){
@@ -639,7 +662,7 @@ public class GameController implements Initializable {
             if (iAmWinner) {
                 msg.append("\n" + "You are the winner!!!");
             } else {
-                msg.append("Your score is: " + myScore);
+                msg.append("\nYour score is: " + myScore);
             }
 
             dialogContent.setBody(new Text(msg.toString()));
@@ -691,6 +714,7 @@ public class GameController implements Initializable {
             // override the onCloseRequest and notify server to remove user.
             currentStage.setOnCloseRequest(t -> {
                 System.out.println("Closing at the Room scene. ");
+                clientObj.logout();
                 Platform.exit();
                 System.exit(0);
             });
@@ -704,13 +728,19 @@ public class GameController implements Initializable {
     }
 
     /**
-     * highlight an inserted letter in the specified cell
+     * highlight a placed letter in the specified cell
      */
-    public void highlightInsertedLetter(int insertedRow, int insertedCol, String insertedLetter){
-        TilePane row = (TilePane)this.gameBoard.getChildren().get(insertedRow);
-        TextField cell = (TextField)row.getChildren().get(insertedCol);
-        cell.setText(insertedLetter);
-        cell.setStyle("-fx-background-color: #fcdb62");
+    public void renderPlacedLetter(int insertedRow, int insertedCol, String insertedLetter){
+        Platform.runLater(()->{
+            TilePane row = (TilePane)this.gameBoard.getChildren().get(insertedRow);
+            TextField cell = (TextField)row.getChildren().get(insertedCol);
+            cell.setText(insertedLetter);
+            cell.setDisable(true);
+            cell.setStyle("-fx-background-color : #68a429;");
+            this.occupiedCells.add(cell);
+            this.NonOccupiedCells.remove(cell);
+        });
+
     }
 
     /**
@@ -721,7 +751,7 @@ public class GameController implements Initializable {
             TilePane row = (TilePane)this.gameBoard.getChildren().get(startRow);
             for(int i=startCol; i<startCol+length; i++){
                 TextField cell = (TextField)row.getChildren().get(i);
-                cell.setStyle("-fx-border-color : #fcdb62;");
+                cell.setStyle("-fx-background-color : #fcdb62;");
             }
         }else{
             for(int i=startRow; i<startRow+length; i++){

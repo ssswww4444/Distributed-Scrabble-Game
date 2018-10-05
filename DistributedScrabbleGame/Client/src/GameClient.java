@@ -10,6 +10,7 @@ public class GameClient {
     private String username;
     private int roomNumber;
     private boolean isHost;
+    private int currTurn;
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
@@ -187,6 +188,7 @@ public class GameClient {
      * Note!! This is used by guests in the room, be notified to update UI to "game".
      */
     public void renderGamePage() {
+        this.currTurn = 1;
         roomController.fadeOut();
     }
 
@@ -272,26 +274,56 @@ public class GameClient {
     /**
      * Notify the server servant to broadcast the voting request
      */
-    public void sendVoteRequest(int startRow, int startCol, String word, boolean horizontal, int insertRow,
-                                int insertCol, String insertedLetter) {
+    public void sendVoteRequest(int startRow, int startCol, String word, boolean horizontal) {
         try {
             serverServantStub.startVote(startRow, startCol, word.length(),
-                    horizontal, roomNumber, word, insertRow, insertCol, insertedLetter);
+                    horizontal, roomNumber, word);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
 
     }
 
-    public void pass() {
-        this.gameController.renderResultPage();
-//        this.gameController.passMsg(false);
-//        this.nextTurn();
+    public void sendPlacedLetter(int insertRow, int insertCol, String insertedLetter){
+        try {
+            serverServantStub.placeLetter(insertRow, insertCol, insertedLetter, this.roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void noWord(int insertedRow, int insertedCol, String insertedLetter) {
+    /**
+     * Send pass request to server
+     */
+    public void pass(){
         try {
-            serverServantStub.noWord(insertedRow, insertedCol, insertedLetter, roomNumber);
+            serverServantStub.passTurn(roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Tell UI controller to render pass message if not current player and move to next turn
+     */
+    public void passResponse() {
+        if(!isMyTurn()){
+            this.gameController.passMsg(false);
+        }
+        this.nextTurn();
+    }
+
+    /**
+     * End the game and display final result
+     */
+    public void endGame(){
+        gameController.renderResultPage();
+    }
+
+
+    public void noWord() {
+        try {
+            serverServantStub.noWord(roomNumber);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -300,26 +332,23 @@ public class GameClient {
     /**
      * Other players did not choose a word
      */
-    public void noWordResponse(int insertedRow, int insertedCol, String insertedLetter){
-        this.gameController.passMsg(true);
-        this.synchronizeGameBoard(insertedRow, insertedCol, insertedLetter);
+    public void noWordResponse(){
+        if(!isMyTurn()){
+            this.gameController.passMsg(true);
+        }
         this.nextTurn();
     }
 
 
     public void nextTurn(){
+        if(currTurn == roomPlayerNames.size()){
+            currTurn = 1;
+        }else{
+            currTurn++;
+        }
         this.gameController.renderNext();
     }
 
-
-
-    public void updatePlayerScore(String username, int score){
-        try {
-            serverServantStub.notifyVoteResult(username, score, this.roomNumber);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
 
     public Boolean isValidWord(Boolean isWord) {
         return true;
@@ -346,27 +375,28 @@ public class GameClient {
     public void renderVoteResult(boolean isWord, int score){
         this.gameController.voteResultMsg(isWord, score);
         if(isWord){
-            this.gameController.updateScore(this.roomPlayerNames.get(0), score);
+            this.gameController.updateScore(roomPlayerNames.get(currTurn-1), score);
         }
+        this.nextTurn();
     }
 
     /**
      * Synchronize selected word and modified cell
      * when the vote is passed by all players
      */
-    public void synchronizeGameBoard(int startRow, int startCol, int length, boolean horizontal, int insertRow,
-                                     int insertCol, String insertedLetter){
-        this.gameController.highlightInsertedLetter(insertRow, insertCol, insertedLetter);
-        this.gameController.highlightChosenWord(startRow, startCol, length, horizontal);
-    }
+//    public void synchronizeGameBoard(int startRow, int startCol, int length, boolean horizontal, int insertRow,
+//                                     int insertCol, String insertedLetter){
+//        this.gameController.highlightChosenWord(startRow, startCol, length, horizontal);
+//    }
+
 
     /**
-     * Synchronize selected word and modified cell
-     * when the vote is NOT agreed among all players
+     * Synchronize the letter placement by another player
      */
-    public void synchronizeGameBoard(int insertRow, int insertCol, String insertedLetter){
-        this.gameController.highlightInsertedLetter(insertRow, insertCol, insertedLetter);
+    public void synchronizePlacedLetter(int insertRow, int insertCol, String insertedLetter){
+        this.gameController.renderPlacedLetter(insertRow, insertCol, insertedLetter);
     }
+
 
     public void yesVote(String word){
         try {
@@ -375,7 +405,6 @@ public class GameClient {
             e.printStackTrace();
         }
 //        renderVoteResult(true, 111);
-        this.nextTurn();
     }
 
     public void noVote(){
@@ -385,7 +414,6 @@ public class GameClient {
             e.printStackTrace();
         }
 //        renderVoteResult(false, 0);
-        this.nextTurn();
     }
 
     /**
@@ -406,4 +434,17 @@ public class GameClient {
         return this.roomPlayerNames;
     }
 
+    /**
+     * Check if the players' turn
+     */
+    public boolean isMyTurn(){
+        return (this.roomPlayerNames.get(this.currTurn-1).equals(this.username));
+    }
+
+    /**
+     * Get current turn player
+     */
+    public String getCurrTurnPlayer(){
+        return this.currTurn + " - " + roomPlayerNames.get(this.currTurn-1);
+    }
 }

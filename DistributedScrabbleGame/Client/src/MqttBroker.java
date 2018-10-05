@@ -131,29 +131,33 @@ public class MqttBroker implements MqttCallback {
             case Constants.GAME_START:
                 gc.renderGamePage();
                 break;
-            case Constants.VOTE:
-                gc.vote(cmd[5]);    //cmd[5] is the voting word
-                break;
-            case Constants.VOTE_RESULT:
-//                gc.updatePlayerScore(cmd[1], Integer.parseInt(cmd[2])); // cmd[2] is the score
-                gc.renderVoteResult(Boolean.parseBoolean(cmd[3]), Integer.parseInt(cmd[2]));
-                break;
-            case Constants.SYNCHRONIZE_GAME:
-                if(Boolean.parseBoolean(cmd[1])){
-                    gc.synchronizeGameBoard(Integer.parseInt(cmd[2]), Integer.parseInt(cmd[3]), Integer.parseInt(cmd[4])
-                            , Boolean.parseBoolean(cmd[5]), Integer.parseInt(cmd[6]), Integer.parseInt(cmd[7]), cmd[8]);
-                }else{
-                    gc.synchronizeGameBoard(Integer.parseInt(cmd[2]), Integer.parseInt(cmd[3]), cmd[4]);
+            case Constants.PLACE_LETTER:
+                if(!gc.isMyTurn()){
+                    gc.synchronizePlacedLetter(Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]), cmd[3]);
                 }
                 break;
+            case Constants.VOTE:
+                if(!gc.isMyTurn()) {
+                    gc.vote(cmd[5]);    //cmd[5] is the voting word
+                }
+                break;
+            case Constants.VOTE_RESULT:
+                gc.renderVoteResult(Boolean.parseBoolean(cmd[3]), Integer.parseInt(cmd[2]));
+                break;
             case Constants.NO_WORD:
-                gc.noWordResponse(Integer.parseInt(cmd[1]), Integer.parseInt(cmd[2]), cmd[3]);
+                    gc.noWordResponse();
                 break;
             case Constants.GAME_OVER:
                 gc.renderResultPage();
                 break;
             case Constants.JOIN_ROOM:  // new player joined room
                 gc.playerJoinedRoom(cmd[1]);
+                break;
+            case Constants.PASS:
+                gc.passResponse();
+                break;
+            case Constants.END_GAME:
+                gc.endGame();
                 break;
         }
     }

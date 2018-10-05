@@ -42,7 +42,7 @@ public class Game {
     public Game(ArrayList<Player> players, int roomID) {
         this.players = players;
 
-//        initGame();
+        //initGame();
         //registerGame(roomID);   // create & bind game servant
         //notifyGameStart();
 
@@ -124,7 +124,16 @@ public class Game {
     /**
      * Current player passed this turn
      */
-    public void passTurn() {
+    public boolean passTurn() {
+        passCount++;
+        if(passCount == players.size()){
+            endGame();
+            return true;
+        }else{
+            nextTurn();
+            return false;
+        }
+
         // notify
 
         //Obsolete if using MQTT
@@ -139,7 +148,6 @@ public class Game {
         }*/
 
         // switch turn
-        nextTurn();
     }
 
     /**
@@ -147,20 +155,13 @@ public class Game {
      */
     public void nextTurn() {
 
-        if (!hasInserted) {   // currPlayer passed
-            passCount += 1;
-        } else {
-            passCount = 0;  // currPlayer not passed
+        if(turn == players.size()){     // The last player has finished his turn
+            turn = 1;       // Go back to player No.1
+        }else{
+            this.turn++;
         }
-
-        if (passCount == players.size()) {  // all players passed
-            endGame();
-        }
-
-        // switch turn
-        turn += 1;
-        if (turn > players.size()) {
-            turn = 1;
+        if(hasInserted){
+            this.passCount = 0;
         }
 
         currStatus = GameStatus.INSERTING;
@@ -179,17 +180,21 @@ public class Game {
     }
 
     /**
-     * Insert letter to the board at (i,j)
+     * Place a letter to the board at (i,j)
      *
      * @return success or fail
      */
-    public void insertLetter(int i, int j, Character letter) {
+    public void placeLetter(int i, int j, String letter) {
         hasInserted = true;
 
         // get cell
-        Cell targetCell = board.get(i).get(j);
+        //Cell targetCell = board.get(i).get(j);
 
-        targetCell.setLetter(letter);
+        currInsertedRow = i;
+        currInsertedCol = j;
+        currInsertedLetter = letter;
+
+        //targetCell.setLetter(letter);
 
         // Obsolete if using MQTT
         /*for (Player player: players) {
@@ -205,8 +210,7 @@ public class Game {
     /**
      * Initialise a vote and notify all clients
      */
-    public void startVote(int startI, int startJ, int length, boolean horizontal, int insertedI, int insertedJ,
-                          String insertedLetter) {
+    public void startVote(int startI, int startJ, int length, boolean horizontal) {
 
         // init vote
         currStatus = GameStatus.VOTING;
@@ -217,9 +221,7 @@ public class Game {
         currStartRow = startI;
         currStartCol = startJ;
         currHorizontal = horizontal;
-        currInsertedRow = insertedI;
-        currInsertedCol = insertedJ;
-        currInsertedLetter = insertedLetter;
+
         // Obsolete if using MQTT
         /*for (Player player: players) {
             ClientInterface clientServant = player.getClientServant();
@@ -246,7 +248,7 @@ public class Game {
         System.out.println("vote total number: " + voteTotalNum);
 
         // check if all voted
-        if (voteTotalNum == players.size()) {
+        if (voteTotalNum == players.size()-1) {
             if (voteAgreeNum == voteTotalNum) {  // all agree
                 voteSuccess();
 

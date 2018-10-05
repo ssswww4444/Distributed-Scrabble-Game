@@ -21,6 +21,9 @@ public class Constants {
     public static final String JOIN_ROOM = "JoinRoom";
     public static final String SYNCHRONIZE_GAME = "SynchronizeGame";
     public static final String NO_WORD = "NoWord";
+    public static final String PLACE_LETTER = "PlaceLetter";
+    public static final String PASS = "Pass";
+    public static final String END_GAME = "EndGame";
 
     // player status
     public static final String STATUS_AVAILABLE = "available";

@@ -221,6 +221,7 @@ public class RoomController implements Initializable {
             // override the onCloseRequest and notify server to remove user.
             currentStage.setOnCloseRequest(t -> {
                 System.out.println("Closing at the Game scene. ");
+                clientObj.logout();
                 Platform.exit();
                 System.exit(0);
             });
