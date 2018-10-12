@@ -116,7 +116,6 @@ public class GameClient {
         return players;
     }
 
-
     /**
      * Display all online users.
      */

@@ -8,7 +8,7 @@ public class Player {
     public Player(String username) {
         this.username = username;
         this.status = Constants.STATUS_AVAILABLE;
-        roomNum = -1;  // initially not in any room
+        roomNum = Constants.NOT_IN_ROOM_ID;  // initially not in any room
     }
 
     public String getUsername() {
