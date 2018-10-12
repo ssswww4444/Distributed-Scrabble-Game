@@ -262,8 +262,10 @@ public class RoomController implements Initializable {
         switch(scene) {
             case "Game":
                 loadGameScene();
+                break;
             case "Menu":
                 loadMenuScene();
+                break;
         }
 
         fadeTransition.setOnFinished(event -> loadGameScene());
