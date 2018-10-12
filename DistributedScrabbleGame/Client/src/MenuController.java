@@ -110,7 +110,7 @@ public class MenuController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScene(isHost, roomPlayers));
+        fadeTransition.setOnFinished(event -> loadRoomScene(isHost, roomPlayers));
         fadeTransition.play();
     }
 
@@ -161,7 +161,7 @@ public class MenuController implements Initializable {
         dialog.show();
     }
 
-    private void loadMainScene(boolean isHost, ArrayList<String> roomPlayers) {
+    private void loadRoomScene(boolean isHost, ArrayList<String> roomPlayers) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
             Parent roomView = loader.load();
@@ -177,6 +177,7 @@ public class MenuController implements Initializable {
             // override the onCloseRequest and notify server to remove user.
             currentStage.setOnCloseRequest(t -> {
                 System.out.println("Closing at the Room scene. ");
+                clientObj.logout();
                 Platform.exit();
                 System.exit(0);
             });

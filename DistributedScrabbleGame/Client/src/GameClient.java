@@ -229,7 +229,7 @@ public class GameClient {
      */
     public void renderGamePage() {
         this.currTurn = 1;
-        roomController.fadeOut();
+        roomController.fadeOut("Game");
     }
 
 
