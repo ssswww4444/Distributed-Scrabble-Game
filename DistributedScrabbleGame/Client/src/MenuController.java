@@ -163,12 +163,9 @@ public class MenuController implements Initializable {
 
     private void loadRoomScene(boolean isHost, ArrayList<String> roomPlayers) {
         try {
-            System.out.println("1");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
-            System.out.println("2");
             Parent roomView = loader.load();
             Scene roomScene = new Scene(roomView);
-            System.out.println("3");
             RoomController controller = loader.getController();
             controller.setClientObj(this.clientObj);
             this.clientObj.setRoomController(controller);
