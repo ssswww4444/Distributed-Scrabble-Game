@@ -255,7 +255,6 @@ public class GameClient {
     public void renderRoomPage() {
         if (this.menuController != null) {
             try {
-                this.roomNumber = roomNumber;
                 this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
                 mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
             } catch (MqttException e) {
