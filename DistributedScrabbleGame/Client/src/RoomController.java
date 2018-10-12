@@ -219,6 +219,9 @@ public class RoomController implements Initializable {
         }
         this.roomPlayers = roomPlayers;  // get reference of roomPlayers in gc
         btnStart.setDisable(true);
+        if (isHost && roomPlayers.size() >= Constants.GAME_MIN_PLAYER) {
+            btnStart.setDisable(false);
+        }
         roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
     }
 
