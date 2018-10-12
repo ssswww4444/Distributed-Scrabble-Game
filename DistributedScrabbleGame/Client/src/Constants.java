@@ -10,22 +10,28 @@ public class Constants {
     // max number of players
     public static final int ROOM_MAX_PLAYER = 4;
 
-    // action types
-    public static final String GAME_START = "GameStart";
-    public static final String VOTE = "Vote";
-    public static final String VOTE_RESULT = "VoteResult";
-    public static final String GAME_OVER = "GameOver";
+    // server actions
     public static final String LOGIN = "Login";
     public static final String LOGOUT = "Logout";
-    public static final String INVITATION = "Invitation";
+
+    // room actions
+    public static final String GAME_START = "GameStart";
     public static final String JOIN_ROOM = "JoinRoom";
+    public static final String DISMISS_ROOM = "DismissRoom";
+    public static final String LEAVE_ROOM = "LeaveRoom";
+
+    // game actions
     public static final String SYNCHRONIZE_GAME = "SynchronizeGame";
     public static final String NO_WORD = "NoWord";
     public static final String PLACE_LETTER = "PlaceLetter";
     public static final String PASS = "Pass";
     public static final String END_GAME = "EndGame";
-    public static final String DISMISS_ROOM = "DismissRoom";
-    public static final String LEAVE_ROOM = "LeaveRoom";
+    public static final String VOTE = "Vote";
+    public static final String VOTE_RESULT = "VoteResult";
+    public static final String GAME_OVER = "GameOver";
+
+    // client actions
+    public static final String INVITATION = "Invitation";
 
     // player status
     public static final String STATUS_AVAILABLE = "available";
