@@ -44,9 +44,9 @@ public class GameClient {
         this.gameController = controller;
     }
 
-    public void setIsHost(boolean isHost){
-        this.isHost = isHost;
-    }
+//    public void setIsHost(boolean isHost){
+//        this.isHost = isHost;
+//    }
 
     /**
      * Create game client.
@@ -70,6 +70,10 @@ public class GameClient {
             mqttBroker = new MqttBroker(username, this);
             serverServantStub.addTOPlayerPool(username);
         }
+
+        // init
+        isHost = false;
+        roomNumber = Constants.NOT_IN_ROOM_ID;
     }
 
 
@@ -153,7 +157,8 @@ public class GameClient {
             mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<>();  // empty
             this.roomPlayerNames.add(this.username);
-            renderRoomPage(true, roomNumber);
+            isHost = true;
+            renderRoomPage();
         } catch (RemoteException | MqttException e) {
             e.printStackTrace();
         }
@@ -188,6 +193,7 @@ public class GameClient {
         Platform.runLater(() -> {
             GameClient.this.roomController.dismissRoom(username);  // update UI
         });
+        roomNumber = Constants.NOT_IN_ROOM_ID;
     }
 
 
@@ -237,7 +243,8 @@ public class GameClient {
         try {
             if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
                 roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // not including himself
-                renderRoomPage(false, roomNumber);
+                this.roomNumber = roomNumber;
+                renderRoomPage();
             } else {  // failed
                 menuController.displayMsg();
             }
@@ -250,10 +257,9 @@ public class GameClient {
     /**
      * Join room successful
      */
-    public void renderRoomPage(boolean isHost, int roomNumber) {
+    public void renderRoomPage() {
         if (this.menuController != null) {
             try {
-                this.isHost = isHost;
                 this.roomNumber = roomNumber;
                 this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
                 mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
@@ -454,9 +460,12 @@ public class GameClient {
     public void leaveRoom() {
         try {
             serverServantStub.leaveRoom(username, isHost, roomNumber);
+            roomPlayerNames = new ArrayList<>();  // set to empty
+            isHost = false;
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+        roomNumber = Constants.NOT_IN_ROOM_ID;
     }
 
     /**
