@@ -110,15 +110,8 @@ public class MqttBroker implements MqttCallback {
     private void serverMessageHandler(MqttMessage message) {
         String[] cmd = message.toString().split(";");
         switch(cmd[0]) {
-            case Constants.LOGIN:  // new username login -> update list
+            case Constants.PLAYER_LIST_UPDATE:  // notify to update player list when logout/login/leaveRoom/joinRoom
                 gc.renderPlayerList();
-                break;
-            case Constants.LOGOUT:
-                gc.renderPlayerList();
-                break;
-            case Constants.INVITATION: // receive invitation (invitation type: all clients)
-                System.out.println(cmd[1] + " invite you to join Room " + cmd[2]);
-                break;
         }
     }
 

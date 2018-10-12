@@ -11,8 +11,7 @@ public class Constants {
     public static final int ROOM_MAX_PLAYER = 4;
 
     // server actions
-    public static final String LOGIN = "Login";
-    public static final String LOGOUT = "Logout";
+    public static final String PLAYER_LIST_UPDATE = "playerListUpdate";  // notify to update player list when logout/login/leaveRoom/joinRoom
 
     // room actions
     public static final String GAME_START = "GameStart";

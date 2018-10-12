@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameClient {
     private String username;
@@ -121,23 +122,24 @@ public class GameClient {
      */
     public void renderPlayerList() {
         ArrayList<String> players;
+        HashMap<String, String> usernameStatusMap;
         try {
             players = serverServantStub.getPlayerPool();
+            usernameStatusMap = serverServantStub.getUsernameStatusMap();
+
             if (this.menuController != null) {
                 ArrayList<PlayerModel> playerModels = new ArrayList<>();
 
                 for (String player : players) {
-                    if (!player.equals(this.username)) {
-                        playerModels.add(new PlayerModel(player, Constants.STATUS_AVAILABLE));
-                    }
+                    playerModels.add(new PlayerModel(player, usernameStatusMap.get(player)));
                 }
+
                 menuController.updatePlayerList(playerModels);
             }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Create a new room
