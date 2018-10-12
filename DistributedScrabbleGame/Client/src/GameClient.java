@@ -59,12 +59,20 @@ public class GameClient {
         // get the RMI stub.
         getServerRegistry();
 
-        if (serverServantStub.getPlayerPool().contains(username)) {
-            throw new Exception("Existing user");
+        ArrayList<String> playerPool;
+
+        try {
+            playerPool = serverServantStub.getPlayerPool();
+        } catch (Exception e) {
+            throw new Exception("Cannot find server.");
+        }
+
+        if (playerPool.contains(username)) {
+            throw new Exception("Username not available. Please choose another one.");
         } else if (username.equals("gameServer")) {  // username cannot be "gameServer" (for mqtt id purpose)
-            throw new Exception("Username cannot be 'gameServer'");
+            throw new Exception("Username cannot be 'gameServer'. Please choose another one.");
         } else if (username.equals("")) {  // empty string
-            throw new Exception("Username cannot be empty");
+            throw new Exception("Username cannot be empty.");
         } else {
             this.username = username;
             mqttBroker = new MqttBroker(username, this);
@@ -80,7 +88,7 @@ public class GameClient {
     /**
      * Get the game server remote servant.
      */
-    private void getServerRegistry() {
+    private void getServerRegistry() throws Exception {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost");
             serverServantStub = (ServerInterface) registry.lookup("ServerInterface");

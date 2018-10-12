@@ -47,16 +47,17 @@ public class LoginController implements Initializable {
             this.clientObj = new GameClient(usernameField.getText());
             this.btnConnect.setDisable(true);
             fadeOut();
-        }catch(Exception e){
-            this.displayMsg();
+        } catch(Exception e){
+            this.displayMsg(e.getMessage());
         }
     }
 
     @FXML
-    public void displayMsg(){
+    public void displayMsg(String message){
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Error Message"));
-        dialogContent.setBody(new Text("Username not available. Please choose another one."));
+//        dialogContent.setBody(new Text("Username not available. Please choose another one."));
+        dialogContent.setBody(new Text(message));
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnClose = new Button("Okay");
