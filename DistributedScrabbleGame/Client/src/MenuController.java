@@ -118,7 +118,7 @@ public class MenuController implements Initializable {
     public void invitationMsg(String username, int roomNumber) {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Room Invitation"));
-        dialogContent.setBody(new Text("User " + username + "invited you to Room: " + roomNumber + ". Accept?"));
+        dialogContent.setBody(new Text("User " + username + " invited you to Room: " + roomNumber + ". Accept?"));
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnYes = new Button("Yes");

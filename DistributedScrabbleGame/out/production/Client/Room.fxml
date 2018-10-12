@@ -30,7 +30,7 @@
             <Font name="System Bold" size="18.0" />
          </font>
       </Label>
-      <Label fx:id="roomNumber" layoutX="108.0" layoutY="21.0" prefHeight="27.0" prefWidth="44.0" text="110">
+      <Label fx:id="roomNumber" layoutX="107.0" layoutY="19.0" prefHeight="27.0" prefWidth="44.0" text="110">
          <font>
             <Font name="System Bold" size="18.0" />
          </font>
@@ -50,7 +50,7 @@
             <Font name="System Bold Italic" size="19.0" />
          </font>
       </Button>
-      <Button fx:id="btnStart" layoutX="492.0" layoutY="104.0" mnemonicParsing="false" onAction="#startBtnClick" prefHeight="177.0" prefWidth="86.0" text="START">
+      <Button fx:id="btnStart" layoutX="481.0" layoutY="104.0" mnemonicParsing="false" onAction="#startBtnClick" prefHeight="177.0" prefWidth="97.0" text="START">
          <font>
             <Font name="System Bold" size="19.0" />
          </font>
@@ -60,7 +60,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Label fx:id="hostUsername" layoutX="64.0" layoutY="48.0" prefHeight="27.0" prefWidth="204.0" text="Username">
+      <Label fx:id="hostUsername" layoutX="64.0" layoutY="46.0" prefHeight="27.0" prefWidth="204.0" text="Username">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
