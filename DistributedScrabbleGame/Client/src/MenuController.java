@@ -48,19 +48,6 @@ public class MenuController implements Initializable {
     @FXML
     private StackPane dialogPane;
 
-
-    /**********************Test*******************/
-    @FXML
-    private Button btnTest;
-
-    @FXML
-    private void testBtnClick(ActionEvent event) {
-        this.clientObj.receiveInvitation("Kuanglaoshi", 111);
-    }
-
-    /**********************Test*******************/
-
-
     @FXML
     public void createBtnClick(ActionEvent event) {
         try {
