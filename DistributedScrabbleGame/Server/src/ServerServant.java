@@ -99,22 +99,50 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      * Decrement the room counter when a room is dismissed.
      */
     @Override
-    public void leaveRoom(String username, boolean isHost, int roomNum) {
+    public void leaveRoom(String username, boolean isHost, int roomNum) throws RemoteException {
         if (isHost) {  // dismiss room
+            ArrayList<String> userNames = getUserInRoom(roomNum);
+            for (String user: userNames) {
+                playerLeaveRoom(user);
+            }
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.DISMISS_ROOM + ";" + username);
         } else {   // leave room
+            playerLeaveRoom(username);
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.LEAVE_ROOM + ";" + username);
         }
     }
 
-
     /**
-     * Invite all available online users.
+     * Get available players
      */
     @Override
-    public void inviteAll(String inviter, int roomNum) {
-            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.INVITATION + ";" + inviter + ";" + roomNum);
+    public ArrayList<String> getAvailablePlayers() throws  RemoteException {
+        ArrayList<String> players = new ArrayList<String>();
+        for (Player player: playerPool) {
+            if (player.getStatus().equals(Constants.STATUS_AVAILABLE)) {
+                players.add(player.getUsername());
+            }
+        }
+        return players;
     }
+
+    /**
+     * Update player status when leave room
+     */
+    private void playerLeaveRoom(String username) {
+        Player player = usernamePlayerMap.get(username);
+        player.setRoomNum(Constants.NOT_IN_ROOM_ID);
+        player.setStatus(Constants.STATUS_AVAILABLE);
+    }
+
+
+//    /**
+//     * Invite all available online users.
+//     */
+//    @Override
+//    public void inviteAll(String inviter, int roomNum) {
+//            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.INVITATION + ";" + inviter + ";" + roomNum);
+//    }
 
 
     /**

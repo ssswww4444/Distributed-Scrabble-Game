@@ -109,7 +109,7 @@ public class GameClient {
     public ArrayList<String> getAvailablePlayers() {
         ArrayList<String> players = new ArrayList<>();
         try {
-            players = serverServantStub.getPlayerPool();
+            players = serverServantStub.getAvailablePlayers();
         } catch (RemoteException e) {
             e.printStackTrace();
         }

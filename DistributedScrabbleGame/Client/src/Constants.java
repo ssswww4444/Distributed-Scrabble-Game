@@ -30,4 +30,5 @@ public class Constants {
     // player status
     public static final String STATUS_AVAILABLE = "available";
     public static final String STATUS_ROOM = "room";
+    public static final int NOT_IN_ROOM_ID = -1;
 }

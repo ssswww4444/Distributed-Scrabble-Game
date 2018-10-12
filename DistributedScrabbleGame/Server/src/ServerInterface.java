@@ -15,7 +15,7 @@ public interface ServerInterface extends Remote {
 
     void leaveRoom(String username, boolean isHost, int roomNum) throws RemoteException;
 
-    void inviteAll(String inviter, int roomNum) throws RemoteException;
+//    void inviteAll(String inviter, int roomNum) throws RemoteException;
 
     void invite(String inviter, String targetUser, int roomNum) throws RemoteException;
 
@@ -39,5 +39,7 @@ public interface ServerInterface extends Remote {
     void leaveGame(String username, int roomNum) throws RemoteException;
 
     boolean canJoinRoom(String username, int roomNum) throws  RemoteException;
+
+    ArrayList<String> getAvailablePlayers() throws  RemoteException;
 
 }
