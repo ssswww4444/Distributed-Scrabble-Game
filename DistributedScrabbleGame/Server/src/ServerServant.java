@@ -99,8 +99,12 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      * Decrement the room counter when a room is dismissed.
      */
     @Override
-    public void leaveRoom() {
-//        roomCount.decrementAndGet();
+    public void leaveRoom(String username, boolean isHost, int roomNum) {
+        if (isHost) {  // dismiss room
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.DISMISS_ROOM + ";" + username);
+        } else {   // leave room
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.LEAVE_ROOM + ";" + username);
+        }
     }
 
 

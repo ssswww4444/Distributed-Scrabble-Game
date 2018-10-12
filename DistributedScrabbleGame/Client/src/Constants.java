@@ -24,6 +24,8 @@ public class Constants {
     public static final String PLACE_LETTER = "PlaceLetter";
     public static final String PASS = "Pass";
     public static final String END_GAME = "EndGame";
+    public static final String DISMISS_ROOM = "DismissRoom";
+    public static final String LEAVE_ROOM = "LeaveRoom";
 
     // player status
     public static final String STATUS_AVAILABLE = "available";

@@ -169,6 +169,26 @@ public class GameClient {
         });
     }
 
+    /**
+     * Receive notification that player left room
+     */
+    public void playerLeaveRoom(String username) {
+        roomPlayerNames.remove(username); // update list
+        Platform.runLater(() -> {
+            GameClient.this.roomController.leaveRoom(username);  // update UI
+        });
+    }
+
+    /**
+     * Receive notification that host dismissed room
+     */
+    public void hostDismissRoom(String username) {
+        roomPlayerNames = new ArrayList<>();  // set to empty
+        Platform.runLater(() -> {
+            GameClient.this.roomController.dismissRoom(username);  // update UI
+        });
+    }
+
 
     /**
      * Create a new room, room ID is assigned by server.
@@ -422,6 +442,17 @@ public class GameClient {
     public void logout() {
         try {
             serverServantStub.removeFromPlayerPool(username);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Tell server that player left room
+     */
+    public void leaveRoom() {
+        try {
+            serverServantStub.leaveRoom(username, isHost, roomNumber);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

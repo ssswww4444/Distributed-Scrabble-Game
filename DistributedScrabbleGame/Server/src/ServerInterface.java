@@ -13,7 +13,7 @@ public interface ServerInterface extends Remote {
 
     int createRoom(String username) throws RemoteException;
 
-    void leaveRoom() throws RemoteException;
+    void leaveRoom(String username, boolean isHost, int roomNum) throws RemoteException;
 
     void inviteAll(String inviter, int roomNum) throws RemoteException;
 

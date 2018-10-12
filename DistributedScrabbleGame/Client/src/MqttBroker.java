@@ -145,7 +145,7 @@ public class MqttBroker implements MqttCallback {
                 gc.renderVoteResult(Boolean.parseBoolean(cmd[3]), Integer.parseInt(cmd[2]));
                 break;
             case Constants.NO_WORD:
-                    gc.noWordResponse();
+                gc.noWordResponse();
                 break;
             case Constants.GAME_OVER:
                 gc.renderResultPage();
@@ -159,6 +159,10 @@ public class MqttBroker implements MqttCallback {
             case Constants.END_GAME:
                 gc.endGame();
                 break;
+            case Constants.LEAVE_ROOM:
+                gc.playerLeaveRoom(cmd[1]);
+            case Constants.DISMISS_ROOM:
+                gc.hostDismissRoom(cmd[1]);
         }
     }
 

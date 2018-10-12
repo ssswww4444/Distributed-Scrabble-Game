@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RoomController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RoomController">
    <children>
       <ImageView fitHeight="25.0" fitWidth="26.0" layoutX="454.0" layoutY="373.0">
          <image>
@@ -65,7 +65,7 @@
             <Font name="System Bold" size="16.0" />
          </font>
       </Label>
-      <Button fx:id="btnLeave" layoutX="492.0" layoutY="321.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="86.0" text="Leave">
+      <Button fx:id="btnLeave" layoutX="492.0" layoutY="321.0" mnemonicParsing="false" onAction="#leaveBtnClick" prefHeight="31.0" prefWidth="86.0" text="Leave">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>

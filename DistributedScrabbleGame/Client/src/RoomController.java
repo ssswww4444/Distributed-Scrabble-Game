@@ -142,7 +142,52 @@ public class RoomController implements Initializable {
         this.roomPlayers.add(username);
     }
 
+    /**
+     * Leave / Dismiss button clicked
+     */
+    @FXML
+    public void leaveBtnClick() {
+        this.clientObj.leaveRoom();
+    }
 
+    /**
+     * Update UI when some player left room
+     */
+    public void leaveRoom(String username) {
+        if (btnPlayer2.getText().equals(username)) {
+            btnPlayer2.setText("<Click to invite>");
+            btnPlayer2.setDisable(false);
+        } else if (btnPlayer3.getText().equals(username)) {
+            btnPlayer3.setText("<Click to invite>");
+            btnPlayer3.setDisable(false);
+        } else if (btnPlayer4.getText().equals(username)) {
+            btnPlayer4.setText("<Click to invite>");
+            btnPlayer4.setDisable(false);
+        }
+        this.roomPlayers.remove(username);
+    }
+
+    /**
+     * Update UI when host dismissed room
+     */
+    public void dismissRoom(String username) {
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setHeading(new Text("Room Dismissed"));
+        dialogContent.setBody(new Text("The host " + username + " has dismissed this room."));
+        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+        Button btnClose = new Button("Okay");
+        btnClose.setOnAction(event -> {
+            dialog.close();
+            dialogPane.setVisible(false);
+//            menuFadeOut();
+        });
+        dialogContent.setActions(btnClose);
+        dialogPane.setVisible(true);
+        dialog.show();
+
+        // back to menu controller
+    }
 
     private Button getFreeButton() {
         if (!this.btnPlayer2.isDisable()) {
