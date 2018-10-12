@@ -176,7 +176,7 @@ public class GameClient {
     public void playerLeaveRoom(String username) {
         roomPlayerNames.remove(username); // update list
         Platform.runLater(() -> {
-            GameClient.this.roomController.leaveRoom(username);  // update UI
+            GameClient.this.roomController.leaveRoom(username, isHost);  // update UI
         });
     }
 

@@ -154,16 +154,23 @@ public class RoomController implements Initializable {
     /**
      * Update UI when some player left room
      */
-    public void leaveRoom(String username) {
+    public void leaveRoom(String username, boolean isHost) {
         if (btnPlayer2.getText().equals(username)) {
             btnPlayer2.setText("<Click to invite>");
-            btnPlayer2.setDisable(false);
+            if (isHost) {
+                btnPlayer2.setDisable(false);
+            }
         } else if (btnPlayer3.getText().equals(username)) {
             btnPlayer3.setText("<Click to invite>");
-            btnPlayer3.setDisable(false);
+            if (isHost) {
+                btnPlayer3.setDisable(false);
+            }
         } else if (btnPlayer4.getText().equals(username)) {
             btnPlayer4.setText("<Click to invite>");
             btnPlayer4.setDisable(false);
+            if (isHost) {
+                btnPlayer4.setDisable(false);
+            }
         }
         this.roomPlayers.remove(username);
         if (roomPlayers.size() < 2) {  // need at least 2 players
