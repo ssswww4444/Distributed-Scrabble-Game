@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameClient {
     private String username;
@@ -43,9 +44,9 @@ public class GameClient {
         this.gameController = controller;
     }
 
-    public void setIsHost(boolean isHost){
-        this.isHost = isHost;
-    }
+//    public void setIsHost(boolean isHost){
+//        this.isHost = isHost;
+//    }
 
     /**
      * Create game client.
@@ -58,24 +59,37 @@ public class GameClient {
         // get the RMI stub.
         getServerRegistry();
 
-        if (serverServantStub.getPlayerPool().contains(username)) {
-            throw new Exception("Existing user");
+        ArrayList<String> playerPool;
+
+        try {
+            playerPool = serverServantStub.getPlayerPool();
+        } catch (Exception e) {
+            throw new Exception("Cannot find server.");
+        }
+
+        if (playerPool.contains(username)) {
+            throw new Exception("Username not available. Please choose another one.");
         } else if (username.equals("gameServer")) {  // username cannot be "gameServer" (for mqtt id purpose)
-            throw new Exception("Username cannot be 'gameServer'");
+            throw new Exception("Username cannot be 'gameServer'. Please choose another one.");
         } else if (username.equals("")) {  // empty string
-            throw new Exception("Username cannot be empty");
+            throw new Exception("Username cannot be empty.");
         } else {
             this.username = username;
             mqttBroker = new MqttBroker(username, this);
             serverServantStub.addTOPlayerPool(username);
         }
+
+        // init
+        isHost = false;
+        roomNumber = Constants.NOT_IN_ROOM_ID;
+        roomPlayerNames = new ArrayList<>();
     }
 
 
     /**
      * Get the game server remote servant.
      */
-    private void getServerRegistry() {
+    private void getServerRegistry() throws Exception {
         try {
             Registry registry = LocateRegistry.getRegistry("localhost");
             serverServantStub = (ServerInterface) registry.lookup("ServerInterface");
@@ -84,61 +98,42 @@ public class GameClient {
         }
     }
 
-
-    /**
-     * Get all current online users.
-     */
-    public ArrayList<PlayerModel> getPlayerList() {
-        ArrayList<PlayerModel> players = new ArrayList<>();
-        try {
-            ArrayList<String> playerObjects = serverServantStub.getPlayerPool();
-            for (String s : playerObjects) {
-                players.add(new PlayerModel(s, Constants.STATUS_AVAILABLE));
-            }
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        return players;
-    }
-
-
     /**
      * Get all current available users. (Current implementation is just "Return all users")
      */
     public ArrayList<String> getAvailablePlayers() {
         ArrayList<String> players = new ArrayList<>();
         try {
-            players = serverServantStub.getPlayerPool();
+            players = serverServantStub.getAvailablePlayers();
         } catch (RemoteException e) {
             e.printStackTrace();
         }
         return players;
     }
 
-
     /**
      * Display all online users.
      */
     public void renderPlayerList() {
         ArrayList<String> players;
+        HashMap<String, String> usernameStatusMap;
         try {
             players = serverServantStub.getPlayerPool();
+            usernameStatusMap = serverServantStub.getUsernameStatusMap();
+
             if (this.menuController != null) {
                 ArrayList<PlayerModel> playerModels = new ArrayList<>();
 
                 for (String player : players) {
-                    if (!player.equals(this.username)) {
-                        playerModels.add(new PlayerModel(player, Constants.STATUS_AVAILABLE));
-                    }
+                    playerModels.add(new PlayerModel(player, usernameStatusMap.get(player)));
                 }
+
                 menuController.updatePlayerList(playerModels);
             }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Create a new room
@@ -149,10 +144,11 @@ public class GameClient {
     public void createRoom() {
         try {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
-            mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
+            mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<>();  // empty
             this.roomPlayerNames.add(this.username);
-            renderRoomPage(true, roomNumber);
+            isHost = true;
+            renderRoomPage();
         } catch (RemoteException | MqttException e) {
             e.printStackTrace();
         }
@@ -165,8 +161,34 @@ public class GameClient {
     public void playerJoinedRoom(String username) {
         roomPlayerNames.add(username); // update list
         Platform.runLater(() -> {
-            GameClient.this.roomController.joinRoom(username);  // update UI
+            GameClient.this.roomController.joinRoom(username, isHost);  // update UI
         });
+    }
+
+    /**
+     * Receive notification that player left room
+     */
+    public void playerLeaveRoom(String username) {
+        roomPlayerNames.remove(username); // update list
+        Platform.runLater(() -> {
+            GameClient.this.roomController.leaveRoom(username, isHost);  // update UI
+        });
+    }
+
+    /**
+     * Receive notification that host dismissed room
+     */
+    public void hostDismissRoom(String username) {
+        Platform.runLater(() -> {
+            GameClient.this.roomController.dismissRoom(username);  // update UI
+        });
+        try {
+            mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+        roomPlayerNames = new ArrayList<>();  // set to empty
+        roomNumber = Constants.NOT_IN_ROOM_ID;
     }
 
 
@@ -189,7 +211,7 @@ public class GameClient {
      */
     public void renderGamePage() {
         this.currTurn = 1;
-        roomController.fadeOut();
+        roomController.fadeOut("Game");
     }
 
 
@@ -215,8 +237,9 @@ public class GameClient {
     public void acceptInvitation(int roomNumber) {
         try {
             if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
-                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // not including himself
-                renderRoomPage(false, roomNumber);
+                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // including himself
+                this.roomNumber = roomNumber;
+                renderRoomPage();
             } else {  // failed
                 menuController.displayMsg();
             }
@@ -229,11 +252,9 @@ public class GameClient {
     /**
      * Join room successful
      */
-    public void renderRoomPage(boolean isHost, int roomNumber) {
+    public void renderRoomPage() {
         if (this.menuController != null) {
             try {
-                this.isHost = isHost;
-                this.roomNumber = roomNumber;
                 this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
                 mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
             } catch (MqttException e) {
@@ -425,6 +446,26 @@ public class GameClient {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Tell server that player left room
+     */
+    public void leaveRoom() {
+        try {
+            mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
+            serverServantStub.leaveRoom(username, isHost, roomNumber);  // notify server
+            roomPlayerNames = new ArrayList<>();  // set to empty
+            if (!isHost) {  // leave room
+                this.roomController.fadeOut("Menu");
+            } else {
+                hostDismissRoom(username);
+            }
+            isHost = false;
+        } catch (RemoteException | MqttException e) {
+            e.printStackTrace();
+        }
+        roomNumber = Constants.NOT_IN_ROOM_ID;
     }
 
     /**

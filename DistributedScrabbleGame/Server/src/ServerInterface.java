@@ -1,6 +1,7 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public interface ServerInterface extends Remote {
@@ -13,9 +14,9 @@ public interface ServerInterface extends Remote {
 
     int createRoom(String username) throws RemoteException;
 
-    void leaveRoom() throws RemoteException;
+    void leaveRoom(String username, boolean isHost, int roomNum) throws RemoteException;
 
-    void inviteAll(String inviter, int roomNum) throws RemoteException;
+//    void inviteAll(String inviter, int roomNum) throws RemoteException;
 
     void invite(String inviter, String targetUser, int roomNum) throws RemoteException;
 
@@ -39,5 +40,9 @@ public interface ServerInterface extends Remote {
     void leaveGame(String username, int roomNum) throws RemoteException;
 
     boolean canJoinRoom(String username, int roomNum) throws  RemoteException;
+
+    ArrayList<String> getAvailablePlayers() throws  RemoteException;
+
+    HashMap<String, String> getUsernameStatusMap() throws RemoteException;
 
 }

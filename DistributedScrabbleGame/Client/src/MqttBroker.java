@@ -110,15 +110,8 @@ public class MqttBroker implements MqttCallback {
     private void serverMessageHandler(MqttMessage message) {
         String[] cmd = message.toString().split(";");
         switch(cmd[0]) {
-            case Constants.LOGIN:  // new username login -> update list
+            case Constants.PLAYER_LIST_UPDATE:  // notify to update player list when logout/login/leaveRoom/joinRoom
                 gc.renderPlayerList();
-                break;
-            case Constants.LOGOUT:
-                gc.renderPlayerList();
-                break;
-            case Constants.INVITATION: // receive invitation (invitation type: all clients)
-                System.out.println(cmd[1] + " invite you to join Room " + cmd[2]);
-                break;
         }
     }
 
@@ -145,7 +138,7 @@ public class MqttBroker implements MqttCallback {
                 gc.renderVoteResult(Boolean.parseBoolean(cmd[3]), Integer.parseInt(cmd[2]));
                 break;
             case Constants.NO_WORD:
-                    gc.noWordResponse();
+                gc.noWordResponse();
                 break;
             case Constants.GAME_OVER:
                 gc.renderResultPage();
@@ -158,6 +151,12 @@ public class MqttBroker implements MqttCallback {
                 break;
             case Constants.END_GAME:
                 gc.endGame();
+                break;
+            case Constants.LEAVE_ROOM:
+                gc.playerLeaveRoom(cmd[1]);
+                break;
+            case Constants.DISMISS_ROOM:
+                gc.hostDismissRoom(cmd[1]);
                 break;
         }
     }

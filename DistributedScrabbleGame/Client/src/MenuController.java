@@ -48,19 +48,6 @@ public class MenuController implements Initializable {
     @FXML
     private StackPane dialogPane;
 
-
-    /**********************Test*******************/
-    @FXML
-    private Button btnTest;
-
-    @FXML
-    private void testBtnClick(ActionEvent event) {
-        this.clientObj.receiveInvitation("Kuanglaoshi", 111);
-    }
-
-    /**********************Test*******************/
-
-
     @FXML
     public void createBtnClick(ActionEvent event) {
         try {
@@ -75,7 +62,8 @@ public class MenuController implements Initializable {
     @FXML
     public void refreshBtnClick(ActionEvent event) {
         btnRefreshPlayers.setDisable(true);
-        refreshPlayerList();
+//        refreshPlayerList();
+        this.clientObj.renderPlayerList();
         btnRefreshPlayers.setDisable(false);
     }
 
@@ -90,7 +78,8 @@ public class MenuController implements Initializable {
 
     public void refresh() {
         this.userLabel.setText(this.clientObj.getUsername());
-        refreshPlayerList();
+//        refreshPlayerList();
+        this.clientObj.renderPlayerList();
     }
 
     public void updatePlayerList(ArrayList<PlayerModel> updatedPlayers) {
@@ -102,15 +91,15 @@ public class MenuController implements Initializable {
         });
     }
 
-    public void refreshPlayerList() {
-        ArrayList<PlayerModel> refreshedPlayers = clientObj.getPlayerList();
-        Platform.runLater(() -> {
-            MenuController.this.playerList.getItems().clear();
-            for (PlayerModel player : refreshedPlayers) {
-                MenuController.this.playerList.getItems().add(player);
-            }
-        });
-    }
+//    public void refreshPlayerList() {
+//        ArrayList<PlayerModel> refreshedPlayers = clientObj.getPlayerList();
+//        Platform.runLater(() -> {
+//            MenuController.this.playerList.getItems().clear();
+//            for (PlayerModel player : refreshedPlayers) {
+//                MenuController.this.playerList.getItems().add(player);
+//            }
+//        });
+//    }
 
 
     /* This method is used to provide a smoother transition between scences */
@@ -121,7 +110,7 @@ public class MenuController implements Initializable {
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScene(isHost, roomPlayers));
+        fadeTransition.setOnFinished(event -> loadRoomScene(isHost, roomPlayers));
         fadeTransition.play();
     }
 
@@ -129,7 +118,7 @@ public class MenuController implements Initializable {
     public void invitationMsg(String username, int roomNumber) {
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Room Invitation"));
-        dialogContent.setBody(new Text("User " + username + "invited you to Room: " + roomNumber + ". Accept?"));
+        dialogContent.setBody(new Text("User " + username + " invited you to Room: " + roomNumber + ". Accept?"));
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnYes = new Button("Yes");
@@ -172,22 +161,23 @@ public class MenuController implements Initializable {
         dialog.show();
     }
 
-    private void loadMainScene(boolean isHost, ArrayList<String> roomPlayers) {
+    private void loadRoomScene(boolean isHost, ArrayList<String> roomPlayers) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
             Parent roomView = loader.load();
             Scene roomScene = new Scene(roomView);
             RoomController controller = loader.getController();
             controller.setClientObj(this.clientObj);
-            this.clientObj.setIsHost(isHost);
             this.clientObj.setRoomController(controller);
             this.clientObj.removeMenuController();
             controller.startup(isHost, roomPlayers);
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
 
+
             // override the onCloseRequest and notify server to remove user.
             currentStage.setOnCloseRequest(t -> {
                 System.out.println("Closing at the Room scene. ");
+                clientObj.logout();
                 Platform.exit();
                 System.exit(0);
             });
@@ -195,7 +185,7 @@ public class MenuController implements Initializable {
             currentStage.setScene(roomScene);
 
         } catch (IOException e) {
-            System.out.println("Cannot find main scene fxml");
+            System.out.println("Cannot find room scene fxml");
         }
     }
 

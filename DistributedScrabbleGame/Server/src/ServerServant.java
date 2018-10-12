@@ -11,6 +11,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     private AtomicInteger roomCount;
     private ArrayList<Game> games;
     private HashMap<String, Player> usernamePlayerMap;
+    private HashMap<String, String> usernameStatusMap;
     private HashMap<Integer, Game> roomNumGameMap;
 
     public ServerServant(MqttBroker broker) throws RemoteException {
@@ -20,6 +21,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         games = new ArrayList<>();
         usernamePlayerMap = new HashMap<>();
         roomNumGameMap = new HashMap<>();
+        usernameStatusMap = new HashMap<>();
     }
 
 
@@ -31,7 +33,11 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         Player player = new Player(username);
         playerPool.add(player);
         usernamePlayerMap.put(username, player);  // add to hashmap
-        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGIN + ";" + username);
+        usernameStatusMap.put(username, Constants.STATUS_AVAILABLE);
+
+//        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGIN + ";" + username);
+
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
 
         // debug printings
         System.out.println("Login info start ---> ");
@@ -52,7 +58,9 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     public void removeFromPlayerPool(String username) {
         playerPool.removeIf(player -> player.getUsername().equals(username));
         usernamePlayerMap.remove(username);
-        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGOUT + ";" + username);
+        usernameStatusMap.remove(username);
+
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
 
         // debug printings
         System.out.println("Logout info start ---> ");
@@ -63,6 +71,14 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         }
         System.out.println();
         System.out.println("Logout info end <---" + "\n");
+    }
+
+    /**
+     * Get usernameStatus hashmap
+     */
+    @Override
+    public HashMap<String, String> getUsernameStatusMap() throws RemoteException {
+        return usernameStatusMap;
     }
 
 
@@ -90,6 +106,10 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         Player player = usernamePlayerMap.get(username);
         player.setStatus(Constants.STATUS_ROOM);
         player.setRoomNum(roomID);
+        player.setIsHost(true);
+        usernameStatusMap.put(username, Constants.STATUS_ROOM + " " + roomID);
+
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
 
         return roomID;
     }
@@ -99,17 +119,45 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      * Decrement the room counter when a room is dismissed.
      */
     @Override
-    public void leaveRoom() {
-//        roomCount.decrementAndGet();
+    public void leaveRoom(String username, boolean isHost, int roomNum) throws RemoteException {
+        if (isHost) {  // dismiss room
+            ArrayList<String> userNames = getUserInRoom(roomNum);
+            for (String user: userNames) {
+                playerLeaveRoom(user);
+                usernameStatusMap.put(user, Constants.STATUS_AVAILABLE);
+            }
+            usernamePlayerMap.get(username).setIsHost(false);  // not host anymore
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.DISMISS_ROOM + ";" + username);
+        } else {   // leave room
+            playerLeaveRoom(username);
+            usernameStatusMap.put(username, Constants.STATUS_AVAILABLE);
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.LEAVE_ROOM + ";" + username);
+        }
+
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
     }
 
-
     /**
-     * Invite all available online users.
+     * Get available players
      */
     @Override
-    public void inviteAll(String inviter, int roomNum) {
-            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.INVITATION + ";" + inviter + ";" + roomNum);
+    public ArrayList<String> getAvailablePlayers() throws  RemoteException {
+        ArrayList<String> players = new ArrayList<String>();
+        for (Player player: playerPool) {
+            if (player.getStatus().equals(Constants.STATUS_AVAILABLE)) {
+                players.add(player.getUsername());
+            }
+        }
+        return players;
+    }
+
+    /**
+     * Update player status when leave room
+     */
+    private void playerLeaveRoom(String username) {
+        Player player = usernamePlayerMap.get(username);
+        player.setRoomNum(Constants.NOT_IN_ROOM_ID);
+        player.setStatus(Constants.STATUS_AVAILABLE);
     }
 
 
@@ -131,11 +179,18 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     @Override
     public ArrayList<String> getUserInRoom(int roomNum) throws RemoteException {
         ArrayList<String> userNames = new ArrayList<>();
+        Player hostPlayer = null;
         for(Player player : playerPool){
             if(player.getRoomNum() == roomNum) {
-                userNames.add(player.getUsername());
+                if (hostPlayer == null && player.getIsHost()) {
+                    hostPlayer = player;
+                } else {
+                    userNames.add(player.getUsername());
+                }
             }
         }
+        userNames.add(0, hostPlayer.getUsername());  // host always at index 0
+
         return userNames;
     }
 
@@ -243,6 +298,9 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
             Player player = usernamePlayerMap.get(username);
             player.setStatus(Constants.STATUS_ROOM);
             player.setRoomNum(roomNum);
+            usernameStatusMap.put(username, Constants.STATUS_ROOM + " " + roomNum);
+
+            mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
 
             return true;
         }
