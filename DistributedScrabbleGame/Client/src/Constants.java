@@ -5,7 +5,6 @@ public class Constants {
     public static final String SERVER_TOPIC = "server";
     public static final String CLIENT_TOPIC = "client";
     public static final String ROOM_TOPIC = "room";
-    public static final String TEST_TOPIC = "mqtt/room1";
 
     // max number of players
     public static final int ROOM_MAX_PLAYER = 4;

@@ -135,6 +135,7 @@ public class RoomController implements Initializable {
 
     public void joinRoom(String username) {
         Button freeButton = this.getFreeButton();
+        btnStart.setDisable(false);
         if (freeButton != null) {
             freeButton.setText(username);
             freeButton.setDisable(true);
@@ -165,6 +166,9 @@ public class RoomController implements Initializable {
             btnPlayer4.setDisable(false);
         }
         this.roomPlayers.remove(username);
+        if (roomPlayers.size() < 2) {  // need at least 2 players
+            btnStart.setDisable(true);
+        }
     }
 
     /**
@@ -220,8 +224,9 @@ public class RoomController implements Initializable {
         if(isHost){
             this.roomPlayers = new ArrayList<>(4);
             this.roomPlayers.add(this.clientObj.getUsername());
+            btnStart.setDisable(true);
             btnLeave.setText("Dismiss");
-        }else{
+        } else{
             this.roomPlayers = roomPlayers;
             btnPlayer2.setDisable(true);
             btnPlayer3.setDisable(true);
