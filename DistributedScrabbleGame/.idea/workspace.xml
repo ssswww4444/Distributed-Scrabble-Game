@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f5574870-6ebc-4324-a3c2-f24a7e325a74" name="Default Changelist" comment="Merge branch 'master' of https://github.com/ssswww4444/DS-Proj2 into single_player_game&#10;&#10;# Conflicts:&#10;#&#9;DistributedScrabbleGame/.idea/workspace.xml&#10;#&#9;DistributedScrabbleGame/Client/src/GameController.java&#10;#&#9;DistributedScrabbleGame/out/production/Client/Constants.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/GameClient.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/GameController.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/MqttBroker.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/RoomController.class&#10;#&#9;DistributedScrabbleGame/out/production/Server/ServerInterface.class&#10;#&#9;DistributedScrabbleGame/out/production/Server/ServerServant.class&#10;#&#9;DistributedScrabbleGame/out/production/Server/ServerServant_Stub.class">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/RoomController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/RoomController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server/src/ServerServant.java" beforeDir="false" afterPath="$PROJECT_DIR$/Server/src/ServerServant.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Client/RoomController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/RoomController.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -62,23 +63,23 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="4859" />
+          <entry key="java" value="5315" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="4859" />
+          <entry key="JAVA" value="5315" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="fxml" value="3" />
-          <entry key="java" value="34" />
+          <entry key="java" value="35" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="JAVA" value="34" />
+          <entry key="JAVA" value="35" />
           <entry key="XML" value="3" />
         </counts>
       </usages-collector>
@@ -113,11 +114,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Client/src/RoomController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="246">
-              <caret line="269" column="8" selection-start-line="269" selection-start-column="8" selection-end-line="269" selection-end-column="8" />
+            <state relative-caret-position="137">
+              <caret line="135" column="24" selection-start-line="135" selection-start-column="16" selection-end-line="135" selection-end-column="24" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#4612#4613#0" expanded="true" />
@@ -130,26 +131,14 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Client/src/MenuController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-300">
-              <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
-              <folding>
-                <element signature="e#4619#4620#0" expanded="true" />
-                <element signature="e#4663#4664#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Client/src/GameClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="500" selection-start-line="500" selection-end-line="500" />
+            <state relative-caret-position="182">
+              <caret line="257" column="65" selection-start-line="257" selection-start-column="52" selection-end-line="257" selection-end-column="65" />
               <folding>
                 <element signature="e#14034#14035#0" expanded="true" />
                 <element signature="e#14077#14078#0" expanded="true" />
+                <element signature="e#14159#14160#0" expanded="true" />
                 <element signature="e#14247#14248#0" expanded="true" />
                 <element signature="e#14334#14335#0" expanded="true" />
                 <element signature="e#14417#14418#0" expanded="true" />
@@ -158,11 +147,33 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Server/src/ServerServant.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="120" column="57" selection-start-line="120" selection-start-column="57" selection-end-line="120" selection-end-column="57" />
+            <state relative-caret-position="308">
+              <caret line="191" column="67" selection-start-line="191" selection-start-column="67" selection-end-line="191" selection-end-column="67" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Server/src/Player.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="83">
+              <caret line="12" column="28" lean-forward="true" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Client/src/MenuController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-203">
+              <caret line="79" column="61" lean-forward="true" selection-start-line="79" selection-start-column="61" selection-end-line="79" selection-end-column="61" />
+              <folding>
+                <element signature="e#4619#4620#0" expanded="true" />
+                <element signature="e#4663#4664#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -178,14 +189,7 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>LeaveRoom</find>
-      <find>|</find>
-      <find>canJoinRoom</find>
-      <find>join</find>
-      <find>start</find>
       <find>btnStart</find>
-      <find>joinRoom</find>
-      <find>createRoom</find>
       <find>not inclu</find>
       <find>click to</find>
       <find>getText</find>
@@ -198,8 +202,6 @@
       <find>fadeout</find>
       <find>leaveBtn</find>
       <find>isHost</find>
-      <find>leaveRoom</find>
-      <find>dismiss</find>
       <find>dismissRoom</find>
       <find>hostDismiss</find>
       <find>hostDis</find>
@@ -208,6 +210,15 @@
       <find>invite</find>
       <find>fadeOut</find>
       <find>loadMenu</find>
+      <find>host</find>
+      <find>leaveRoom</find>
+      <find>joinRoom</find>
+      <find>acceptInvitation</find>
+      <find>createRoom</find>
+      <find>dismiss</find>
+      <find>playerIn</find>
+      <find>inroom</find>
+      <find>getUserInRoom</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -218,15 +229,15 @@
       <list>
         <option value="$PROJECT_DIR$/Client/src/GameController.java" />
         <option value="$PROJECT_DIR$/Server/src/Game.java" />
-        <option value="$PROJECT_DIR$/Server/src/Player.java" />
         <option value="$PROJECT_DIR$/Server/src/ServerInterface.java" />
-        <option value="$PROJECT_DIR$/Server/src/ServerServant.java" />
         <option value="$PROJECT_DIR$/Client/src/MqttBroker.java" />
         <option value="$PROJECT_DIR$/Client/src/LoginController.java" />
         <option value="$PROJECT_DIR$/Client/src/Constants.java" />
         <option value="$PROJECT_DIR$/Client/src/GameClient.java" />
         <option value="$PROJECT_DIR$/Client/src/MenuController.java" />
         <option value="$PROJECT_DIR$/Client/src/RoomController.java" />
+        <option value="$PROJECT_DIR$/Server/src/Player.java" />
+        <option value="$PROJECT_DIR$/Server/src/ServerServant.java" />
       </list>
     </option>
   </component>
@@ -301,7 +312,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1539336454082" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1539337280082" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -421,7 +432,7 @@
     <frame x="0" y="23" width="1277" height="777" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49928674" visible="true" weight="0.16761133" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49928674" visible="true" weight="0.16761133" />
       <window_info id="Structure" order="1" sideWeight="0.5007133" side_tool="true" weight="0.22038421" />
       <window_info id="Designer" order="2" />
       <window_info id="Learn" order="3" weight="0.3295238" />
@@ -431,7 +442,7 @@
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49919224" visible="true" weight="0.41167882" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49919224" visible="true" weight="0.41167882" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39978212" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -549,13 +560,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/Player.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="68" selection-start-line="3" selection-start-column="68" selection-end-line="3" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Server/src/GameServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
@@ -594,42 +598,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Server/src/ServerServant.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="120" column="57" selection-start-line="120" selection-start-column="57" selection-end-line="120" selection-end-column="57" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/LoginController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="138">
           <caret line="98" column="67" selection-start-line="98" selection-start-column="67" selection-end-line="98" selection-end-column="67" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Client/src/GameClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="500" selection-start-line="500" selection-end-line="500" />
-          <folding>
-            <element signature="e#14034#14035#0" expanded="true" />
-            <element signature="e#14077#14078#0" expanded="true" />
-            <element signature="e#14247#14248#0" expanded="true" />
-            <element signature="e#14334#14335#0" expanded="true" />
-            <element signature="e#14417#14418#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Client/src/MenuController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-300">
-          <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
-          <folding>
-            <element signature="e#4619#4620#0" expanded="true" />
-            <element signature="e#4663#4664#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -640,10 +612,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Client/src/MenuController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-203">
+          <caret line="79" column="61" lean-forward="true" selection-start-line="79" selection-start-column="61" selection-end-line="79" selection-end-column="61" />
+          <folding>
+            <element signature="e#4619#4620#0" expanded="true" />
+            <element signature="e#4663#4664#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/RoomController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="246">
-          <caret line="269" column="8" selection-start-line="269" selection-start-column="8" selection-end-line="269" selection-end-column="8" />
+        <state relative-caret-position="137">
+          <caret line="135" column="24" selection-start-line="135" selection-start-column="16" selection-end-line="135" selection-end-column="24" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#4612#4613#0" expanded="true" />
@@ -651,6 +634,35 @@
             <element signature="e#7990#7991#0" expanded="true" />
             <element signature="e#8032#8033#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Client/src/GameClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="257" column="65" selection-start-line="257" selection-start-column="52" selection-end-line="257" selection-end-column="65" />
+          <folding>
+            <element signature="e#14034#14035#0" expanded="true" />
+            <element signature="e#14077#14078#0" expanded="true" />
+            <element signature="e#14159#14160#0" expanded="true" />
+            <element signature="e#14247#14248#0" expanded="true" />
+            <element signature="e#14334#14335#0" expanded="true" />
+            <element signature="e#14417#14418#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/Player.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="83">
+          <caret line="12" column="28" lean-forward="true" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Server/src/ServerServant.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="191" column="67" selection-start-line="191" selection-start-column="67" selection-end-line="191" selection-end-column="67" />
         </state>
       </provider>
     </entry>

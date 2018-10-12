@@ -106,6 +106,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         Player player = usernamePlayerMap.get(username);
         player.setStatus(Constants.STATUS_ROOM);
         player.setRoomNum(roomID);
+        player.setIsHost(true);
         usernameStatusMap.put(username, Constants.STATUS_ROOM + " " + roomID);
 
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
@@ -125,6 +126,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
                 playerLeaveRoom(user);
                 usernameStatusMap.put(user, Constants.STATUS_AVAILABLE);
             }
+            usernamePlayerMap.get(username).setIsHost(false);  // not host anymore
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.DISMISS_ROOM + ";" + username);
         } else {   // leave room
             playerLeaveRoom(username);
@@ -177,11 +179,18 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     @Override
     public ArrayList<String> getUserInRoom(int roomNum) throws RemoteException {
         ArrayList<String> userNames = new ArrayList<>();
+        Player hostPlayer = null;
         for(Player player : playerPool){
             if(player.getRoomNum() == roomNum) {
-                userNames.add(player.getUsername());
+                if (hostPlayer == null && player.getIsHost()) {
+                    hostPlayer = player;
+                } else {
+                    userNames.add(player.getUsername());
+                }
             }
         }
+        userNames.add(0, hostPlayer.getUsername());  // host always at index 0
+
         return userNames;
     }
 
