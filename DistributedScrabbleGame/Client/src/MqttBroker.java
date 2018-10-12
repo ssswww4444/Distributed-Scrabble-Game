@@ -154,8 +154,10 @@ public class MqttBroker implements MqttCallback {
                 break;
             case Constants.LEAVE_ROOM:
                 gc.playerLeaveRoom(cmd[1]);
+                break;
             case Constants.DISMISS_ROOM:
                 gc.hostDismissRoom(cmd[1]);
+                break;
         }
     }
 
