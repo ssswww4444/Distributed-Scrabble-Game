@@ -189,10 +189,15 @@ public class GameClient {
      * Receive notification that host dismissed room
      */
     public void hostDismissRoom(String username) {
-        roomPlayerNames = new ArrayList<>();  // set to empty
         Platform.runLater(() -> {
             GameClient.this.roomController.dismissRoom(username);  // update UI
         });
+        try {
+            mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+        roomPlayerNames = new ArrayList<>();  // set to empty
         roomNumber = Constants.NOT_IN_ROOM_ID;
     }
 

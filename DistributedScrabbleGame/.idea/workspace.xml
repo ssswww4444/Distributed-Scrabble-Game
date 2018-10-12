@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f5574870-6ebc-4324-a3c2-f24a7e325a74" name="Default Changelist" comment="Merge branch 'master' of https://github.com/ssswww4444/DS-Proj2 into single_player_game&#10;&#10;# Conflicts:&#10;#&#9;DistributedScrabbleGame/.idea/workspace.xml&#10;#&#9;DistributedScrabbleGame/Client/src/GameController.java&#10;#&#9;DistributedScrabbleGame/out/production/Client/Constants.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/GameClient.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/GameController.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/MqttBroker.class&#10;#&#9;DistributedScrabbleGame/out/production/Client/RoomController.class&#10;#&#9;DistributedScrabbleGame/out/production/Server/ServerInterface.class&#10;#&#9;DistributedScrabbleGame/out/production/Server/ServerServant.class&#10;#&#9;DistributedScrabbleGame/out/production/Server/ServerServant_Stub.class">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/Constants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client/src/GameClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/GameClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/MenuController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client/src/RoomController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Client/src/RoomController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/Constants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/GameClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/GameClient.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/MenuController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/MenuController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Client/RoomController.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Client/RoomController.class" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -68,12 +60,12 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="java" value="3596" />
+          <entry key="java" value="3660" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="JAVA" value="3596" />
+          <entry key="JAVA" value="3660" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -135,8 +127,26 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Client/src/GameClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="261">
-              <caret line="157" column="63" lean-forward="true" selection-start-line="157" selection-start-column="63" selection-end-line="157" selection-end-column="63" />
+            <state relative-caret-position="152">
+              <caret line="190" column="50" selection-start-line="190" selection-start-column="50" selection-end-line="190" selection-end-column="50" />
+              <folding>
+                <element signature="e#8582#8583#0" expanded="true" />
+                <element signature="e#8624#8625#0" expanded="true" />
+                <element signature="e#8741#8742#0" expanded="true" />
+                <element signature="e#8783#8784#0" expanded="true" />
+                <element signature="e#8900#8901#0" expanded="true" />
+                <element signature="e#8942#8943#0" expanded="true" />
+                <element signature="e#10209#10210#0" expanded="true" />
+                <element signature="e#10258#10259#0" expanded="true" />
+                <element signature="e#10897#10898#0" expanded="true" />
+                <element signature="e#10924#10925#0" expanded="true" />
+                <element signature="e#13789#13790#0" expanded="true" />
+                <element signature="e#13832#13833#0" expanded="true" />
+                <element signature="e#13914#13915#0" expanded="true" />
+                <element signature="e#14002#14003#0" expanded="true" />
+                <element signature="e#14089#14090#0" expanded="true" />
+                <element signature="e#14172#14173#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -190,7 +200,6 @@
       <find>refresh()</find>
       <find>refrash</find>
       <find>refresh</find>
-      <find>dismiss</find>
       <find>playerLeaveRoom</find>
       <find>player</find>
       <find>dialog</find>
@@ -200,6 +209,7 @@
       <find>LeaveRoom</find>
       <find>uns</find>
       <find>subscribe</find>
+      <find>dismiss</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -292,7 +302,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1539325846914" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1539326021737" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -422,14 +432,14 @@
       <window_info id="Favorites" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49919224" visible="true" weight="0.32554746" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49919224" weight="0.32554746" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39978212" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.329927" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.329927" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49839914" weight="0.29343066" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" sideWeight="0.49839914" visible="true" weight="0.29343066" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50160086" side_tool="true" weight="0.27567568" />
       <window_info anchor="bottom" id="Messages" order="11" weight="0.20437956" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -618,8 +628,26 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Client/src/GameClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="261">
-          <caret line="157" column="63" lean-forward="true" selection-start-line="157" selection-start-column="63" selection-end-line="157" selection-end-column="63" />
+        <state relative-caret-position="152">
+          <caret line="190" column="50" selection-start-line="190" selection-start-column="50" selection-end-line="190" selection-end-column="50" />
+          <folding>
+            <element signature="e#8582#8583#0" expanded="true" />
+            <element signature="e#8624#8625#0" expanded="true" />
+            <element signature="e#8741#8742#0" expanded="true" />
+            <element signature="e#8783#8784#0" expanded="true" />
+            <element signature="e#8900#8901#0" expanded="true" />
+            <element signature="e#8942#8943#0" expanded="true" />
+            <element signature="e#10209#10210#0" expanded="true" />
+            <element signature="e#10258#10259#0" expanded="true" />
+            <element signature="e#10897#10898#0" expanded="true" />
+            <element signature="e#10924#10925#0" expanded="true" />
+            <element signature="e#13789#13790#0" expanded="true" />
+            <element signature="e#13832#13833#0" expanded="true" />
+            <element signature="e#13914#13915#0" expanded="true" />
+            <element signature="e#14002#14003#0" expanded="true" />
+            <element signature="e#14089#14090#0" expanded="true" />
+            <element signature="e#14172#14173#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
