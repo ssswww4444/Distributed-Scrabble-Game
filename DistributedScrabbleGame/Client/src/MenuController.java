@@ -62,7 +62,8 @@ public class MenuController implements Initializable {
     @FXML
     public void refreshBtnClick(ActionEvent event) {
         btnRefreshPlayers.setDisable(true);
-        refreshPlayerList();
+//        refreshPlayerList();
+        this.clientObj.renderPlayerList();
         btnRefreshPlayers.setDisable(false);
     }
 
@@ -77,7 +78,8 @@ public class MenuController implements Initializable {
 
     public void refresh() {
         this.userLabel.setText(this.clientObj.getUsername());
-        refreshPlayerList();
+//        refreshPlayerList();
+        this.clientObj.renderPlayerList();
     }
 
     public void updatePlayerList(ArrayList<PlayerModel> updatedPlayers) {
@@ -89,15 +91,15 @@ public class MenuController implements Initializable {
         });
     }
 
-    public void refreshPlayerList() {
-        ArrayList<PlayerModel> refreshedPlayers = clientObj.getPlayerList();
-        Platform.runLater(() -> {
-            MenuController.this.playerList.getItems().clear();
-            for (PlayerModel player : refreshedPlayers) {
-                MenuController.this.playerList.getItems().add(player);
-            }
-        });
-    }
+//    public void refreshPlayerList() {
+//        ArrayList<PlayerModel> refreshedPlayers = clientObj.getPlayerList();
+//        Platform.runLater(() -> {
+//            MenuController.this.playerList.getItems().clear();
+//            for (PlayerModel player : refreshedPlayers) {
+//                MenuController.this.playerList.getItems().add(player);
+//            }
+//        });
+//    }
 
 
     /* This method is used to provide a smoother transition between scences */
@@ -166,7 +168,7 @@ public class MenuController implements Initializable {
             Scene roomScene = new Scene(roomView);
             RoomController controller = loader.getController();
             controller.setClientObj(this.clientObj);
-            this.clientObj.setIsHost(isHost);
+//            this.clientObj.setIsHost(isHost);
             this.clientObj.setRoomController(controller);
             this.clientObj.removeMenuController();
             controller.startup(isHost, roomPlayers);

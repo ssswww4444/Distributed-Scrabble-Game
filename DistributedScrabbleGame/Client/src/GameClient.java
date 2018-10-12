@@ -154,7 +154,7 @@ public class GameClient {
     public void createRoom() {
         try {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
-            mqttBroker.getMqttClient().subscribe("mqtt/room/" + Integer.toString(roomNumber));  // subscribe
+            mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
             this.roomPlayerNames = new ArrayList<>();  // empty
             this.roomPlayerNames.add(this.username);
             isHost = true;
@@ -462,6 +462,11 @@ public class GameClient {
             serverServantStub.leaveRoom(username, isHost, roomNumber);
             roomPlayerNames = new ArrayList<>();  // set to empty
             isHost = false;
+            try {
+                mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }

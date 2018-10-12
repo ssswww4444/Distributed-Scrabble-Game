@@ -6,8 +6,9 @@ public class Constants {
     public static final String CLIENT_TOPIC = "client";
     public static final String ROOM_TOPIC = "room";
 
-    // max number of players
+    // max and min number of players
     public static final int ROOM_MAX_PLAYER = 4;
+    public static final int GAME_MIN_PLAYER = 2;
 
     // server actions
     public static final String PLAYER_LIST_UPDATE = "playerListUpdate";  // notify to update player list when logout/login/leaveRoom/joinRoom

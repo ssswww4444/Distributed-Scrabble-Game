@@ -173,7 +173,8 @@ public class RoomController implements Initializable {
             }
         }
         this.roomPlayers.remove(username);
-        if (roomPlayers.size() < 2) {  // need at least 2 players
+
+        if (roomPlayers.size() < Constants.GAME_MIN_PLAYER) {  // need at least 2 players
             btnStart.setDisable(true);
         }
     }
