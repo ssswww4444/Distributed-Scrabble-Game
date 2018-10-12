@@ -82,6 +82,7 @@ public class GameClient {
         // init
         isHost = false;
         roomNumber = Constants.NOT_IN_ROOM_ID;
+        roomPlayerNames = new ArrayList<>();
     }
 
 
@@ -96,25 +97,6 @@ public class GameClient {
             e.printStackTrace();
         }
     }
-
-
-    /**
-     * Get all current online users.
-     */
-    public ArrayList<PlayerModel> getPlayerList() {
-        ArrayList<PlayerModel> players = new ArrayList<>();
-        try {
-            ArrayList<String> playerObjects = serverServantStub.getPlayerPool();
-            for (String s : playerObjects) {
-                players.add(new PlayerModel(s, Constants.STATUS_AVAILABLE));
-            }
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        return players;
-    }
-
 
     /**
      * Get all current available users. (Current implementation is just "Return all users")

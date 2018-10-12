@@ -52,7 +52,7 @@ public class RoomController implements Initializable {
 
     private GameClient clientObj;
 
-    private ArrayList<String> roomPlayers;
+    private ArrayList<String> roomPlayers;  // reference of roomPlayers in gc
 
     /* UI element methods */
 
@@ -115,24 +115,6 @@ public class RoomController implements Initializable {
         dialog.show();
     }
 
-
-//    public void replyInvitation(String username, boolean accept) {
-//        if (accept) {
-//            if (roomPlayers.size() <= 4) {
-//                Button freeButton = this.getFreeButton();
-//                if (freeButton != null) {
-//                    freeButton.setText(username);
-//                    freeButton.setDisable(true);
-//                }
-//                this.roomPlayers.add(username);
-//            } else {
-//
-//            }
-//        } else {
-//
-//        }
-//    }
-
     public void joinRoom(String username, boolean isHost) {
         Button freeButton = this.getFreeButton();
         if (isHost) {
@@ -142,7 +124,6 @@ public class RoomController implements Initializable {
             freeButton.setText(username);
             freeButton.setDisable(true);
         }
-        this.roomPlayers.add(username);
     }
 
     /**
@@ -174,7 +155,6 @@ public class RoomController implements Initializable {
                 btnPlayer4.setDisable(false);
             }
         }
-        this.roomPlayers.remove(username);
 
         if (roomPlayers.size() < Constants.GAME_MIN_PLAYER) {  // need at least 2 players
             btnStart.setDisable(true);
@@ -230,17 +210,14 @@ public class RoomController implements Initializable {
             }
         }
         if(isHost){
-            this.roomPlayers = new ArrayList<>(4);
-            this.roomPlayers.add(this.clientObj.getUsername());
             btnLeave.setText("Dismiss");
         } else {
-            this.roomPlayers = roomPlayers;
             btnPlayer2.setDisable(true);
             btnPlayer3.setDisable(true);
             btnPlayer4.setDisable(true);
             btnLeave.setText("Leave");
         }
-
+        this.roomPlayers = roomPlayers;  // get reference of roomPlayers in gc
         btnStart.setDisable(true);
         roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
     }
