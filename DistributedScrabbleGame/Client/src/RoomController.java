@@ -133,9 +133,11 @@ public class RoomController implements Initializable {
 //        }
 //    }
 
-    public void joinRoom(String username) {
+    public void joinRoom(String username, boolean isHost) {
         Button freeButton = this.getFreeButton();
-        btnStart.setDisable(false);
+        if (isHost) {
+            btnStart.setDisable(false);
+        }
         if (freeButton != null) {
             freeButton.setText(username);
             freeButton.setDisable(true);
@@ -156,17 +158,17 @@ public class RoomController implements Initializable {
      */
     public void leaveRoom(String username, boolean isHost) {
         if (btnPlayer2.getText().equals(username)) {
-            btnPlayer2.setText("<Click to invite>");
+            btnPlayer2.setText(Constants.EMPTY_BUTTON_TEXT);
             if (isHost) {
                 btnPlayer2.setDisable(false);
             }
         } else if (btnPlayer3.getText().equals(username)) {
-            btnPlayer3.setText("<Click to invite>");
+            btnPlayer3.setText(Constants.EMPTY_BUTTON_TEXT);
             if (isHost) {
                 btnPlayer3.setDisable(false);
             }
         } else if (btnPlayer4.getText().equals(username)) {
-            btnPlayer4.setText("<Click to invite>");
+            btnPlayer4.setText(Constants.EMPTY_BUTTON_TEXT);
             btnPlayer4.setDisable(false);
             if (isHost) {
                 btnPlayer4.setDisable(false);
@@ -200,11 +202,11 @@ public class RoomController implements Initializable {
     }
 
     private Button getFreeButton() {
-        if (!this.btnPlayer2.isDisable()) {
+        if (this.btnPlayer2.getText().equals(Constants.EMPTY_BUTTON_TEXT)) {
             return btnPlayer2;
-        } else if (!this.btnPlayer3.isDisable()) {
+        } else if (this.btnPlayer3.getText().equals(Constants.EMPTY_BUTTON_TEXT)) {
             return btnPlayer3;
-        } else if (!this.btnPlayer4.isDisable()) {
+        } else if (this.btnPlayer4.getText().equals(Constants.EMPTY_BUTTON_TEXT)) {
             return btnPlayer4;
         } else {
             return null;
@@ -230,17 +232,16 @@ public class RoomController implements Initializable {
         if(isHost){
             this.roomPlayers = new ArrayList<>(4);
             this.roomPlayers.add(this.clientObj.getUsername());
-            btnStart.setDisable(true);
             btnLeave.setText("Dismiss");
-        } else{
+        } else {
             this.roomPlayers = roomPlayers;
             btnPlayer2.setDisable(true);
             btnPlayer3.setDisable(true);
             btnPlayer4.setDisable(true);
-            btnStart.setDisable(true);
             btnLeave.setText("Leave");
         }
 
+        btnStart.setDisable(true);
         roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
     }
 
@@ -250,7 +251,7 @@ public class RoomController implements Initializable {
     }
 
 
-    /* This method is used to provide a smoother transition between scences */
+    /* This method is used to provide a smoother transition between scenes */
     public void fadeOut(String scene) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));

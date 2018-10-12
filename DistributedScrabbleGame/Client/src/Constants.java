@@ -1,5 +1,7 @@
 public class Constants {
 
+    public static final String EMPTY_BUTTON_TEXT = "<Click to invite>";
+
     // mqtt topic names
     public static final String MQTT_TOPIC = "mqtt";
     public static final String SERVER_TOPIC = "server";

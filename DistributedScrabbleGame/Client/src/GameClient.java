@@ -179,7 +179,7 @@ public class GameClient {
     public void playerJoinedRoom(String username) {
         roomPlayerNames.add(username); // update list
         Platform.runLater(() -> {
-            GameClient.this.roomController.joinRoom(username);  // update UI
+            GameClient.this.roomController.joinRoom(username, isHost);  // update UI
         });
     }
 
@@ -255,7 +255,7 @@ public class GameClient {
     public void acceptInvitation(int roomNumber) {
         try {
             if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
-                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // not including himself
+                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // including himself
                 this.roomNumber = roomNumber;
                 renderRoomPage();
             } else {  // failed
@@ -472,15 +472,16 @@ public class GameClient {
      */
     public void leaveRoom() {
         try {
-            serverServantStub.leaveRoom(username, isHost, roomNumber);
+            mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
+            serverServantStub.leaveRoom(username, isHost, roomNumber);  // notify server
             roomPlayerNames = new ArrayList<>();  // set to empty
-            isHost = false;
-            try {
-                mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
-            } catch (MqttException e) {
-                e.printStackTrace();
+            if (!isHost) {  // leave room
+                this.roomController.fadeOut("Menu");
+            } else {
+                hostDismissRoom(username);
             }
-        } catch (RemoteException e) {
+            isHost = false;
+        } catch (RemoteException | MqttException e) {
             e.printStackTrace();
         }
         roomNumber = Constants.NOT_IN_ROOM_ID;

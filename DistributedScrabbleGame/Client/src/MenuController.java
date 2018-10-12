@@ -163,16 +163,19 @@ public class MenuController implements Initializable {
 
     private void loadRoomScene(boolean isHost, ArrayList<String> roomPlayers) {
         try {
+            System.out.println("1");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
+            System.out.println("2");
             Parent roomView = loader.load();
             Scene roomScene = new Scene(roomView);
+            System.out.println("3");
             RoomController controller = loader.getController();
             controller.setClientObj(this.clientObj);
-//            this.clientObj.setIsHost(isHost);
             this.clientObj.setRoomController(controller);
             this.clientObj.removeMenuController();
             controller.startup(isHost, roomPlayers);
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
 
             // override the onCloseRequest and notify server to remove user.
             currentStage.setOnCloseRequest(t -> {
@@ -185,7 +188,7 @@ public class MenuController implements Initializable {
             currentStage.setScene(roomScene);
 
         } catch (IOException e) {
-            System.out.println("Cannot find main scene fxml");
+            System.out.println("Cannot find room scene fxml");
         }
     }
 
