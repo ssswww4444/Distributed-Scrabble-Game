@@ -193,9 +193,9 @@ public class GameClient {
      * Receive notification that player left room
      */
     public void playerLeaveRoom(String username) {
-        roomPlayerInfoMap.remove(username);
-
         int pos = roomPlayerInfoMap.get(username).get(0);
+
+        roomPlayerInfoMap.remove(username);
 
         if(this.roomController!=null){      // If user is in room scene
             Platform.runLater(() -> {
