@@ -15,7 +15,8 @@ public class GameClient {
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
-    private ArrayList<String> roomPlayerNames;
+//    private ArrayList<String> roomPlayerNames;
+    private HashMap<String, ArrayList<Integer>> roomPlayerInfoMap;
     private MqttBroker mqttBroker;
 
     private ServerInterface serverServantStub;
@@ -82,7 +83,8 @@ public class GameClient {
         // init
         isHost = false;
         roomNumber = Constants.NOT_IN_ROOM_ID;
-        roomPlayerNames = new ArrayList<>();
+//        roomPlayerNames = new ArrayList<>();
+        roomPlayerInfoMap = new HashMap<>();
     }
 
 
@@ -145,8 +147,11 @@ public class GameClient {
         try {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
             mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
-            this.roomPlayerNames = new ArrayList<>();  // empty
-            this.roomPlayerNames.add(this.username);
+//            this.roomPlayerNames = new ArrayList<>();  // empty
+//            this.roomPlayerNames.add(this.username);
+
+            addToInfoMap(this.username, 1, 1);  // host always ready
+
             isHost = true;
             renderRoomPage();
         } catch (RemoteException | MqttException e) {
@@ -154,22 +159,52 @@ public class GameClient {
         }
     }
 
+    /**
+     * Add new player to the roomPlayerInfoMap
+     */
+    private void addToInfoMap(String username, int pos, int ready) {
+        ArrayList<Integer> infoList = new ArrayList<>();
+        infoList.add(pos);
+        infoList.add(ready);
+        roomPlayerInfoMap.put(username, infoList);
+    }
+
 
     /**
      * Receive notification that new player joined room
      */
-    public void playerJoinedRoom(String username) {
-        roomPlayerNames.add(username); // update list
+    public void playerJoinedRoom(String username, int pos) {
+//        roomPlayerNames.add(username); // update list
+
+
+        addToInfoMap(username, pos, 0);
+
+
         Platform.runLater(() -> {
-            GameClient.this.roomController.joinRoom(username, isHost);  // update UI
+            GameClient.this.roomController.joinRoom(username, pos);  // update UI
         });
     }
+
+    /**
+     * Send notification that the player is ready
+     */
+    public void ready() {
+        try {
+            serverServantStub.ready(username, roomNumber);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Receive notification that player left room
      */
     public void playerLeaveRoom(String username) {
-        roomPlayerNames.remove(username); // update list
+//        roomPlayerNames.remove(username); // update list
+
+        roomPlayerInfoMap.remove(username);
+
         if(this.roomController!=null){      // If user is in room scene
             Platform.runLater(() -> {
                 GameClient.this.roomController.leaveRoom(username, isHost);  // update UI
@@ -194,7 +229,9 @@ public class GameClient {
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-            roomPlayerNames = new ArrayList<>();  // set to empty
+//            roomPlayerNames = new ArrayList<>();  // set to empty
+            roomPlayerInfoMap = new HashMap<>();
+
             roomNumber = Constants.NOT_IN_ROOM_ID;
         }else{  // Room dismissed in Game scene
             Platform.runLater(()->{
@@ -209,6 +246,19 @@ public class GameClient {
 
     }
 
+    /**
+     * Get notification that a client is ready
+     */
+    public void playerReady(String username) {
+        ArrayList<Integer> infoList = roomPlayerInfoMap.get(username);
+        infoList.remove(1);
+        infoList.add(1);
+        roomPlayerInfoMap.put(username, infoList);  // ready
+        Platform.runLater(() -> {
+            this.roomController.playerReady(infoList.get(0));  // player at this pos get ready
+        });
+    }
+
 
     /**
      * Create a new room, room ID is assigned by server.
@@ -216,7 +266,7 @@ public class GameClient {
      */
     public void startGame() {
         try {
-            serverServantStub.startNewGame(roomPlayerNames, roomNumber);
+            serverServantStub.startNewGame(new ArrayList<>(roomPlayerInfoMap.keySet()), roomNumber);
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -231,7 +281,6 @@ public class GameClient {
         this.currTurn = 1;
         roomController.fadeOut("Game");
     }
-
 
     /**
      * Send invitation to target user via Server
@@ -255,12 +304,25 @@ public class GameClient {
     public void acceptInvitation(int roomNumber) {
         try {
             if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
-                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // including himself
+//                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // including himself
+                roomPlayerInfoMap = serverServantStub.getUserInRoom(roomNumber);
+
                 this.roomNumber = roomNumber;
                 renderRoomPage();
             } else {  // failed
                 menuController.displayMsg();
             }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update roomPlayerInfoMap from server
+     */
+    public void updateRoomInfoMap() {
+        try {
+            roomPlayerInfoMap = serverServantStub.getUserInRoom(roomNumber);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -273,7 +335,7 @@ public class GameClient {
     public void renderRoomPage() {
         if (this.menuController != null) {
             try {
-                this.menuController.loadRoom(isHost, roomPlayerNames);  // render GUI to room
+                this.menuController.loadRoom(isHost, roomPlayerInfoMap);  // render GUI to room
                 mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNumber);  // subscribe
             } catch (MqttException e) {
                 e.printStackTrace();
@@ -379,7 +441,7 @@ public class GameClient {
 
 
     public void nextTurn(){
-        if(currTurn == roomPlayerNames.size()){
+        if(currTurn == roomPlayerInfoMap.keySet().size()){
             currTurn = 1;
         }else{
             currTurn++;
@@ -413,7 +475,7 @@ public class GameClient {
     public void renderVoteResult(boolean isWord, int score){
         this.gameController.voteResultMsg(isWord, score);
         if(isWord){
-            this.gameController.updateScore(roomPlayerNames.get(currTurn-1), score);
+            this.gameController.updateScore(new ArrayList<>(roomPlayerInfoMap.keySet()).get(currTurn-1), score);
         }
         this.nextTurn();
     }
@@ -472,7 +534,9 @@ public class GameClient {
         try {
             mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
             serverServantStub.leaveRoom(username, isHost, roomNumber);  // notify server
-            roomPlayerNames = new ArrayList<>();  // set to empty
+//            roomPlayerNames = new ArrayList<>();  // set to empty
+            roomPlayerInfoMap = new HashMap<>();
+
             if(this.roomController!=null) {   // leave in room scene
                 Platform.runLater(() -> {
                     this.roomController.fadeOut("Menu");
@@ -490,23 +554,23 @@ public class GameClient {
     }
 
     /**
-     * Get room player names
+     * Get room player info map
      */
-    public ArrayList<String> getRoomPlayerNames(){
-        return this.roomPlayerNames;
+    public HashMap<String, ArrayList<Integer>> getRoomInfoMap(){
+        return this.roomPlayerInfoMap;
     }
 
     /**
      * Check if the players' turn
      */
     public boolean isMyTurn(){
-        return (this.roomPlayerNames.get(this.currTurn-1).equals(this.username));
+        return (new ArrayList<>(roomPlayerInfoMap.keySet()).get(this.currTurn-1).equals(this.username));
     }
 
     /**
      * Get current turn player
      */
     public String getCurrTurnPlayer(){
-        return this.currTurn + " - " + roomPlayerNames.get(this.currTurn-1);
+        return this.currTurn + " - " + new ArrayList<>(roomPlayerInfoMap.keySet()).get(this.currTurn-1);
     }
 }

@@ -22,6 +22,7 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 /* Controller class for the start scene of the Client App */
@@ -103,14 +104,14 @@ public class MenuController implements Initializable {
 
 
     /* This method is used to provide a smoother transition between scences */
-    public void fadeOut(boolean isHost, ArrayList<String> roomPlayers) {
+    public void fadeOut(boolean isHost, HashMap<String, ArrayList<Integer>> roomPlayerInfoMap) {
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));
         fadeTransition.setNode(rootPane);
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadRoomScene(isHost, roomPlayers));
+        fadeTransition.setOnFinished(event -> loadRoomScene(isHost, roomPlayerInfoMap));
         fadeTransition.play();
     }
 
@@ -140,8 +141,8 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    public void loadRoom(boolean isHost, ArrayList<String> roomPlayers) {
-        fadeOut(isHost, roomPlayers);
+    public void loadRoom(boolean isHost, HashMap<String, ArrayList<Integer>> roomPlayerInfoMap) {
+        fadeOut(isHost, roomPlayerInfoMap);
     }
 
     @FXML
@@ -161,7 +162,7 @@ public class MenuController implements Initializable {
         dialog.show();
     }
 
-    private void loadRoomScene(boolean isHost, ArrayList<String> roomPlayers) {
+    private void loadRoomScene(boolean isHost, HashMap<String, ArrayList<Integer>> roomPlayerInfoMap) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Room.fxml"));
             Parent roomView = loader.load();
@@ -170,9 +171,8 @@ public class MenuController implements Initializable {
             controller.setClientObj(this.clientObj);
             this.clientObj.setRoomController(controller);
             this.clientObj.removeMenuController();
-            controller.startup(isHost, roomPlayers);
+            controller.startup(isHost, roomPlayerInfoMap);
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
-
 
             // override the onCloseRequest and notify server to remove user.
             currentStage.setOnCloseRequest(t -> {

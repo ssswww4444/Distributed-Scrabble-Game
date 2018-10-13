@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -22,6 +23,7 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 /* Controller class for the start scene of the Client App */
@@ -52,16 +54,22 @@ public class RoomController implements Initializable {
 
     private GameClient clientObj;
 
-    private ArrayList<String> roomPlayers;  // reference of roomPlayers in gc
+    private HashMap<String, ArrayList<Integer>> roomPlayerInfoMap;  // reference of roomPlayers in gc
 
     /* UI element methods */
 
     @FXML
     public void startBtnClick(ActionEvent event) {
-        try {
-            clientObj.startGame();
-        } catch (Exception e) {
 
+        if (clientObj.isHost()) {  // start game
+            try {
+                clientObj.startGame();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {    // ready
+            clientObj.ready();
+            btnStart.setDisable(true);
         }
     }
 
@@ -115,15 +123,52 @@ public class RoomController implements Initializable {
         dialog.show();
     }
 
-    public void joinRoom(String username, boolean isHost) {
-        Button freeButton = this.getFreeButton();
-        if (isHost) {
+    public void playerReady(int pos) {
+        Button targetButton = buttonAtPos(pos);
+        targetButton.setStyle("-fx-text-fill: #0000ff");  // blue
+        if (clientObj.isHost()) {
+            // check if all ready
+            for (ArrayList<Integer> infoList: roomPlayerInfoMap.values()) {
+                if (infoList.get(1) == 0) {  // not ready
+                    return;
+                }
+            }
+            // all ready
             btnStart.setDisable(false);
         }
-        if (freeButton != null) {
-            freeButton.setText(username);
-            freeButton.setDisable(true);
+    }
+
+    private Button buttonAtPos(int pos) {
+        switch (pos) {
+            case 1:
+                return btnHost;
+            case 2:
+                return btnPlayer2;
+            case 3:
+                return btnPlayer3;
+            case 4:
+                return btnPlayer4;
         }
+        return null;
+    }
+
+    public void joinRoom(String username, int pos) {  // user join room at pos
+//        Button freeButton = this.getFreeButton();
+
+        if (clientObj.isHost()) {
+            btnStart.setDisable(true);  // disable start when any new player enter room
+        }
+
+        Button targetButton = buttonAtPos(pos);
+        if (targetButton != null) {
+            targetButton.setText(username);
+            targetButton.setDisable(true);
+        }
+
+//        if (freeButton != null) {
+//            freeButton.setText(username);
+//            freeButton.setDisable(true);
+//        }
     }
 
     /**
@@ -138,6 +183,16 @@ public class RoomController implements Initializable {
      * Update UI when some player left room
      */
     public void leaveRoom(String username, boolean isHost) {
+
+        int pos = roomPlayerInfoMap.get(username).get(0);
+        Button targetButton = buttonAtPos(pos);
+        targetButton.setText(Constants.EMPTY_BUTTON_TEXT);
+        targetButton.setStyle("-fx-text-fill: #000000");   // black
+        if (isHost) {
+            targetButton.setDisable(false);
+        }
+
+
         if (btnPlayer2.getText().equals(username)) {
             btnPlayer2.setText(Constants.EMPTY_BUTTON_TEXT);
             if (isHost) {
@@ -155,9 +210,11 @@ public class RoomController implements Initializable {
             }
         }
 
-        if (roomPlayers.size() < Constants.GAME_MIN_PLAYER) {  // need at least 2 players
-            btnStart.setDisable(true);
-        }
+//        if (roomPlayerInfoMap.keySet().size() < Constants.GAME_MIN_PLAYER) {  // need at least 2 players
+//            btnStart.setDisable(true);
+//        }
+
+
     }
 
     /**
@@ -197,40 +254,45 @@ public class RoomController implements Initializable {
 
     }
 
-    public void startup(boolean isHost, ArrayList<String> roomPlayers){
-        hostUsername.setText(roomPlayers.get(0));
-        btnHost.setText(roomPlayers.get(0));
-        for(String username : roomPlayers){
-            if(!username.equals(roomPlayers.get(0))){
-                Button freeButton = getFreeButton();
-                if(freeButton!=null){
-                    freeButton.setText(username);
+    public void startup(boolean isHost, HashMap<String, ArrayList<Integer>> roomPlayerInfoMap){
+        this.roomPlayerInfoMap = roomPlayerInfoMap;  // get reference of roomPlayers in gc
+        roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
+
+        for (String name: roomPlayerInfoMap.keySet()) {
+            int pos = roomPlayerInfoMap.get(name).get(0);
+
+            if (pos == 1) {
+                hostUsername.setText(name);
+                btnHost.setText(name);
+                btnHost.setDisable(true);
+            } else {
+                Button targetButton = buttonAtPos(pos);
+                targetButton.setText(name);
+                targetButton.setDisable(true);
+                if (roomPlayerInfoMap.get(name).get(1) == 1) {  // is ready
+                    targetButton.setStyle("-fx-text-fill: #0000ff");
                 }
             }
         }
+
+//        for(String username : roomPlayers.subList(1,roomPlayers.size())){  // except index 0
+//            Button freeButton = getFreeButton();
+//            if(freeButton!=null){
+//                freeButton.setText(username);
+//            }
+//        }
+
         if(isHost){
             btnLeave.setText("Dismiss");
-            if(this.clientObj.getRoomPlayerNames().size()>1){
-                btnPlayer2.setDisable(true);
-            }
-            if(this.clientObj.getRoomPlayerNames().size()>2){
-                btnPlayer3.setDisable(true);
-            }
-            if(this.clientObj.getRoomPlayerNames().size()>3){
-                btnPlayer4.setDisable(true);
-            }
+            btnStart.setDisable(true);  // need players to "ready"
         } else {
             btnPlayer2.setDisable(true);
             btnPlayer3.setDisable(true);
             btnPlayer4.setDisable(true);
             btnLeave.setText("Leave");
-        }
-        this.roomPlayers = roomPlayers;  // get reference of roomPlayers in gc
-        btnStart.setDisable(true);
-        if (isHost && roomPlayers.size() >= Constants.GAME_MIN_PLAYER) {
+            btnStart.setText("Ready");
             btnStart.setDisable(false);
         }
-        roomNumber.setText(Integer.toString(this.clientObj.getRoomNumber()));
     }
 
 

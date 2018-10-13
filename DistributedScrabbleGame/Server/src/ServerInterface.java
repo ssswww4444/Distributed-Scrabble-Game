@@ -20,7 +20,7 @@ public interface ServerInterface extends Remote {
 
     void invite(String inviter, String targetUser, int roomNum) throws RemoteException;
 
-    ArrayList<String> getUserInRoom(int roomNum) throws RemoteException;
+    HashMap<String, ArrayList<Integer>> getUserInRoom(int roomNum) throws RemoteException;
 
     void startNewGame(ArrayList<String> players, int roomNum) throws RemoteException;
 
@@ -44,5 +44,7 @@ public interface ServerInterface extends Remote {
     ArrayList<String> getAvailablePlayers() throws  RemoteException;
 
     HashMap<String, String> getUsernameStatusMap() throws RemoteException;
+
+    void ready(String username, int roomNum) throws RemoteException;
 
 }
