@@ -127,15 +127,23 @@ public class RoomController implements Initializable {
         Button targetButton = buttonAtPos(pos);
         targetButton.setStyle("-fx-text-fill: #0000ff");  // blue
         if (clientObj.isHost()) {
-            // check if all ready
-            for (ArrayList<Integer> infoList: roomPlayerInfoMap.values()) {
-                if (infoList.get(1) == 0) {  // not ready
-                    return;
-                }
+            if (allReady()) {
+                btnStart.setDisable(false);
             }
-            // all ready
-            btnStart.setDisable(false);
         }
+    }
+
+    /**
+     * Check if all players ready
+     */
+    private boolean allReady() {
+        // check if all ready
+        for (ArrayList<Integer> infoList: roomPlayerInfoMap.values()) {
+            if (infoList.get(1) == 0) {  // not ready
+                return false;
+            }
+        }
+        return true;
     }
 
     private Button buttonAtPos(int pos) {
@@ -284,7 +292,11 @@ public class RoomController implements Initializable {
 
         if(isHost){
             btnLeave.setText("Dismiss");
-            btnStart.setDisable(true);  // need players to "ready"
+            if (allReady()) {
+                btnStart.setDisable(false);
+            } else {
+                btnStart.setDisable(true);  // need players to "ready"
+            }
         } else {
             btnPlayer2.setDisable(true);
             btnPlayer3.setDisable(true);

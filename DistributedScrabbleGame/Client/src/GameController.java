@@ -692,12 +692,14 @@ public class GameController implements Initializable {
             dialog.setOverlayClose(false);
             Button btnClose = new Button("Okay");
             if(!dismissed) {
+                System.out.println("111");
                 btnClose.setOnAction(event -> {
                     dialog.close();
                     dialogPane.setVisible(false);
                     roomFadeOut();
                 });
             }else{
+                System.out.println("222");
                 btnClose.setOnAction(event -> {
                     dialog.close();
                     dialogPane.setVisible(false);

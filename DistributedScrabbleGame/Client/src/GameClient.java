@@ -250,6 +250,9 @@ public class GameClient {
      * Get notification that a client is ready
      */
     public void playerReady(String username) {
+        if (roomController == null) {  // not at room scene
+            return;
+        }
         ArrayList<Integer> infoList = roomPlayerInfoMap.get(username);
         infoList.remove(1);
         infoList.add(1);
