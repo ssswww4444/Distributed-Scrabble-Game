@@ -65,6 +65,8 @@ public class GameController implements Initializable {
     private TableColumn username;
     @FXML
     private TableColumn score;
+    @FXML
+    private Button btnLeave;
 
     private ArrayList<TextField> occupiedCells;
 
@@ -304,8 +306,8 @@ public class GameController implements Initializable {
     }
 
     @FXML
-    public void connectBtnClick(ActionEvent event){
-        fadeOut();
+    public void leaveBtnClick(ActionEvent event){
+        this.clientObj.leaveRoom();
     }
 
     @Override
@@ -510,14 +512,22 @@ public class GameController implements Initializable {
 
 
     /* This method is used to provide a smoother transition between scences */
-    public void fadeOut(){
+    public void fadeOut(String scene){
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));
         fadeTransition.setNode(rootPane);
         fadeTransition.setFromValue(1);
         fadeTransition.setToValue(0);
 
-        fadeTransition.setOnFinished(event -> loadMainScene());
+        switch(scene) {
+            case "Room":
+                fadeTransition.setOnFinished(event -> loadRoomScene());
+                break;
+            case "Menu":
+                fadeTransition.setOnFinished(event -> loadMenuScene());
+                break;
+        }
+
         fadeTransition.play();
     }
 
@@ -615,10 +625,19 @@ public class GameController implements Initializable {
     /**
      * Display the end-game result dialog
      */
-    public void renderResultPage(){
+    public void renderResultPage(String username, boolean dismissed){
         Platform.runLater(() -> {
             JFXDialogLayout dialogContent = new JFXDialogLayout();
-            dialogContent.setHeading(new Text("Game Over"));
+            if(username == null && !this.NonOccupiedCells.isEmpty()){
+                dialogContent.setHeading(new Text("Game Over! Everybody has chosen to pass!"));
+            }else if(username == null){
+                dialogContent.setHeading(new Text("Game Over! No empty cell left!"));
+            }else if(!dismissed){
+                dialogContent.setHeading(new Text("Game Over! " + username + " left the room!"));
+            }else{
+                dialogContent.setHeading(new Text("Game Over! The host left the room!"));
+            }
+
             ArrayList<String> winners = new ArrayList<>();
             int highScore = 0;
             int myScore = 0;
@@ -670,11 +689,19 @@ public class GameController implements Initializable {
             JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
             dialog.setOverlayClose(false);
             Button btnClose = new Button("Okay");
-            btnClose.setOnAction(event -> {
-                dialog.close();
-                dialogPane.setVisible(false);
-                roomFadeOut();
-            });
+            if(!dismissed) {
+                btnClose.setOnAction(event -> {
+                    dialog.close();
+                    dialogPane.setVisible(false);
+                    roomFadeOut();
+                });
+            }else{
+                btnClose.setOnAction(event -> {
+                    dialog.close();
+                    dialogPane.setVisible(false);
+                    fadeOut("Menu");
+                });
+            }
 
             dialogContent.setActions(btnClose);
             dialogPane.setVisible(true);
@@ -724,6 +751,36 @@ public class GameController implements Initializable {
         } catch (IOException e) {
             /* Need to do a pop-up dialog instead of printing in terminal here! */
             System.out.println("Cannot find room scene fxml");
+        }
+    }
+
+    /**
+     * Load the menu scene after game being interrupted(e.g. when somebody left the room).
+     */
+    private void loadMenuScene() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Menu.fxml"));
+            Parent menuView = loader.load();
+            Scene menuScene = new Scene(menuView);
+            MenuController controller = loader.getController();
+            controller.setClientObj(this.clientObj);
+            this.clientObj.setMenuController(controller);
+            this.clientObj.removeGameController();
+            controller.refresh();
+            Stage currentStage = (Stage) rootPane.getScene().getWindow();
+
+            // override the onCloseRequest and notify server to remove user.
+            currentStage.setOnCloseRequest(t -> {
+                System.out.println("Closing at the Menu scene. ");
+                clientObj.logout();
+                Platform.exit();
+                System.exit(0);
+            });
+
+            currentStage.setScene(menuScene);
+
+        } catch (IOException e) {
+            System.out.println("Cannot find Menu.fxml");
         }
     }
 
