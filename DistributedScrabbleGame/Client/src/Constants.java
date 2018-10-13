@@ -20,6 +20,7 @@ public class Constants {
     public static final String JOIN_ROOM = "JoinRoom";
     public static final String DISMISS_ROOM = "DismissRoom";
     public static final String LEAVE_ROOM = "LeaveRoom";
+    public static final String READY = "Ready";
 
     // game actions
     public static final String SYNCHRONIZE_GAME = "SynchronizeGame";

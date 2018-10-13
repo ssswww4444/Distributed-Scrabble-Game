@@ -144,7 +144,7 @@ public class MqttBroker implements MqttCallback {
                 gc.renderResultPage();
                 break;
             case Constants.JOIN_ROOM:  // new player joined room
-                gc.playerJoinedRoom(cmd[1]);
+                gc.playerJoinedRoom(cmd[1], Integer.parseInt(cmd[2]));
                 break;
             case Constants.PASS:
                 gc.passResponse();
@@ -158,6 +158,8 @@ public class MqttBroker implements MqttCallback {
             case Constants.DISMISS_ROOM:
                 gc.hostDismissRoom(cmd[1]);
                 break;
+            case Constants.READY:
+                gc.playerReady(cmd[1]);
         }
     }
 
