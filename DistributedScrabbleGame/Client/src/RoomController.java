@@ -150,7 +150,6 @@ public class RoomController implements Initializable {
             }
         } else if (btnPlayer4.getText().equals(username)) {
             btnPlayer4.setText(Constants.EMPTY_BUTTON_TEXT);
-            btnPlayer4.setDisable(false);
             if (isHost) {
                 btnPlayer4.setDisable(false);
             }
@@ -211,6 +210,15 @@ public class RoomController implements Initializable {
         }
         if(isHost){
             btnLeave.setText("Dismiss");
+            if(this.clientObj.getRoomPlayerNames().size()>1){
+                btnPlayer2.setDisable(true);
+            }
+            if(this.clientObj.getRoomPlayerNames().size()>2){
+                btnPlayer3.setDisable(true);
+            }
+            if(this.clientObj.getRoomPlayerNames().size()>3){
+                btnPlayer4.setDisable(true);
+            }
         } else {
             btnPlayer2.setDisable(true);
             btnPlayer3.setDisable(true);
@@ -259,6 +267,7 @@ public class RoomController implements Initializable {
             MenuController controller = loader.getController();
             controller.setClientObj(this.clientObj);
             this.clientObj.setMenuController(controller);
+            this.clientObj.removeRoomController();
             controller.refresh();
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
 
@@ -286,6 +295,7 @@ public class RoomController implements Initializable {
             GameController controller = loader.getController();
             controller.setClientObj(this.clientObj);
             this.clientObj.setGameController(controller);
+            this.clientObj.removeRoomController();
             controller.startup();
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
 

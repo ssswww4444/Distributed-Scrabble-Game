@@ -170,25 +170,43 @@ public class GameClient {
      */
     public void playerLeaveRoom(String username) {
         roomPlayerNames.remove(username); // update list
-        Platform.runLater(() -> {
-            GameClient.this.roomController.leaveRoom(username, isHost);  // update UI
-        });
+        if(this.roomController!=null){      // If user is in room scene
+            Platform.runLater(() -> {
+                GameClient.this.roomController.leaveRoom(username, isHost);  // update UI
+            });
+        }else{      // If user is in game scene
+            Platform.runLater(()->{
+                GameClient.this.gameController.renderResultPage(username, false); // not
+            });
+        }
     }
 
     /**
      * Receive notification that host dismissed room
      */
     public void hostDismissRoom(String username) {
-        Platform.runLater(() -> {
-            GameClient.this.roomController.dismissRoom(username);  // update UI
-        });
-        try {
-            mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));
-        } catch (MqttException e) {
-            e.printStackTrace();
+        if(this.roomController!=null){  // Room dismissed in Room scene
+            Platform.runLater(() -> {
+                GameClient.this.roomController.dismissRoom(username);  // update UI
+            });
+            try {
+                mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+            roomPlayerNames = new ArrayList<>();  // set to empty
+            roomNumber = Constants.NOT_IN_ROOM_ID;
+        }else{  // Room dismissed in Game scene
+            Platform.runLater(()->{
+                GameClient.this.gameController.renderResultPage(username, true);
+            });
+            try {
+                mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));;
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
         }
-        roomPlayerNames = new ArrayList<>();  // set to empty
-        roomNumber = Constants.NOT_IN_ROOM_ID;
+
     }
 
 
@@ -338,9 +356,8 @@ public class GameClient {
      * End the game and display final result
      */
     public void endGame(){
-        gameController.renderResultPage();
+        gameController.renderResultPage(null, isHost);
     }
-
 
     public void noWord() {
         try {
@@ -456,16 +473,20 @@ public class GameClient {
             mqttBroker.getMqttClient().unsubscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
             serverServantStub.leaveRoom(username, isHost, roomNumber);  // notify server
             roomPlayerNames = new ArrayList<>();  // set to empty
-            if (!isHost) {  // leave room
-                this.roomController.fadeOut("Menu");
+            if(this.roomController!=null) {   // leave in room scene
+                Platform.runLater(() -> {
+                    this.roomController.fadeOut("Menu");
+                });
             } else {
-                hostDismissRoom(username);
+                Platform.runLater(()->{
+                    this.gameController.fadeOut("Menu");
+                });
             }
             isHost = false;
+            roomNumber = Constants.NOT_IN_ROOM_ID;
         } catch (RemoteException | MqttException e) {
             e.printStackTrace();
         }
-        roomNumber = Constants.NOT_IN_ROOM_ID;
     }
 
     /**

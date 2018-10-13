@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="654.0" prefWidth="681.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="654.0" prefWidth="681.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameController">
    <children>
       <Button fx:id="btnVote" disable="true" layoutX="24.0" layoutY="604.0" mnemonicParsing="false" onAction="#voteBtnClick" prefHeight="36.0" prefWidth="96.0" text="VOTE">
          <font>
@@ -48,7 +48,7 @@
             </TableView>
          </children>
       </StackPane>
-      <Button fx:id="btnConnect" layoutX="565.0" layoutY="557.0" mnemonicParsing="false" onAction="#connectBtnClick" prefHeight="31.0" prefWidth="96.0" text="Leave">
+      <Button fx:id="btnLeave" layoutX="565.0" layoutY="557.0" mnemonicParsing="false" onAction="#leaveBtnClick" prefHeight="31.0" prefWidth="96.0" text="Leave">
          <font>
             <Font name="System Bold" size="16.0" />
          </font>
