@@ -203,17 +203,19 @@ public class GameClient {
     public void playerLeaveRoom(String username) {
 //        roomPlayerNames.remove(username); // update list
 
-        roomPlayerInfoMap.remove(username);
+        int pos = roomPlayerInfoMap.get(username).get(0);
 
         if(this.roomController!=null){      // If user is in room scene
             Platform.runLater(() -> {
-                GameClient.this.roomController.leaveRoom(username, isHost);  // update UI
+                GameClient.this.roomController.leaveRoom(pos, isHost);  // update UI
             });
-        }else{      // If user is in game scene
+        } else{      // If user is in game scene
             Platform.runLater(()->{
                 GameClient.this.gameController.renderResultPage(username, false); // not
             });
         }
+
+        roomPlayerInfoMap.remove(username);
     }
 
     /**
@@ -250,16 +252,16 @@ public class GameClient {
      * Get notification that a client is ready
      */
     public void playerReady(String username) {
-        if (roomController == null) {  // not at room scene
-            return;
-        }
         ArrayList<Integer> infoList = roomPlayerInfoMap.get(username);
         infoList.remove(1);
         infoList.add(1);
         roomPlayerInfoMap.put(username, infoList);  // ready
-        Platform.runLater(() -> {
-            this.roomController.playerReady(infoList.get(0));  // player at this pos get ready
-        });
+
+        if (roomController != null) {  // not at room scene
+            Platform.runLater(() -> {
+                this.roomController.playerReady(infoList.get(0));  // player at this pos get ready
+            });
+        }
     }
 
 

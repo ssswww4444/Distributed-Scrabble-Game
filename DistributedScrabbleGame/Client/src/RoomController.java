@@ -190,9 +190,9 @@ public class RoomController implements Initializable {
     /**
      * Update UI when some player left room
      */
-    public void leaveRoom(String username, boolean isHost) {
+    public void leaveRoom(int pos, boolean isHost) {
 
-        int pos = roomPlayerInfoMap.get(username).get(0);
+//        int pos = roomPlayerInfoMap.get(username).get(0);
         Button targetButton = buttonAtPos(pos);
         targetButton.setText(Constants.EMPTY_BUTTON_TEXT);
         targetButton.setStyle("-fx-text-fill: #000000");   // black
@@ -201,22 +201,22 @@ public class RoomController implements Initializable {
         }
 
 
-        if (btnPlayer2.getText().equals(username)) {
-            btnPlayer2.setText(Constants.EMPTY_BUTTON_TEXT);
-            if (isHost) {
-                btnPlayer2.setDisable(false);
-            }
-        } else if (btnPlayer3.getText().equals(username)) {
-            btnPlayer3.setText(Constants.EMPTY_BUTTON_TEXT);
-            if (isHost) {
-                btnPlayer3.setDisable(false);
-            }
-        } else if (btnPlayer4.getText().equals(username)) {
-            btnPlayer4.setText(Constants.EMPTY_BUTTON_TEXT);
-            if (isHost) {
-                btnPlayer4.setDisable(false);
-            }
-        }
+//        if (btnPlayer2.getText().equals(username)) {
+//            btnPlayer2.setText(Constants.EMPTY_BUTTON_TEXT);
+//            if (isHost) {
+//                btnPlayer2.setDisable(false);
+//            }
+//        } else if (btnPlayer3.getText().equals(username)) {
+//            btnPlayer3.setText(Constants.EMPTY_BUTTON_TEXT);
+//            if (isHost) {
+//                btnPlayer3.setDisable(false);
+//            }
+//        } else if (btnPlayer4.getText().equals(username)) {
+//            btnPlayer4.setText(Constants.EMPTY_BUTTON_TEXT);
+//            if (isHost) {
+//                btnPlayer4.setDisable(false);
+//            }
+//        }
 
 //        if (roomPlayerInfoMap.keySet().size() < Constants.GAME_MIN_PLAYER) {  // need at least 2 players
 //            btnStart.setDisable(true);
