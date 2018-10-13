@@ -184,16 +184,17 @@ public class RoomController implements Initializable {
      * Update UI when some player left room
      */
     public void leaveRoom(int pos, boolean isHost) {
-
-//        int pos = roomPlayerInfoMap.get(username).get(0);
         Button targetButton = buttonAtPos(pos);
         targetButton.setText(Constants.EMPTY_BUTTON_TEXT);
         targetButton.setStyle("-fx-text-fill: #000000");   // black
         if (isHost) {
             targetButton.setDisable(false);
+            if (roomPlayerInfoMap.keySet().size() < Constants.GAME_MIN_PLAYER) {  // not enough number of players
+                btnStart.setDisable(true);
+            } else if(allReady()) {  // all ready
+                btnStart.setDisable(false);
+            }
         }
-
-
     }
 
     /**

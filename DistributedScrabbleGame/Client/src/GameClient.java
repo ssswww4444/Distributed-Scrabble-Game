@@ -193,6 +193,8 @@ public class GameClient {
      * Receive notification that player left room
      */
     public void playerLeaveRoom(String username) {
+        roomPlayerInfoMap.remove(username);
+
         int pos = roomPlayerInfoMap.get(username).get(0);
 
         if(this.roomController!=null){      // If user is in room scene
@@ -204,8 +206,6 @@ public class GameClient {
                 GameClient.this.gameController.renderResultPage(username, false); // not
             });
         }
-
-        roomPlayerInfoMap.remove(username);
     }
 
     /**
