@@ -245,7 +245,7 @@ public class RoomController implements Initializable {
 
         if(isHost){
             btnLeave.setText("Dismiss");
-            if (allReady()) {
+            if (allReady() && roomPlayerInfoMap.keySet().size() >= Constants.GAME_MIN_PLAYER) {
                 btnStart.setDisable(false);
             } else {
                 btnStart.setDisable(true);  // need players to "ready"
