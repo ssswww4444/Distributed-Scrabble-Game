@@ -14,8 +14,6 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     private HashMap<String, String> usernameStatusMap;
     private HashMap<Integer, Game> roomNumGameMap;
 
-//    private HashMap<Integer, ArrayList<String>> roomPlayerMap;
-
     // room -> username -> info(ArrayList)
     // info: pos in room, ready(0 for not ready, 1 for ready)
     private HashMap<Integer, HashMap<String, ArrayList<Integer>>> roomUserInfoMap;  // room -> username -> info(ArrayList)
@@ -28,8 +26,6 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         usernamePlayerMap = new HashMap<>();
         roomNumGameMap = new HashMap<>();
         usernameStatusMap = new HashMap<>();
-
-//        roomPlayerMap = new HashMap<>();
         roomUserInfoMap = new HashMap();
     }
 
@@ -43,8 +39,6 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         playerPool.add(player);
         usernamePlayerMap.put(username, player);  // add to hashmap
         usernameStatusMap.put(username, Constants.STATUS_AVAILABLE);
-
-//        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.LOGIN + ";" + username);
 
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
 
@@ -132,10 +126,6 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         userInfoMap.put(username, infoList);
         roomUserInfoMap.put(roomID, userInfoMap);
 
-//        ArrayList<String> roomPlayers = new ArrayList<>();
-//        roomPlayers.add(username);
-//        roomPlayerMap.put(roomID, roomPlayers);
-
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
 
         return roomID;
@@ -148,21 +138,16 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
     @Override
     public void leaveRoom(String username, boolean isHost, int roomNum) throws RemoteException {
         if (isHost) {  // dismiss room
-//            ArrayList<String> userNames = getUserInRoom(roomNum);
             for (String user: roomUserInfoMap.get(roomNum).keySet()) {
                 playerLeaveRoom(user);
                 usernameStatusMap.put(user, Constants.STATUS_AVAILABLE);
             }
-//            roomPlayerMap.remove(roomNum);
             roomUserInfoMap.remove(roomNum);
             usernamePlayerMap.get(username).setIsHost(false);  // not host anymore
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.DISMISS_ROOM + ";" + username);
         } else {   // leave room
             playerLeaveRoom(username);
             usernameStatusMap.put(username, Constants.STATUS_AVAILABLE);
-//            ArrayList<String> currentPlayers = roomPlayerMap.get(roomNum);
-//            currentPlayers.remove(username);
-//            roomPlayerMap.put(roomNum, currentPlayers);
             roomUserInfoMap.get(roomNum).remove(username);
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum, Constants.LEAVE_ROOM + ";" + username);
         }
@@ -211,7 +196,6 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public HashMap<String, ArrayList<Integer>> getUserInRoom(int roomNum) throws RemoteException {
-//        return roomPlayerMap.get(roomNum);
         return roomUserInfoMap.get(roomNum);
     }
 
@@ -329,10 +313,6 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
             player.setStatus(Constants.STATUS_ROOM);
             player.setRoomNum(roomNum);
             usernameStatusMap.put(username, Constants.STATUS_ROOM + " " + roomNum);
-
-//            ArrayList<String> currentPlayers = roomPlayerMap.get(roomNum);
-//            currentPlayers.add(username);
-//            roomPlayerMap.put(roomNum, currentPlayers);
 
             ArrayList<Integer> infoList = new ArrayList<>();
             int pos = 2;

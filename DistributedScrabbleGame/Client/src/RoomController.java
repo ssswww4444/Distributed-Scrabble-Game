@@ -161,8 +161,6 @@ public class RoomController implements Initializable {
     }
 
     public void joinRoom(String username, int pos) {  // user join room at pos
-//        Button freeButton = this.getFreeButton();
-
         if (clientObj.isHost()) {
             btnStart.setDisable(true);  // disable start when any new player enter room
         }
@@ -172,11 +170,6 @@ public class RoomController implements Initializable {
             targetButton.setText(username);
             targetButton.setDisable(true);
         }
-
-//        if (freeButton != null) {
-//            freeButton.setText(username);
-//            freeButton.setDisable(true);
-//        }
     }
 
     /**
@@ -201,28 +194,6 @@ public class RoomController implements Initializable {
         }
 
 
-//        if (btnPlayer2.getText().equals(username)) {
-//            btnPlayer2.setText(Constants.EMPTY_BUTTON_TEXT);
-//            if (isHost) {
-//                btnPlayer2.setDisable(false);
-//            }
-//        } else if (btnPlayer3.getText().equals(username)) {
-//            btnPlayer3.setText(Constants.EMPTY_BUTTON_TEXT);
-//            if (isHost) {
-//                btnPlayer3.setDisable(false);
-//            }
-//        } else if (btnPlayer4.getText().equals(username)) {
-//            btnPlayer4.setText(Constants.EMPTY_BUTTON_TEXT);
-//            if (isHost) {
-//                btnPlayer4.setDisable(false);
-//            }
-//        }
-
-//        if (roomPlayerInfoMap.keySet().size() < Constants.GAME_MIN_PLAYER) {  // need at least 2 players
-//            btnStart.setDisable(true);
-//        }
-
-
     }
 
     /**
@@ -243,18 +214,6 @@ public class RoomController implements Initializable {
         dialogContent.setActions(btnClose);
         dialogPane.setVisible(true);
         dialog.show();
-    }
-
-    private Button getFreeButton() {
-        if (this.btnPlayer2.getText().equals(Constants.EMPTY_BUTTON_TEXT)) {
-            return btnPlayer2;
-        } else if (this.btnPlayer3.getText().equals(Constants.EMPTY_BUTTON_TEXT)) {
-            return btnPlayer3;
-        } else if (this.btnPlayer4.getText().equals(Constants.EMPTY_BUTTON_TEXT)) {
-            return btnPlayer4;
-        } else {
-            return null;
-        }
     }
 
     @Override
@@ -282,13 +241,6 @@ public class RoomController implements Initializable {
                 }
             }
         }
-
-//        for(String username : roomPlayers.subList(1,roomPlayers.size())){  // except index 0
-//            Button freeButton = getFreeButton();
-//            if(freeButton!=null){
-//                freeButton.setText(username);
-//            }
-//        }
 
         if(isHost){
             btnLeave.setText("Dismiss");

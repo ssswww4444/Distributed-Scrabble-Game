@@ -15,7 +15,6 @@ public class GameClient {
     private MenuController menuController;
     private RoomController roomController;
     private GameController gameController;
-//    private ArrayList<String> roomPlayerNames;
     private HashMap<String, ArrayList<Integer>> roomPlayerInfoMap;
     private MqttBroker mqttBroker;
 
@@ -83,7 +82,6 @@ public class GameClient {
         // init
         isHost = false;
         roomNumber = Constants.NOT_IN_ROOM_ID;
-//        roomPlayerNames = new ArrayList<>();
         roomPlayerInfoMap = new HashMap<>();
     }
 
@@ -147,8 +145,6 @@ public class GameClient {
         try {
             this.roomNumber = serverServantStub.createRoom(this.username);  // get roomID from server
             mqttBroker.getMqttClient().subscribe(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + Integer.toString(roomNumber));  // subscribe
-//            this.roomPlayerNames = new ArrayList<>();  // empty
-//            this.roomPlayerNames.add(this.username);
 
             addToInfoMap(this.username, 1, 1);  // host always ready
 
@@ -174,11 +170,7 @@ public class GameClient {
      * Receive notification that new player joined room
      */
     public void playerJoinedRoom(String username, int pos) {
-//        roomPlayerNames.add(username); // update list
-
-
-        addToInfoMap(username, pos, 0);
-
+        addToInfoMap(username, pos, 0);  // update map
 
         Platform.runLater(() -> {
             GameClient.this.roomController.joinRoom(username, pos);  // update UI
@@ -201,8 +193,6 @@ public class GameClient {
      * Receive notification that player left room
      */
     public void playerLeaveRoom(String username) {
-//        roomPlayerNames.remove(username); // update list
-
         int pos = roomPlayerInfoMap.get(username).get(0);
 
         if(this.roomController!=null){      // If user is in room scene
@@ -231,7 +221,6 @@ public class GameClient {
             } catch (MqttException e) {
                 e.printStackTrace();
             }
-//            roomPlayerNames = new ArrayList<>();  // set to empty
             roomPlayerInfoMap = new HashMap<>();
 
             roomNumber = Constants.NOT_IN_ROOM_ID;
@@ -309,7 +298,6 @@ public class GameClient {
     public void acceptInvitation(int roomNumber) {
         try {
             if (serverServantStub.canJoinRoom(this.username, roomNumber)) {  // check if can join
-//                roomPlayerNames = serverServantStub.getUserInRoom(roomNumber);  // including himself
                 roomPlayerInfoMap = serverServantStub.getUserInRoom(roomNumber);
 
                 this.roomNumber = roomNumber;
