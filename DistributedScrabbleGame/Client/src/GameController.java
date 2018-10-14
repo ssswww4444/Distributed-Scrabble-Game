@@ -30,9 +30,11 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 /* Controller class for the start scene of the Client App */
@@ -329,8 +331,8 @@ public class GameController implements Initializable {
     }
 
     public void startup(){
-        ArrayList<String> playerNames = this.clientObj.getRoomPlayerNames();
-        for(String player : playerNames){
+        HashMap<String, ArrayList<Integer>> roomPlayerInfoMap = clientObj.getRoomInfoMap();  // copy reference from client.obj
+        for(String player : roomPlayerInfoMap.keySet()){
             this.scoreList.getItems().add(new ScoreModel(player, Integer.toString(0)));
         }
 
@@ -717,12 +719,14 @@ public class GameController implements Initializable {
             dialog.setOverlayClose(false);
             Button btnClose = new Button("Okay");
             if(!dismissed) {
+                System.out.println("111");
                 btnClose.setOnAction(event -> {
                     dialog.close();
                     dialogPane.setVisible(false);
                     roomFadeOut();
                 });
             }else{
+                System.out.println("222");
                 btnClose.setOnAction(event -> {
                     dialog.close();
                     dialogPane.setVisible(false);
@@ -740,6 +744,10 @@ public class GameController implements Initializable {
      * The fading-out animation for changing to room scene
      */
     private void roomFadeOut(){
+
+        // update player list before fadeout
+        clientObj.updateRoomInfoMap();
+
         FadeTransition fadeTransition = new FadeTransition();
         fadeTransition.setDuration(Duration.millis(500));
         fadeTransition.setNode(rootPane);
@@ -762,7 +770,7 @@ public class GameController implements Initializable {
             controller.setClientObj(this.clientObj);
             this.clientObj.setRoomController(controller);
             this.clientObj.removeGameController();
-            controller.startup(this.clientObj.isHost(), this.clientObj.getRoomPlayerNames());
+            controller.startup(this.clientObj.isHost(), clientObj.getRoomInfoMap());
             Stage currentStage = (Stage) rootPane.getScene().getWindow();
 
             // override the onCloseRequest and notify server to remove user.
