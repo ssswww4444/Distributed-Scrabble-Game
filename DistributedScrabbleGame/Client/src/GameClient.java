@@ -584,4 +584,17 @@ public class GameClient {
     public String getCurrTurnPlayer(){
         return this.currTurn + " - " + new ArrayList<>(roomPlayerInfoMap.keySet()).get(this.currTurn-1);
     }
+
+    /**
+     * pop up message when server is down
+     */
+    public void serverDown(){
+        if(this.menuController!=null){
+            this.menuController.serverDownMsg();
+        }else if(this.roomController!=null){
+            this.roomController.serverDownMsg();
+        }else if(this.gameController!=null){
+            this.gameController.serverDownMsg();
+        }
+    }
 }

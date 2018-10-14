@@ -14,6 +14,7 @@ public class Constants {
 
     // server actions
     public static final String PLAYER_LIST_UPDATE = "playerListUpdate";  // notify to update player list when logout/login/leaveRoom/joinRoom
+    public static final String SERVER_DOWN = "serverDown";
 
     // room actions
     public static final String GAME_START = "GameStart";

@@ -113,6 +113,9 @@ public class MqttBroker implements MqttCallback {
         switch(cmd[0]) {
             case Constants.PLAYER_LIST_UPDATE:  // notify to update player list when logout/login/leaveRoom/joinRoom
                 gc.renderPlayerList();
+                break;
+            case Constants.SERVER_DOWN:
+                gc.serverDown();
         }
     }
 

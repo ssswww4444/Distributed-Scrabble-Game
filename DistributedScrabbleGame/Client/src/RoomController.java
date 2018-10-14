@@ -350,4 +350,56 @@ public class RoomController implements Initializable {
             System.out.println("Cannot find Game.fxml");
         }
     }
+
+    @FXML
+    public void serverDownMsg() {
+        Platform.runLater(()->{
+            dialogPane.getChildren().clear();
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Error Message"));
+            dialogContent.setBody(new Text("Server is down. Please reconnect later."));
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+            Button btnClose = new Button("Okay");
+            btnClose.setOnAction(event -> {
+                dialog.close();
+                dialogPane.setVisible(false);
+                loadLoginScene();
+            });
+            dialogContent.setActions(btnClose);
+            dialogPane.setVisible(true);
+            dialog.show();
+        });
+    }
+
+    private void loadLoginScene() {
+        Platform.runLater(()->{
+            FadeTransition fadeTransition = new FadeTransition();
+            fadeTransition.setDuration(Duration.millis(500));
+            fadeTransition.setNode(rootPane);
+            fadeTransition.setFromValue(1);
+            fadeTransition.setToValue(0);
+
+            fadeTransition.setOnFinished(event -> {
+                try {
+
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
+                    Parent loginView = loader.load();
+                    Scene loginScene = new Scene(loginView);
+                    Stage currentStage = (Stage) rootPane.getScene().getWindow();
+                    currentStage.setOnCloseRequest(t -> {
+                        System.out.println("Primary Stage is closing, process is killed! ");
+                        Platform.exit();
+                        System.exit(0);
+                    });
+                    currentStage.setScene(loginScene);
+
+                } catch (IOException e) {
+                    System.out.println("Cannot find login scene fxml");
+                }
+            });
+
+            fadeTransition.play();
+        });
+    }
 }

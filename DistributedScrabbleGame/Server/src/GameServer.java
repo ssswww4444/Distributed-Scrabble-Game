@@ -11,6 +11,11 @@ public class GameServer {
         // There is no need for server to subscribe any topic at current stage.
         MqttBroker mqttBroker = new MqttBroker(PLACEHOLDER, clientID);
         bindServerRegistry(mqttBroker);
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                serverServant.serverDown();
+            }
+        });
     }
 
 

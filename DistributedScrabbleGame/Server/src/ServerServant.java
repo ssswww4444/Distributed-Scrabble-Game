@@ -343,4 +343,8 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         }
         return false;
     }
+
+    public void serverDown(){
+        mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.SERVER_DOWN);
+    }
 }
