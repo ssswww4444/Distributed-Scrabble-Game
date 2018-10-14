@@ -47,6 +47,8 @@ public class RoomController implements Initializable {
     @FXML
     private StackPane dialogPane;
     @FXML
+    private StackPane selectionPane;
+    @FXML
     private Button btnLeave;
 
 
@@ -67,13 +69,13 @@ public class RoomController implements Initializable {
 
     @FXML
     public void inviteBtnClick() {
-        JFXDialogLayout dialogContent = new JFXDialogLayout();
-        dialogContent.setHeading(new Text("Please select a player from the list"));
-        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
-        dialog.setOverlayClose(false);
-
         ArrayList<String> availablePlayers = clientObj.getAvailablePlayers();
         if (availablePlayers.isEmpty()) {
+            dialogPane.getChildren().clear();
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Error"));
+            JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
             dialogContent.setBody(new Text("No available players. Try again later."));
             Button btnCancel = new Button("Okay");
             dialogContent.setActions(btnCancel);
@@ -81,7 +83,15 @@ public class RoomController implements Initializable {
                 dialog.close();
                 dialogPane.setVisible(false);
             });
+            dialogPane.setVisible(true);
+            dialog.show();
         } else {
+            selectionPane.getChildren().clear();
+            JFXDialogLayout dialogContent = new JFXDialogLayout();
+            dialogContent.setHeading(new Text("Please select a player"));
+            JFXDialog dialog = new JFXDialog(selectionPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+            dialog.setOverlayClose(false);
+
             ListView<String> playerList = new ListView<String>();
             ObservableList<String> playerNames = FXCollections.observableArrayList();
             playerNames.addAll(availablePlayers);
@@ -93,7 +103,7 @@ public class RoomController implements Initializable {
             btnInvite.setOnAction(event -> {
                 clientObj.invite(playerList.getSelectionModel().getSelectedItem());
                 dialog.close();
-                dialogPane.setVisible(false);
+                selectionPane.setVisible(false);
             });
 
             playerList.setOnMouseClicked(event -> {
@@ -105,14 +115,13 @@ public class RoomController implements Initializable {
             Button btnCancel = new Button("Cancel");
             btnCancel.setOnAction(event -> {
                 dialog.close();
-                dialogPane.setVisible(false);
+                selectionPane.setVisible(false);
             });
 
             dialogContent.setActions(playerList, btnInvite, btnCancel);
+            selectionPane.setVisible(true);
+            dialog.show();
         }
-
-        dialogPane.setVisible(true);
-        dialog.show();
     }
 
     public void joinRoom(String username, boolean isHost) {
@@ -164,6 +173,7 @@ public class RoomController implements Initializable {
      * Update UI when host dismissed room
      */
     public void dismissRoom(String username) {
+        dialogPane.getChildren().clear();
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Room Dismissed"));
         dialogContent.setBody(new Text("The host " + username + " has dismissed this room."));

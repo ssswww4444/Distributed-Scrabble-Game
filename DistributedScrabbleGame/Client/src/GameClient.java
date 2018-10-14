@@ -54,10 +54,15 @@ public class GameClient {
      * 1. Subscribe Server topic and wait for messages
      * 2. Add the current player to server playerPool via RMI
      */
-    public GameClient(String username) throws Exception {
+    public GameClient(String hostname, String username) throws Exception {
 
         // get the RMI stub.
-        getServerRegistry();
+        try {
+            getServerRegistry(hostname);
+        } catch (Exception e) {
+            throw new Exception("Cannot find server.");
+        }
+
 
         ArrayList<String> playerPool;
 
@@ -89,13 +94,9 @@ public class GameClient {
     /**
      * Get the game server remote servant.
      */
-    private void getServerRegistry() throws Exception {
-        try {
-            Registry registry = LocateRegistry.getRegistry("localhost");
-            serverServantStub = (ServerInterface) registry.lookup("ServerInterface");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void getServerRegistry(String hostname) throws Exception {
+        Registry registry = LocateRegistry.getRegistry(hostname);
+        serverServantStub = (ServerInterface) registry.lookup("ServerInterface");
     }
 
     /**
@@ -356,7 +357,7 @@ public class GameClient {
      * End the game and display final result
      */
     public void endGame(){
-        gameController.renderResultPage(null, isHost);
+        gameController.renderResultPage(null, false);
     }
 
     public void noWord() {
@@ -379,12 +380,21 @@ public class GameClient {
 
 
     public void nextTurn(){
-        if(currTurn == roomPlayerNames.size()){
-            currTurn = 1;
+        if(this.gameController.fullCells()){
+            try {
+                serverServantStub.endGame(roomNumber);
+                this.renderResultPage();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }else{
-            currTurn++;
+            if(currTurn == roomPlayerNames.size()){
+                currTurn = 1;
+            }else{
+                currTurn++;
+            }
+            this.gameController.renderNext();
         }
-        this.gameController.renderNext();
     }
 
 
@@ -459,6 +469,9 @@ public class GameClient {
      */
     public void logout() {
         try {
+            if(this.roomController!=null||this.gameController!=null){
+                this.leaveRoom();
+            }
             serverServantStub.removeFromPlayerPool(username);
         } catch (RemoteException e) {
             e.printStackTrace();

@@ -39,12 +39,14 @@ public class LoginController implements Initializable {
     @FXML
     private TextField usernameField;
     @FXML
+    private TextField hostname;
+    @FXML
     private StackPane dialogPane;
 
     @FXML
     public void connectBtnClick(ActionEvent event){
         try{
-            this.clientObj = new GameClient(usernameField.getText());
+            this.clientObj = new GameClient(hostname.getText(), usernameField.getText());
             this.btnConnect.setDisable(true);
             fadeOut();
         } catch(Exception e){
@@ -54,6 +56,7 @@ public class LoginController implements Initializable {
 
     @FXML
     public void displayMsg(String message){
+        dialogPane.getChildren().clear();
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Error Message"));
 //        dialogContent.setBody(new Text("Username not available. Please choose another one."));

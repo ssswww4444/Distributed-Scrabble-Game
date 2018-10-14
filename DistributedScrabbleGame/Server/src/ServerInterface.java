@@ -37,7 +37,7 @@ public interface ServerInterface extends Remote {
 
     void vote(String username, boolean agree, int roomNum) throws RemoteException;
 
-    void leaveGame(String username, int roomNum) throws RemoteException;
+    void endGame(int roomNum) throws RemoteException;
 
     boolean canJoinRoom(String username, int roomNum) throws  RemoteException;
 

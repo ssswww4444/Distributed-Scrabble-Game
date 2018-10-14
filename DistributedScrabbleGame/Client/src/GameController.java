@@ -109,6 +109,17 @@ public class GameController implements Initializable {
         this.btnVote.setDisable(true);
         System.out.println(chosenWord);
         this.clientObj.sendVoteRequest(getRow(head), getCol(head), this.chosenWord, isHorizontal(head, tail));
+
+        dialogPane.getChildren().clear();
+        JFXDialogLayout dialogContent = new JFXDialogLayout();
+        dialogContent.setHeading(new Text("Waiting for vote result..."));
+        ProgressIndicator loadingIcon = new ProgressIndicator();
+        loadingIcon.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        dialogContent.setBody(loadingIcon);
+        JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
+        dialog.setOverlayClose(false);
+        dialogPane.setVisible(true);
+        dialog.show();
     }
 
     private boolean isHorizontal(TextField start, TextField end){
@@ -367,6 +378,7 @@ public class GameController implements Initializable {
                             tail = (TextField)event.getSource();
                             chosenWord = getWord(head, tail);
                             if(chosenWord==null) {
+                                dialogPane.getChildren().clear();
                                 JFXDialogLayout dialogContent = new JFXDialogLayout();
                                 dialogContent.setHeading(new javafx.scene.text.Text("Invalid Choice:"));
                                 dialogContent.setBody(new javafx.scene.text.Text("You must choose from left \nto right, or from top to "
@@ -408,7 +420,7 @@ public class GameController implements Initializable {
                     }else if(state.equals("place")){
                         cell.setStyle("-fx-border-color : #68a429;");
                     }else if(state.equals("choose")){
-
+                        cell.setStyle(cell.getStyle()+"-fx-border-color : none;");
                     }
                 });
 
@@ -435,8 +447,13 @@ public class GameController implements Initializable {
                         enterStatePlace();
                     }else if(state.equals("place")){
                         btnSelected.setSelected(false);
-                        btnSelected = (ToggleButton)event.getSource();
-                        System.out.println("Btn: " + btnSelected.getText());
+                        if(btnSelected==(ToggleButton)event.getSource()){
+                            btnSelected=null;
+                            enterStateSelect();
+                        }else{
+                            btnSelected = (ToggleButton)event.getSource();
+                            System.out.println("Btn: " + btnSelected.getText());
+                        }
                     }else if(state.equals("choose")){
 
                     }
@@ -451,6 +468,7 @@ public class GameController implements Initializable {
      * Create a dialog to confirm letter placement. Players are not allowed to change placement afterwards.
      */
     private void confirmPlacement(TextField cell){
+        dialogPane.getChildren().clear();
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new javafx.scene.text.Text("Please Confirm Placement:"));
         dialogContent.setBody(new javafx.scene.text.Text("Are you sure to place letter \'" + btnSelected.getText() + "\' ?"));
@@ -466,7 +484,12 @@ public class GameController implements Initializable {
             occupiedCells.add(cell);
             NonOccupiedCells.remove(cell);
             chosenCell = cell;
-            this.clientObj.sendPlacedLetter(getRow(chosenCell), getCol(chosenCell), btnSelected.getText());
+            if(NonOccupiedCells.isEmpty()){
+                this.clientObj.sendPlacedLetter(getRow(chosenCell), getCol(chosenCell), btnSelected.getText());
+            }else{
+                this.clientObj.sendPlacedLetter(getRow(chosenCell), getCol(chosenCell), btnSelected.getText());
+            }
+
 
             enterStateChoose();
         });
@@ -485,6 +508,7 @@ public class GameController implements Initializable {
     @FXML
     public void voteMsg(String word) {
         Platform.runLater(() -> {
+            dialogPane.getChildren().clear();
             JFXDialogLayout dialogContent = new JFXDialogLayout();
             dialogContent.setHeading(new Text("Vote"));
             dialogContent.setBody(new Text("Do you think " + word + " is a word?"));
@@ -553,6 +577,7 @@ public class GameController implements Initializable {
      */
     public void voteResultMsg(boolean isWord, int score){
         Platform.runLater(() -> {
+            dialogPane.getChildren().clear();
             JFXDialogLayout dialogContent = new JFXDialogLayout();
             dialogContent.setHeading(new Text("Vote result"));
             if (isWord) {
@@ -580,6 +605,7 @@ public class GameController implements Initializable {
      */
     public void passMsg(boolean wordSelected){
         Platform.runLater(()->{
+            dialogPane.getChildren().clear();
             JFXDialogLayout dialogContent = new JFXDialogLayout();
             dialogContent.setHeading(new Text("Vote result"));
             if(wordSelected){
@@ -627,6 +653,7 @@ public class GameController implements Initializable {
      */
     public void renderResultPage(String username, boolean dismissed){
         Platform.runLater(() -> {
+            dialogPane.getChildren().clear();
             JFXDialogLayout dialogContent = new JFXDialogLayout();
             if(username == null && !this.NonOccupiedCells.isEmpty()){
                 dialogContent.setHeading(new Text("Game Over! Everybody has chosen to pass!"));
@@ -817,5 +844,12 @@ public class GameController implements Initializable {
                 cell.setStyle("-fx-border-color : #fcdb62;");
             }
         }
+    }
+
+    /**
+     *
+     */
+    public boolean fullCells(){
+        return this.NonOccupiedCells.isEmpty();
     }
 }

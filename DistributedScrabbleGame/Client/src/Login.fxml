@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LoginController">
+<AnchorPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LoginController">
    <children>
       <ImageView fitHeight="75.0" fitWidth="75.0" layoutX="263.0" layoutY="25.0">
          <image>
@@ -21,17 +21,23 @@
             <Font name="System Bold" size="35.0" />
          </font>
       </Label>
-      <Label layoutX="73.0" layoutY="227.0" text="Username:">
+      <Label layoutX="73.0" layoutY="253.0" text="Username:">
          <font>
             <Font name="System Italic" size="25.0" />
          </font>
       </Label>
-      <TextField fx:id="usernameField" layoutX="202.0" layoutY="232.0" prefHeight="31.0" prefWidth="210.0" />
-      <Button fx:id="btnConnect" layoutX="421.0" layoutY="232.0" mnemonicParsing="false" onAction="#connectBtnClick" prefHeight="31.0" prefWidth="86.0" text="Enter">
+      <TextField fx:id="usernameField" layoutX="202.0" layoutY="258.0" prefHeight="31.0" prefWidth="210.0" />
+      <Button fx:id="btnConnect" layoutX="420.0" layoutY="258.0" mnemonicParsing="false" onAction="#connectBtnClick" prefHeight="31.0" prefWidth="86.0" text="Enter">
          <font>
             <Font size="15.0" />
          </font>
       </Button>
-      <StackPane fx:id="dialogPane" layoutX="109.0" layoutY="151.0" prefHeight="120.0" prefWidth="383.0" visible="false" />
+      <Label layoutX="88.0" layoutY="210.0" text="Server IP:">
+         <font>
+            <Font name="System Italic" size="25.0" />
+         </font>
+      </Label>
+      <TextField fx:id="hostname" layoutX="202.0" layoutY="212.0" prefHeight="31.0" prefWidth="210.0" />
+      <StackPane fx:id="dialogPane" layoutX="108.0" layoutY="142.0" prefHeight="140.0" prefWidth="387.0" visible="false" />
    </children>
 </AnchorPane>
