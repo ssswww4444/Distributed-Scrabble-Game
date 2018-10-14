@@ -6,6 +6,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 public class GameClient {
     private String username;
@@ -79,9 +80,13 @@ public class GameClient {
         } else if (username.equals("")) {  // empty string
             throw new Exception("Username cannot be empty.");
         } else {
-            this.username = username;
-            mqttBroker = new MqttBroker(username, this);
-            serverServantStub.addTOPlayerPool(username);
+            try{
+                this.username = username;
+                mqttBroker = new MqttBroker(username, this, hostname);
+                serverServantStub.addTOPlayerPool(username);
+            } catch (Exception e){
+                throw new Exception("Cannot find server.");
+            }
         }
 
         // init

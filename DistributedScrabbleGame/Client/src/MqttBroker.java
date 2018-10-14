@@ -36,9 +36,9 @@ public class MqttBroker implements MqttCallback {
     /**
      * Constructor used in Game Client (Broker at Client)
      */
-    public MqttBroker(String mqttClientID, GameClient gc) {  // mqttClientID = username
+    public MqttBroker(String mqttClientID, GameClient gc, String hostname) throws MqttException{  // mqttClientID = username
         try {
-            mqttClient = new MqttClient(BROKER_ADDR, mqttClientID);
+            mqttClient = new MqttClient("tcp://"+hostname+":1883", mqttClientID);
             mqttClient.setCallback(this);
             mqttClient.connect();
             this.gc = gc;
@@ -54,6 +54,7 @@ public class MqttBroker implements MqttCallback {
             System.err.println("Mqtt Client exception: " + e.toString());
             e.getCause();
             e.printStackTrace();
+            throw e;
         }
     }
 
