@@ -153,6 +153,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         }
 
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.SERVER_TOPIC, Constants.PLAYER_LIST_UPDATE);
+        this.endGame(roomNum);
     }
 
     /**
@@ -239,6 +240,8 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
      */
     @Override
     public void noWord(int roomNum) throws RemoteException{
+        Game currGame = roomNumGameMap.get(roomNum);
+        currGame.nextTurn();
         mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                 Constants.NO_WORD);
     }
@@ -265,6 +268,7 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
         Game currGame = roomNumGameMap.get(roomNum);
         boolean endGame = currGame.passTurn();
         if(endGame){
+            this.endGame(roomNum);
             mqttBroker.notify(Constants.MQTT_TOPIC + "/" + Constants.ROOM_TOPIC + "/" + roomNum,
                     Constants.END_GAME);
         }else{
@@ -293,21 +297,21 @@ public class ServerServant extends UnicastRemoteObject implements ServerInterfac
                             scores.get(playername) + ";" + "false");
         }
         else{  //if somebody has not voted
-                System.out.println("Waiting for voting");
+            System.out.println("Waiting for voting");
         }
     }
 
     @Override
-    public void leaveGame(String username, int roomNum) throws RemoteException {
-
+    public void endGame(int roomNum) throws RemoteException {
+        if(roomNumGameMap.containsKey(roomNum)){
+            roomNumGameMap.remove(roomNum);
+        }
     }
 
     @Override
     public boolean canJoinRoom(String username, int roomNum) throws  RemoteException {
-//        ArrayList<String> players = getUserInRoom(roomNum);
         HashMap<String, ArrayList<Integer>> currentUserInfoMap = roomUserInfoMap.get(roomNum);
-
-        if (currentUserInfoMap.keySet().size() < Constants.ROOM_MAX_PLAYER) {
+        if (currentUserInfoMap.keySet().size() < Constants.ROOM_MAX_PLAYER && !roomNumGameMap.containsKey(roomNum)) {
             // update player status
             Player player = usernamePlayerMap.get(username);
             player.setStatus(Constants.STATUS_ROOM);

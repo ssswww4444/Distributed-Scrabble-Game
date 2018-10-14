@@ -27,6 +27,7 @@ public class Game {
     private int currInsertedRow;
     private int currInsertedCol;
     private String currInsertedLetter;
+    private int letterNum;
 
     private enum GameStatus {
         INSERTING, VOTING
@@ -58,6 +59,7 @@ public class Game {
         // init turn 1
         turn = 1;
         hasInserted = false;
+        letterNum = 0;
 
     }
 
@@ -193,6 +195,7 @@ public class Game {
         currInsertedRow = i;
         currInsertedCol = j;
         currInsertedLetter = letter;
+        this.letterNum++;
 
         //targetCell.setLetter(letter);
 

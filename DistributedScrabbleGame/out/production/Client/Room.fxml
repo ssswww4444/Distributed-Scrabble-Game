@@ -70,6 +70,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Button>
-      <StackPane fx:id="dialogPane" layoutX="187.0" layoutY="25.0" prefHeight="350.0" prefWidth="227.0" visible="false" />
+      <StackPane fx:id="selectionPane" layoutX="187.0" layoutY="25.0" prefHeight="350.0" prefWidth="227.0" visible="false" />
+      <StackPane fx:id="dialogPane" layoutX="161.0" layoutY="128.0" prefHeight="135.0" prefWidth="296.0" visible="false" />
    </children>
 </AnchorPane>

@@ -117,6 +117,7 @@ public class MenuController implements Initializable {
 
     @FXML
     public void invitationMsg(String username, int roomNumber) {
+        dialogPane.getChildren().clear();
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Room Invitation"));
         dialogContent.setBody(new Text("User " + username + " invited you to Room: " + roomNumber + ". Accept?"));
@@ -147,9 +148,10 @@ public class MenuController implements Initializable {
 
     @FXML
     public void displayMsg() {
+        dialogPane.getChildren().clear();
         JFXDialogLayout dialogContent = new JFXDialogLayout();
         dialogContent.setHeading(new Text("Error Message"));
-        dialogContent.setBody(new Text("The room is full or dismissed."));
+        dialogContent.setBody(new Text("The room is full, dismissed or game already started."));
         JFXDialog dialog = new JFXDialog(dialogPane, dialogContent, JFXDialog.DialogTransition.CENTER);
         dialog.setOverlayClose(false);
         Button btnClose = new Button("Okay");
